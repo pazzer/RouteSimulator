@@ -1,5 +1,5 @@
 //
-//  Circle.swift
+//  Node.swift
 //  RouteSimulator
 //
 //  Created by Paul Patterson on 10/09/2019.
@@ -9,9 +9,9 @@
 import Foundation
 import UIKit
 
-class Circle: Graphic {
+class Node: Graphic {
     
-    init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, name: String? = nil) {
+    init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, name: String) {
         self.frame = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
         self.fill = fill
         self.stroke = stroke
@@ -32,19 +32,20 @@ class Circle: Graphic {
     
     private var labelSize = CGSize.zero
     
-    var name: String? {
+    var name: String = "" {
         didSet {
             updateLabelSize()
         }
     }
     
     private func updateLabelSize() {
-        guard let name = self.name else {
+        let name = self.name.trimmingCharacters(in: .whitespaces)
+        if name.count > 0 {
+            let label = NSString(string: name)
+            labelSize = label.size(withAttributes: nameAttributes)
+        } else {
             labelSize = .zero
-            return
         }
-        let label = NSString(string: name)
-        labelSize = label.size(withAttributes: nameAttributes)
     }
     
     var isLocked = false
@@ -83,10 +84,12 @@ class Circle: Graphic {
             halo.stroke()
         }
         
-        // Draw the label (if there is one)
-        guard let name = self.name else {
+        // Draw the label
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        guard trimmedName.count > 0 && labelSize != .zero else {
             return
         }
+        
         let labelRect = CGRect(x: center.x - labelSize.width / 2, y: center.y - labelSize.height / 2, width: labelSize.width, height: labelSize.height)
         NSString(string: name).draw(in: labelRect, withAttributes: nameAttributes)
     }

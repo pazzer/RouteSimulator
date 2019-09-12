@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class SquareCursor: Graphic {
+class Crosshairs: Graphic {
     var frame: CGRect = .zero {
         didSet {
             updatePaths()
@@ -18,6 +18,7 @@ class SquareCursor: Graphic {
     
     var isLocked = false
     var selected: Bool = false
+    
     init(center: CGPoint, size: CGSize) {
         frame = CGRect(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5, width: size.width, height: size.height)
         updatePaths()
@@ -25,20 +26,34 @@ class SquareCursor: Graphic {
     }
     
     func updatePaths() {
-        graySquare = UIBezierPath(rect: frame)
-        let crosshairsSize = CGSize(width: 10, height: 10)
-        crosshairs = UIBezierPath(rect: CGRect(x: center.x - crosshairsSize.width * 0.5, y: center.y - crosshairsSize.height * 0.5, width: crosshairsSize.width, height: crosshairsSize.height))
+        grayCircle = UIBezierPath(ovalIn: frame)
+        let crosshairsRect = frame.insetBy(dx: 16, dy: 16)
+        
+        let verticalPath = UIBezierPath()
+        verticalPath.move(to: CGPoint(x: crosshairsRect.midX, y: crosshairsRect.minY))
+        verticalPath.addLine(to: CGPoint(x: crosshairsRect.midX, y: crosshairsRect.maxY))
+        verticalPath.lineWidth = 2
+        verticalCrosshair = verticalPath
+        
+        let horizontalPath = UIBezierPath()
+        horizontalPath.move(to: CGPoint(x: crosshairsRect.minX, y: crosshairsRect.midY))
+        horizontalPath.addLine(to: CGPoint(x: crosshairsRect.maxX, y: crosshairsRect.midY))
+        horizontalPath.lineWidth = 2
+        horizontalCrosshair = horizontalPath
     }
+
     
     let fill = #colorLiteral(red: 0.7952535152, green: 0.7952535152, blue: 0.7952535152, alpha: 0.3990426937)
-    var graySquare: UIBezierPath!
-    var crosshairs: UIBezierPath!
+    var grayCircle: UIBezierPath!
+    var verticalCrosshair: UIBezierPath!
+    var horizontalCrosshair: UIBezierPath!
     
     func draw(in context: CGContext, rect: CGRect) {
         fill.setFill()
-        UIColor.black.setStroke()
-        crosshairs.lineWidth = 2.0
-        graySquare.fill()
-        crosshairs.stroke()
+        grayCircle.fill()
+        #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1).setStroke()
+        
+        verticalCrosshair?.stroke()
+        horizontalCrosshair?.stroke()
     }
 }

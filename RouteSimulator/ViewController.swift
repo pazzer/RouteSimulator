@@ -10,7 +10,7 @@ import UIKit
 
 
 let UNICODE_CAP_A = 65
-let CircleFreeZone = 0
+let NodeFreeZone = 0
 let grid: (rows: Int, columns: Int) = (15, 8)
 
 class ViewController: UIViewController {
@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         return _undoManager
     }
     
-    let circleRadius = CGFloat(22.0)
+    let nodeRadius = CGFloat(22.0)
     let arrowInset: CGFloat = 5
     var canvas: Canvas {
         return view as! Canvas
@@ -40,17 +40,17 @@ class ViewController: UIViewController {
             let pt = pan.location(in: canvas)
             if cursor.contains(pt) {
                 panningGraphic = cursor
-            } else if let circle = canvas.graphics.first(where: { (graphic) -> Bool in
-                graphic is Circle && graphic.contains(pt)
-            }) as? Circle {
-                panningGraphic = circle
+            } else if let node = canvas.graphics.first(where: { (graphic) -> Bool in
+                graphic is Node && graphic.contains(pt)
+            }) as? Node {
+                panningGraphic = node
             }
             
         case .changed:
             
-            if let circle = panningGraphic as? Circle {
-                relocateCircle(circle, translation: pan.translation(in: canvas))
-            } else if let cursor = panningGraphic as? SquareCursor {
+            if let node = panningGraphic as? Node {
+                relocateNode(node, translation: pan.translation(in: canvas))
+            } else if let cursor = panningGraphic as? Crosshairs {
                 relocateGraphic(cursor, translation: pan.translation(in: canvas))
             }
             
@@ -71,50 +71,50 @@ class ViewController: UIViewController {
         canvas.setNeedsDisplay(oldFrame.union(graphic.frame))
     }
     
-    func relocateCircle(_ circle: Circle, translation: CGPoint) {
-        relocateGraphic(circle, translation: translation)
-        if let next = route.next(of: circle.name!), let arrow = arrows[circle.name!] {
-            setArrow(arrow, toPointFrom: circle, to: self.circle(named: next))
+    func relocateNode(_ node: Node, translation: CGPoint) {
+        relocateGraphic(node, translation: translation)
+        if let next = route.next(of: node.name), let arrow = arrows[node.name] {
+            setArrow(arrow, toPointFrom: node, to: self.node(named: next))
         }
-        if let previous = route.previous(of: circle.name!), let arrow = arrows[previous] {
-            setArrow(arrow, toPointFrom: self.circle(named: previous), to: circle)
+        if let previous = route.previous(of: node.name), let arrow = arrows[previous] {
+            setArrow(arrow, toPointFrom: self.node(named: previous), to: node)
         }
     }
     
-    func addCirclesTo(zones: [Int]) {
+    func addNodesTo(zones: [Int]) {
         for zone in zones {
-            assert(zone != CircleFreeZone)
-            let circle = newCircle(at: randomLocation(in: zone))
-            canvas.add(circle)
+            assert(zone != NodeFreeZone)
+            let node = newNode(at: randomLocation(in: zone))
+            canvas.add(node)
             
         }
     }
     
-    func newCircle(at centerpoint: CGPoint) -> Circle {
+    func newNode(at centerpoint: CGPoint) -> Node {
         let name = String(Unicode.Scalar(nextName)!)
-        let circle = Circle(center: centerpoint, radius: circleRadius, fill: .red, stroke: .clear, name: name)
-        circle.center = centerpoint
+        let node = Node(center: centerpoint, radius: nodeRadius, fill: .red, stroke: .clear, name: name)
+        node.center = centerpoint
         nextName += 1
-        return circle
+        return node
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
     }
     
-    var cursor: SquareCursor!
+    var cursor: Crosshairs!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        cursor = SquareCursor(center: CGPoint(x: canvas.bounds.midX, y: canvas.bounds.maxX), size: CGSize(width: 120, height: 120))
+        cursor = Crosshairs(center: CGPoint(x: canvas.bounds.midX, y: canvas.bounds.maxX), size: CGSize(width: 120, height: 120))
         canvas.add(cursor)
         updateButtons()
     }
     
-    func addCircle(to zone: Int) -> Circle {
+    func addNode(to zone: Int) -> Node {
         let center = randomLocation(in: zone)
-        let circle = newCircle(at: center)
-        return circle
+        let node = newNode(at: center)
+        return node
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -177,9 +177,9 @@ class ViewController: UIViewController {
     }
     
     
-    var selection: Circle?
+    var selection: Node?
     
-    func updateSelection(to newSelection: Circle?) {
+    func updateSelection(to newSelection: Node?) {
         
         if let oldSelection = selection {
             oldSelection.selected = false
@@ -197,16 +197,16 @@ class ViewController: UIViewController {
     @IBAction func userTapped(_ tap: UITapGestureRecognizer) {
         let loc = tap.location(in: canvas)
         
-        guard let graphic = canvas.graphics.first(where: { $0.frame.contains(loc) }), let circle = graphic as? Circle else {
+        guard let graphic = canvas.graphics.first(where: { $0.frame.contains(loc) }), let node = graphic as? Node else {
             updateSelection(to: nil)
             return
         }
         
-        guard !circle.isLocked && !circle.selected else {
+        guard !node.isLocked && !node.selected else {
             return
         }
         
-        updateSelection(to: circle)
+        updateSelection(to: node)
         
     }
     
@@ -218,31 +218,56 @@ class ViewController: UIViewController {
     }
     
     @IBAction func userTappedAdd(_ sender: Any) {
-        switch (circleUnderCursor, selection) {
+        switch (nodeUnderCursor, selection) {
         case (nil, nil):
-            addStandaloneCircle()
+            if let arrow = arrowUnderCursor {
+                insertCirle(on: arrow)
+            } else {
+                addStandaloneNode()
+            }
         case let (nil, selection?):
             extendRoute(from: selection)
-        case let (circleUnderCursor?, selection?):
-            updateNext(of: selection, to: circleUnderCursor)
+        case let (nodeUnderCursor?, selection?):
+            updateNext(of: selection, to: nodeUnderCursor)
         default:
             break
         }
     }
     
-    func updateNext(of subject: Circle, to target: Circle) {
+    func insertCirle(on arrow: Arrow) {
+        guard let name = arrows.first(where: {$1 === arrow})?.key else {
+            return
+        }
+        guard let next = route.next(of: name) else {
+            return
+        }
+        
+        let newNode = self.newNode(at: cursor.center)
+        canvas.add(newNode)
+        setArrow(arrow, toPointFrom: self.node(named: name), to: newNode)
+        
+        let newArrow = makeArrow(from: newNode, to: self.node(named: next))
+        canvas.add(newArrow)
+        arrows[newNode.name] = newArrow
+        
+        route.add(newNode.name)
+        route.setNext(of: name, to: newNode.name)
+        route.setNext(of: newNode.name, to: self.node(named: next).name)
+    }
+    
+    func updateNext(of subject: Node, to target: Node) {
         var spareArrows = [Arrow]()
         
-        if let previous = route.previous(of: target.name!), let existingArrow = arrows.removeValue(forKey: previous) {
+        if let previous = route.previous(of: target.name), let existingArrow = arrows.removeValue(forKey: previous) {
             spareArrows.append(existingArrow)
         }
         
-        if let _ = route.next(of: subject.name!), let existingArrow = arrows.removeValue(forKey: subject.name!) {
+        if let _ = route.next(of: subject.name), let existingArrow = arrows.removeValue(forKey: subject.name) {
             spareArrows.append(existingArrow)
         }
         
         // update model
-        route.setNext(of: subject.name!, to: target.name!)
+        route.setNext(of: subject.name, to: target.name)
 
         // Update view
         let dirty = spareArrows.reduce(CGRect.null) { $0.union($1.frame) }
@@ -257,59 +282,59 @@ class ViewController: UIViewController {
             canvas.insert(arrow, below: cursor)
         }
         updateSelection(to: target)
-        arrows[subject.name!] = arrow
+        arrows[subject.name] = arrow
         
     }
     
 
     
-    func extendRoute(from existingCircle: Circle) {
-        let newCircle = self.newCircle(at: cursor.center)
+    func extendRoute(from existingNode: Node) {
+        let newNode = self.newNode(at: cursor.center)
         
         var arrow: Arrow!
-        if let _ = route.next(of: existingCircle.name!), let existingArrow = arrows.removeValue(forKey: existingCircle.name!) {
+        if let _ = route.next(of: existingNode.name), let existingArrow = arrows.removeValue(forKey: existingNode.name) {
             let dirty = existingArrow.frame
-            setArrow(existingArrow, toPointFrom: existingCircle, to: newCircle)
+            setArrow(existingArrow, toPointFrom: existingNode, to: newNode)
             arrow = existingArrow
             canvas.setNeedsDisplay(dirty.union(existingArrow.frame))
         } else {
-            arrow = makeArrow(from: existingCircle, to: newCircle)
+            arrow = makeArrow(from: existingNode, to: newNode)
             canvas.insert(arrow, below: cursor)
         }
-        arrows[existingCircle.name!] = arrow
+        arrows[existingNode.name] = arrow
         
         // update the model
-        route.add(newCircle.name!)
-        route.setNext(of: existingCircle.name!, to: newCircle.name!)
+        route.add(newNode.name)
+        route.setNext(of: existingNode.name, to: newNode.name)
         
         // update the view
-        canvas.insert(newCircle, below: cursor)
-        updateSelection(to: newCircle)
+        canvas.insert(newNode, below: cursor)
+        updateSelection(to: newNode)
         
         
     }
     
     var arrows = [String: Arrow]()
     
-    func circle(named name: String) -> Circle {
+    func node(named name: String) -> Node {
         return canvas.graphics.first { (graphic) -> Bool in
-            if let circle = graphic as? Circle, circle.name! == name {
+            if let node = graphic as? Node, node.name == name {
                 return true
             } else {
                 return false
             }
-        } as! Circle
+        } as! Node
     }
     
-    func addStandaloneCircle() {
-        let circle = newCircle(at: cursor.center)
+    func addStandaloneNode() {
+        let node = newNode(at: cursor.center)
         
         // update the model
-        route.add(circle.name!)
+        route.add(node.name)
         
         // update the view
-        canvas.insert(circle, below: cursor)
-        updateSelection(to: circle)
+        canvas.insert(node, below: cursor)
+        updateSelection(to: node)
     }
     
     
@@ -318,8 +343,8 @@ class ViewController: UIViewController {
     
     @IBAction func userTappedRemove(_ sender: Any) {
         
-        if let circle = circleUnderCursor {
-            remove(circle)
+        if let node = nodeUnderCursor {
+            remove(node)
         } else if let arrow = arrowUnderCursor {
             remove(arrow)
         }
@@ -333,43 +358,43 @@ class ViewController: UIViewController {
     
     var counter = 0
     
-    func addCircle(at centerpoint: CGPoint) {
-        let circle = newCircle(at: centerpoint)
-        canvas.insert(circle, below: cursor)
+    func addNode(at centerpoint: CGPoint) {
+        let node = newNode(at: centerpoint)
+        canvas.insert(node, below: cursor)
 
-        selection = circle
+        selection = node
     }
     
     func describeCanvas() {
         for (index, graphic) in canvas.graphics.enumerated() {
-            if let circle = graphic as? Circle {
-                print("\(index): \(circle.name!)(\(self.zone(containing: circle.center)))")
+            if let node = graphic as? Node {
+                print("\(index): \(node.name)(\(self.zone(containing: node.center)))")
             }
         }
     }
     
-    func remove(_ circle: Circle) {
+    func remove(_ node: Node) {
         
         // Update view
-        if let _ = route.next(of: circle.name!) {
-            if let arrow = arrows[circle.name!] {
+        if let _ = route.next(of: node.name) {
+            if let arrow = arrows[node.name] {
                 canvas.remove(arrow)
             }
         }
         
-        if let previous = route.previous(of: circle.name!) {
+        if let previous = route.previous(of: node.name) {
             if let arrow = arrows[previous] {
                 canvas.remove(arrow)
             }
         }
         
-        if let selection = self.selection, circle === selection {
+        if let selection = self.selection, node === selection {
             updateSelection(to: nil)
         }
-        canvas.remove(circle)
+        canvas.remove(node)
         
         // update model
-        route.remove(circle.name!)
+        route.remove(node.name)
     }
     
     func remove(_ arrow: Arrow) {
@@ -383,27 +408,27 @@ class ViewController: UIViewController {
         }
     }
     
-    var circleUnderCursor: Circle? {
+    var nodeUnderCursor: Node? {
         return canvas.graphics.first { (graphic) -> Bool in
-            return graphic is Circle && graphic.contains(cursor.center)
-        } as? Circle
+            return graphic is Node && graphic.contains(cursor.center)
+        } as? Node
     }
     
-    var circles: [Circle] {
-//        return view.subviews.filter { $0 is Circle } as! [Circle]
+    var nodes: [Node] {
+//        return view.subviews.filter { $0 is Node } as! [Node]
         return []
     }
     
     
     // Handling Arrows
     
-    func makeArrow(from: Circle, to: Circle) -> Arrow {
+    func makeArrow(from: Node, to: Node) -> Arrow {
         let pts = calculateCoordinates(ofArrowFrom: from, to: to)
         return Arrow(start: pts.start, end: pts.end)
     }
     
     
-    func setArrow(_ arrow: Arrow, toPointFrom from: Circle, to: Circle) {
+    func setArrow(_ arrow: Arrow, toPointFrom from: Node, to: Node) {
         assert(canvas.graphics.contains(where: { $0 === arrow }))
         let oldFrame = arrow.frame
         let pts = calculateCoordinates(ofArrowFrom: from, to: to)
@@ -413,19 +438,19 @@ class ViewController: UIViewController {
     
     var route = Route()
     
-    func calculateCoordinates(ofArrowFrom from: Circle, to: Circle) -> (start: CGPoint, end: CGPoint) {
-        guard from.center.distance(to: to.center) > circleRadius * 2 + arrowInset * 2 else {
+    func calculateCoordinates(ofArrowFrom from: Node, to: Node) -> (start: CGPoint, end: CGPoint) {
+        guard from.center.distance(to: to.center) > nodeRadius * 2 + arrowInset * 2 else {
             return (.zero, .zero)
         }
         
         let line = LineSector(start: from.center, end: to.center)
-        let d1 = circleRadius + arrowInset
-        let d2 = from.center.distance(to: to.center) - (circleRadius + arrowInset)
+        let d1 = nodeRadius + arrowInset
+        let d2 = from.center.distance(to: to.center) - (nodeRadius + arrowInset)
         
         var start = line.point(distanceFromOrigin: d1)
         var end = line.point(distanceFromOrigin: d2)
         
-        if circle(from, inCircularRelationshipWith: to) {
+        if node(from, inCircularRelationshipWith: to) {
             let insetLine = LineSector(start: start, end: end)
             let offsetLines = insetLine.parallelLineSectors(offset: 15)
             start = offsetLines.0.start
@@ -437,11 +462,8 @@ class ViewController: UIViewController {
     
     // MARK: Querying the model
     
-    func circle(_ circle: Circle, inCircularRelationshipWith other: Circle) -> Bool {
-        guard let name = circle.name, let otherName = other.name else {
-            fatalError("can't evaluate - found unnamed circle")
-        }
-        return route.circularRelationshipExistsBetween(name, and: otherName)
+    func node(_ node: Node, inCircularRelationshipWith other: Node) -> Bool {
+        return route.circularRelationshipExistsBetween(node.name, and: other.name)
     }
 }
 

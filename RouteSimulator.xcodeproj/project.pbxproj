@@ -26,6 +26,7 @@
 		CF8A75BD2328E5A2001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */; };
 		CF8A75DF232924B7001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
+		CF8A75E6232A69BF001582C7 /* RouteBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75E5232A69BF001582C7 /* RouteBot.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		CF8A75D523291013001582C7 /* RouteSimulatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteSimulatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSimulatorTests.swift; sourceTree = "<group>"; };
 		CF8A75D923291013001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CF8A75E5232A69BF001582C7 /* RouteBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteBot.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,21 +104,22 @@
 		CF8A75892322544F001582C7 /* RouteSimulator */ = {
 			isa = PBXGroup;
 			children = (
-				CF8A75B62328413A001582C7 /* CGPoint+.swift */,
+				CF8A75E2232A5AB7001582C7 /* LiveTesting */,
+				CF8A75E1232A5A8C001582C7 /* Extensions */,
 				CF8A75A123225659001582C7 /* MapViewZones.jpeg */,
 				CF8A758A2322544F001582C7 /* AppDelegate.swift */,
 				CF8A758C2322544F001582C7 /* ViewController.swift */,
+				CF8A75BA2328E158001582C7 /* Direction.swift */,
 				CF8A75B82328DDAE001582C7 /* LineSector.swift */,
 				CF8A75A923279E26001582C7 /* Canvas.swift */,
 				CF8A75A52322ACC5001582C7 /* Scratch */,
-				CF8A75BC2328E5A2001582C7 /* Route.swift */,
+				CF8A75E0232A5A77001582C7 /* Model */,
 				CF8A758E2322544F001582C7 /* Main.storyboard */,
 				CF8A759423225450001582C7 /* Assets.xcassets */,
 				CF8A759623225450001582C7 /* LaunchScreen.storyboard */,
 				CF8A759923225450001582C7 /* Info.plist */,
 				CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */,
 				CF8A75B5232840A7001582C7 /* Graphics */,
-				CF8A75BA2328E158001582C7 /* Direction.swift */,
 			);
 			path = RouteSimulator;
 			sourceTree = "<group>";
@@ -139,6 +142,30 @@
 				CF8A75D923291013001582C7 /* Info.plist */,
 			);
 			path = RouteSimulatorTests;
+			sourceTree = "<group>";
+		};
+		CF8A75E0232A5A77001582C7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75BC2328E5A2001582C7 /* Route.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		CF8A75E1232A5A8C001582C7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75B62328413A001582C7 /* CGPoint+.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		CF8A75E2232A5AB7001582C7 /* LiveTesting */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75E5232A69BF001582C7 /* RouteBot.swift */,
+			);
+			path = LiveTesting;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -247,6 +274,7 @@
 				CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */,
 				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
 				CF8A758D2322544F001582C7 /* ViewController.swift in Sources */,
+				CF8A75E6232A69BF001582C7 /* RouteBot.swift in Sources */,
 				CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */,
 				CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */,
 				CF8A75932322544F001582C7 /* RouteSimulator.xcdatamodeld in Sources */,

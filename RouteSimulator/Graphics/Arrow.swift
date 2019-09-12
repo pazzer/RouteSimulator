@@ -38,6 +38,10 @@ class Arrow: Graphic {
     
     private var skipUpdates = false
     
+    func contains(_ point: CGPoint) -> Bool {
+        return path.contains(point)
+    }
+    
     private func updateProperties() {
         guard !skipUpdates else {
             return
