@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.16" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eD3-YN-jTO">
+    <device id="retina4_0" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.12"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -9,16 +13,77 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="RouteSimulator" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="Canvas" customModule="RouteSimulator" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="A5M-dx-MKq"/>
+                            <outletCollection property="gestureRecognizers" destination="H1x-00-GJu" appends="YES" id="anT-K5-skS"/>
+                        </connections>
                     </view>
+                    <navigationItem key="navigationItem" id="Ce5-z7-v4Q">
+                        <leftBarButtonItems>
+                            <barButtonItem title="Undo" id="rkn-BR-dSo">
+                                <connections>
+                                    <action selector="undo:" destination="BYZ-38-t0r" id="7Tt-cT-yC9"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Redo" id="YdR-KH-SHj">
+                                <connections>
+                                    <action selector="redo:" destination="BYZ-38-t0r" id="sgG-gK-Ta8"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Remove" id="h37-oH-lwE">
+                                <connections>
+                                    <action selector="userTappedRemove:" destination="BYZ-38-t0r" id="B3u-5N-f30"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Add" id="F0f-Ed-AE8">
+                                <connections>
+                                    <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="aWy-sY-doL"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="redoButton" destination="YdR-KH-SHj" id="uQb-vG-MGZ"/>
+                        <outlet property="undoButton" destination="rkn-BR-dSo" id="POY-mq-wSb"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="hD9-VH-AYF">
+                    <connections>
+                        <action selector="userTapped:" destination="BYZ-38-t0r" id="bHa-I2-hjs"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="H1x-00-GJu">
+                    <connections>
+                        <action selector="userPannedOnCanvas:" destination="BYZ-38-t0r" id="1H0-Xg-u2a"/>
+                    </connections>
+                </panGestureRecognizer>
             </objects>
+            <point key="canvasLocation" x="647" y="137"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="vQK-ha-yg6">
+            <objects>
+                <navigationController id="eD3-YN-jTO" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="fta-Ln-GUJ">
+                        <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="iKb-Lb-yro"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wuI-7w-qss" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-183" y="138"/>
         </scene>
     </scenes>
 </document>

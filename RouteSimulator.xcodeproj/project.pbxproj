@@ -13,7 +13,30 @@
 		CF8A75932322544F001582C7 /* RouteSimulator.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */; };
 		CF8A759523225450001582C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF8A759423225450001582C7 /* Assets.xcassets */; };
 		CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF8A759623225450001582C7 /* LaunchScreen.storyboard */; };
+		CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75A123225659001582C7 /* MapViewZones.jpeg */; };
+		CF8A75A62322ACC5001582C7 /* Scratch in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75A52322ACC5001582C7 /* Scratch */; };
+		CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A723279D3F001582C7 /* Graphic.swift */; };
+		CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* Canvas.swift */; };
+		CF8A75AC23283F08001582C7 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AB23283F08001582C7 /* Circle.swift */; };
+		CF8A75B023283F58001582C7 /* SquareCursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AF23283F58001582C7 /* SquareCursor.swift */; };
+		CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B323283F8B001582C7 /* Arrow.swift */; };
+		CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B62328413A001582C7 /* CGPoint+.swift */; };
+		CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B82328DDAE001582C7 /* LineSector.swift */; };
+		CF8A75BB2328E158001582C7 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BA2328E158001582C7 /* Direction.swift */; };
+		CF8A75BD2328E5A2001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
+		CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */; };
+		CF8A75DF232924B7001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CF8A75DA23291013001582C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CF8A757F2322544F001582C7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CF8A75862322544F001582C7;
+			remoteInfo = RouteSimulator;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		CF8A75872322544F001582C7 /* RouteSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,10 +47,31 @@
 		CF8A759423225450001582C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF8A759723225450001582C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CF8A759923225450001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CF8A75A123225659001582C7 /* MapViewZones.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = MapViewZones.jpeg; sourceTree = "<group>"; };
+		CF8A75A52322ACC5001582C7 /* Scratch */ = {isa = PBXFileReference; lastKnownFileType = text; path = Scratch; sourceTree = "<group>"; };
+		CF8A75A723279D3F001582C7 /* Graphic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic.swift; sourceTree = "<group>"; };
+		CF8A75A923279E26001582C7 /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
+		CF8A75AB23283F08001582C7 /* Circle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Circle.swift; sourceTree = "<group>"; };
+		CF8A75AF23283F58001582C7 /* SquareCursor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareCursor.swift; sourceTree = "<group>"; };
+		CF8A75B323283F8B001582C7 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
+		CF8A75B62328413A001582C7 /* CGPoint+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+.swift"; sourceTree = "<group>"; };
+		CF8A75B82328DDAE001582C7 /* LineSector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineSector.swift; sourceTree = "<group>"; };
+		CF8A75BA2328E158001582C7 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
+		CF8A75BC2328E5A2001582C7 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
+		CF8A75D523291013001582C7 /* RouteSimulatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteSimulatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSimulatorTests.swift; sourceTree = "<group>"; };
+		CF8A75D923291013001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		CF8A75842322544F001582C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF8A75D223291013001582C7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -41,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				CF8A75892322544F001582C7 /* RouteSimulator */,
+				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
 				CF8A75882322544F001582C7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				CF8A75872322544F001582C7 /* RouteSimulator.app */,
+				CF8A75D523291013001582C7 /* RouteSimulatorTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -56,15 +102,43 @@
 		CF8A75892322544F001582C7 /* RouteSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				CF8A75B62328413A001582C7 /* CGPoint+.swift */,
+				CF8A75A123225659001582C7 /* MapViewZones.jpeg */,
 				CF8A758A2322544F001582C7 /* AppDelegate.swift */,
 				CF8A758C2322544F001582C7 /* ViewController.swift */,
+				CF8A75B82328DDAE001582C7 /* LineSector.swift */,
+				CF8A75A923279E26001582C7 /* Canvas.swift */,
+				CF8A75A52322ACC5001582C7 /* Scratch */,
+				CF8A75BC2328E5A2001582C7 /* Route.swift */,
 				CF8A758E2322544F001582C7 /* Main.storyboard */,
 				CF8A759423225450001582C7 /* Assets.xcassets */,
 				CF8A759623225450001582C7 /* LaunchScreen.storyboard */,
 				CF8A759923225450001582C7 /* Info.plist */,
 				CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */,
+				CF8A75B5232840A7001582C7 /* Graphics */,
+				CF8A75BA2328E158001582C7 /* Direction.swift */,
 			);
 			path = RouteSimulator;
+			sourceTree = "<group>";
+		};
+		CF8A75B5232840A7001582C7 /* Graphics */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75A723279D3F001582C7 /* Graphic.swift */,
+				CF8A75B323283F8B001582C7 /* Arrow.swift */,
+				CF8A75AB23283F08001582C7 /* Circle.swift */,
+				CF8A75AF23283F58001582C7 /* SquareCursor.swift */,
+			);
+			path = Graphics;
+			sourceTree = "<group>";
+		};
+		CF8A75D623291013001582C7 /* RouteSimulatorTests */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */,
+				CF8A75D923291013001582C7 /* Info.plist */,
+			);
+			path = RouteSimulatorTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -87,6 +161,24 @@
 			productReference = CF8A75872322544F001582C7 /* RouteSimulator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CF8A75D423291013001582C7 /* RouteSimulatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF8A75DC23291013001582C7 /* Build configuration list for PBXNativeTarget "RouteSimulatorTests" */;
+			buildPhases = (
+				CF8A75D123291013001582C7 /* Sources */,
+				CF8A75D223291013001582C7 /* Frameworks */,
+				CF8A75D323291013001582C7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CF8A75DB23291013001582C7 /* PBXTargetDependency */,
+			);
+			name = RouteSimulatorTests;
+			productName = RouteSimulatorTests;
+			productReference = CF8A75D523291013001582C7 /* RouteSimulatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -99,6 +191,10 @@
 				TargetAttributes = {
 					CF8A75862322544F001582C7 = {
 						CreatedOnToolsVersion = 10.3;
+					};
+					CF8A75D423291013001582C7 = {
+						CreatedOnToolsVersion = 10.3;
+						TestTargetID = CF8A75862322544F001582C7;
 					};
 				};
 			};
@@ -116,6 +212,7 @@
 			projectRoot = "";
 			targets = (
 				CF8A75862322544F001582C7 /* RouteSimulator */,
+				CF8A75D423291013001582C7 /* RouteSimulatorTests */,
 			);
 		};
 /* End PBXProject section */
@@ -126,8 +223,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */,
+				CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */,
 				CF8A759523225450001582C7 /* Assets.xcassets in Resources */,
 				CF8A75902322544F001582C7 /* Main.storyboard in Resources */,
+				CF8A75A62322ACC5001582C7 /* Scratch in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF8A75D323291013001582C7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,13 +244,39 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */,
+				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
 				CF8A758D2322544F001582C7 /* ViewController.swift in Sources */,
+				CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */,
+				CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */,
 				CF8A75932322544F001582C7 /* RouteSimulator.xcdatamodeld in Sources */,
+				CF8A75B023283F58001582C7 /* SquareCursor.swift in Sources */,
 				CF8A758B2322544F001582C7 /* AppDelegate.swift in Sources */,
+				CF8A75BD2328E5A2001582C7 /* Route.swift in Sources */,
+				CF8A75AC23283F08001582C7 /* Circle.swift in Sources */,
+				CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */,
+				CF8A75BB2328E158001582C7 /* Direction.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CF8A75D123291013001582C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */,
+				CF8A75DF232924B7001582C7 /* Route.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CF8A75DB23291013001582C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CF8A75862322544F001582C7 /* RouteSimulator */;
+			targetProxy = CF8A75DA23291013001582C7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		CF8A758E2322544F001582C7 /* Main.storyboard */ = {
@@ -318,6 +450,46 @@
 			};
 			name = Release;
 		};
+		CF8A75DD23291013001582C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RLT3Y7VWF4;
+				INFOPLIST_FILE = RouteSimulatorTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.paulpatterson.RouteSimulatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RouteSimulator.app/RouteSimulator";
+			};
+			name = Debug;
+		};
+		CF8A75DE23291013001582C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = RLT3Y7VWF4;
+				INFOPLIST_FILE = RouteSimulatorTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.paulpatterson.RouteSimulatorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RouteSimulator.app/RouteSimulator";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -335,6 +507,15 @@
 			buildConfigurations = (
 				CF8A759D23225450001582C7 /* Debug */,
 				CF8A759E23225450001582C7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CF8A75DC23291013001582C7 /* Build configuration list for PBXNativeTarget "RouteSimulatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF8A75DD23291013001582C7 /* Debug */,
+				CF8A75DE23291013001582C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
