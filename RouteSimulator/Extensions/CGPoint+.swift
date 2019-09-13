@@ -11,6 +11,10 @@ import UIKit
 
 extension CGPoint {
     
+    func midpoint(_ other: CGPoint) -> CGPoint {
+        return CGPoint(x: (other.x + x) / 2, y: (other.y + y) / 2)
+    }
+    
     func distance(to other: CGPoint) -> CGFloat {
         return hypot(x - other.x, y - other.y)
     }
@@ -46,6 +50,12 @@ extension CGPoint {
         }
         
         return Measurement(value: Double(radians), unit: UnitAngle.radians)
+    }
+    
+    init(from dict: NSDictionary) {
+        let x = dict.value(forKey: "x") as! CGFloat
+        let y = dict.value(forKey: "y") as! CGFloat
+        self.init(x: x, y: y)
     }
 }
 

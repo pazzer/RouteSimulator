@@ -8,17 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		CF8A758B2322544F001582C7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A758A2322544F001582C7 /* AppDelegate.swift */; };
-		CF8A758D2322544F001582C7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A758C2322544F001582C7 /* ViewController.swift */; };
+		CF8A758D2322544F001582C7 /* RouteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A758C2322544F001582C7 /* RouteViewController.swift */; };
 		CF8A75902322544F001582C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF8A758E2322544F001582C7 /* Main.storyboard */; };
 		CF8A75932322544F001582C7 /* RouteSimulator.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */; };
 		CF8A759523225450001582C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF8A759423225450001582C7 /* Assets.xcassets */; };
 		CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF8A759623225450001582C7 /* LaunchScreen.storyboard */; };
 		CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75A123225659001582C7 /* MapViewZones.jpeg */; };
-		CF8A75A62322ACC5001582C7 /* Scratch in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75A52322ACC5001582C7 /* Scratch */; };
 		CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A723279D3F001582C7 /* Graphic.swift */; };
 		CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* Canvas.swift */; };
 		CF8A75AC23283F08001582C7 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AB23283F08001582C7 /* Circle.swift */; };
-		CF8A75B023283F58001582C7 /* SquareCursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AF23283F58001582C7 /* SquareCursor.swift */; };
+		CF8A75B023283F58001582C7 /* Crosshairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AF23283F58001582C7 /* Crosshairs.swift */; };
 		CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B323283F8B001582C7 /* Arrow.swift */; };
 		CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B62328413A001582C7 /* CGPoint+.swift */; };
 		CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B82328DDAE001582C7 /* LineSector.swift */; };
@@ -27,6 +26,10 @@
 		CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */; };
 		CF8A75DF232924B7001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CF8A75E6232A69BF001582C7 /* RouteBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75E5232A69BF001582C7 /* RouteBot.swift */; };
+		CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75E7232A7A7C001582C7 /* BotTests.plist */; };
+		CF8A75EA232AD502001582C7 /* TestsSummaryView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75E9232AD502001582C7 /* TestsSummaryView.xib */; };
+		CF8A75EC232AE02C001582C7 /* TestsSummaryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75EB232AE02C001582C7 /* TestsSummaryController.swift */; };
+		CF8A75EE232AE134001582C7 /* DashedLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75ED232AE134001582C7 /* DashedLineView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,18 +45,17 @@
 /* Begin PBXFileReference section */
 		CF8A75872322544F001582C7 /* RouteSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF8A758A2322544F001582C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		CF8A758C2322544F001582C7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		CF8A758C2322544F001582C7 /* RouteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteViewController.swift; sourceTree = "<group>"; };
 		CF8A758F2322544F001582C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CF8A75922322544F001582C7 /* RouteSimulator.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = RouteSimulator.xcdatamodel; sourceTree = "<group>"; };
 		CF8A759423225450001582C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF8A759723225450001582C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CF8A759923225450001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF8A75A123225659001582C7 /* MapViewZones.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = MapViewZones.jpeg; sourceTree = "<group>"; };
-		CF8A75A52322ACC5001582C7 /* Scratch */ = {isa = PBXFileReference; lastKnownFileType = text; path = Scratch; sourceTree = "<group>"; };
 		CF8A75A723279D3F001582C7 /* Graphic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic.swift; sourceTree = "<group>"; };
 		CF8A75A923279E26001582C7 /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
 		CF8A75AB23283F08001582C7 /* Circle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Circle.swift; sourceTree = "<group>"; };
-		CF8A75AF23283F58001582C7 /* SquareCursor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareCursor.swift; sourceTree = "<group>"; };
+		CF8A75AF23283F58001582C7 /* Crosshairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crosshairs.swift; sourceTree = "<group>"; };
 		CF8A75B323283F8B001582C7 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
 		CF8A75B62328413A001582C7 /* CGPoint+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+.swift"; sourceTree = "<group>"; };
 		CF8A75B82328DDAE001582C7 /* LineSector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineSector.swift; sourceTree = "<group>"; };
@@ -63,6 +65,11 @@
 		CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSimulatorTests.swift; sourceTree = "<group>"; };
 		CF8A75D923291013001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF8A75E5232A69BF001582C7 /* RouteBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteBot.swift; sourceTree = "<group>"; };
+		CF8A75E7232A7A7C001582C7 /* BotTests.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BotTests.plist; sourceTree = "<group>"; };
+		CF8A75E9232AD502001582C7 /* TestsSummaryView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestsSummaryView.xib; sourceTree = "<group>"; };
+		CF8A75EB232AE02C001582C7 /* TestsSummaryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestsSummaryController.swift; sourceTree = "<group>"; };
+		CF8A75ED232AE134001582C7 /* DashedLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashedLineView.swift; sourceTree = "<group>"; };
+		CF8A75F0232AEC24001582C7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +96,7 @@
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
 				CF8A75882322544F001582C7 /* Products */,
+				CF8A75EF232AEC24001582C7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -106,13 +114,12 @@
 			children = (
 				CF8A75E2232A5AB7001582C7 /* LiveTesting */,
 				CF8A75E1232A5A8C001582C7 /* Extensions */,
-				CF8A75A123225659001582C7 /* MapViewZones.jpeg */,
 				CF8A758A2322544F001582C7 /* AppDelegate.swift */,
-				CF8A758C2322544F001582C7 /* ViewController.swift */,
+				CF8A758C2322544F001582C7 /* RouteViewController.swift */,
 				CF8A75BA2328E158001582C7 /* Direction.swift */,
 				CF8A75B82328DDAE001582C7 /* LineSector.swift */,
 				CF8A75A923279E26001582C7 /* Canvas.swift */,
-				CF8A75A52322ACC5001582C7 /* Scratch */,
+				CF8A75ED232AE134001582C7 /* DashedLineView.swift */,
 				CF8A75E0232A5A77001582C7 /* Model */,
 				CF8A758E2322544F001582C7 /* Main.storyboard */,
 				CF8A759423225450001582C7 /* Assets.xcassets */,
@@ -130,7 +137,7 @@
 				CF8A75A723279D3F001582C7 /* Graphic.swift */,
 				CF8A75B323283F8B001582C7 /* Arrow.swift */,
 				CF8A75AB23283F08001582C7 /* Circle.swift */,
-				CF8A75AF23283F58001582C7 /* SquareCursor.swift */,
+				CF8A75AF23283F58001582C7 /* Crosshairs.swift */,
 			);
 			path = Graphics;
 			sourceTree = "<group>";
@@ -163,9 +170,21 @@
 		CF8A75E2232A5AB7001582C7 /* LiveTesting */ = {
 			isa = PBXGroup;
 			children = (
+				CF8A75A123225659001582C7 /* MapViewZones.jpeg */,
+				CF8A75E7232A7A7C001582C7 /* BotTests.plist */,
 				CF8A75E5232A69BF001582C7 /* RouteBot.swift */,
+				CF8A75E9232AD502001582C7 /* TestsSummaryView.xib */,
+				CF8A75EB232AE02C001582C7 /* TestsSummaryController.swift */,
 			);
 			path = LiveTesting;
+			sourceTree = "<group>";
+		};
+		CF8A75EF232AEC24001582C7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75F0232AEC24001582C7 /* QuartzCore.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -249,11 +268,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF8A75EA232AD502001582C7 /* TestsSummaryView.xib in Resources */,
+				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
 				CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */,
 				CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */,
 				CF8A759523225450001582C7 /* Assets.xcassets in Resources */,
 				CF8A75902322544F001582C7 /* Main.storyboard in Resources */,
-				CF8A75A62322ACC5001582C7 /* Scratch in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,16 +293,18 @@
 			files = (
 				CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */,
 				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
-				CF8A758D2322544F001582C7 /* ViewController.swift in Sources */,
+				CF8A758D2322544F001582C7 /* RouteViewController.swift in Sources */,
+				CF8A75EE232AE134001582C7 /* DashedLineView.swift in Sources */,
 				CF8A75E6232A69BF001582C7 /* RouteBot.swift in Sources */,
 				CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */,
 				CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */,
 				CF8A75932322544F001582C7 /* RouteSimulator.xcdatamodeld in Sources */,
-				CF8A75B023283F58001582C7 /* SquareCursor.swift in Sources */,
+				CF8A75B023283F58001582C7 /* Crosshairs.swift in Sources */,
 				CF8A758B2322544F001582C7 /* AppDelegate.swift in Sources */,
 				CF8A75BD2328E5A2001582C7 /* Route.swift in Sources */,
 				CF8A75AC23283F08001582C7 /* Circle.swift in Sources */,
 				CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */,
+				CF8A75EC232AE02C001582C7 /* TestsSummaryController.swift in Sources */,
 				CF8A75BB2328E158001582C7 /* Direction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

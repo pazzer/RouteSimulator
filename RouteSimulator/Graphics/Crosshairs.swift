@@ -25,6 +25,12 @@ class Crosshairs: Graphic {
         
     }
     
+//    var center = CGPoint.zero {
+//        didSet {
+//            frame = CGRect(x: center.x - frame.size.width * 0.5, y: center.y - frame.size.height * 0.5, width: frame.size.width, height: frame.size.width)
+//        }
+//    }
+    
     func updatePaths() {
         grayCircle = UIBezierPath(ovalIn: frame)
         let crosshairsRect = frame.insetBy(dx: 16, dy: 16)

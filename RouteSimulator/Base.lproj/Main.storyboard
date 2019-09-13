@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Route View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="RouteSimulator" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="RouteViewController" customModule="RouteSimulator" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="Canvas" customModule="RouteSimulator" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -46,6 +46,11 @@
                             <barButtonItem title="Add" id="F0f-Ed-AE8">
                                 <connections>
                                     <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="aWy-sY-doL"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Test" id="wsW-fN-84w">
+                                <connections>
+                                    <action selector="userTappedTest:" destination="BYZ-38-t0r" id="B8h-oO-Hea"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>

@@ -10,10 +10,10 @@ import UIKit
 
 
 let UNICODE_CAP_A = 65
-let NodeFreeZone = 0
+
 let grid: (rows: Int, columns: Int) = (15, 8)
 
-class ViewController: UIViewController {
+class RouteViewController: UIViewController {
 
     @IBOutlet weak var undoButton: UIBarButtonItem!
     @IBOutlet weak var redoButton: UIBarButtonItem!
@@ -38,8 +38,8 @@ class ViewController: UIViewController {
             
         case .began:
             let pt = pan.location(in: canvas)
-            if cursor.contains(pt) {
-                panningGraphic = cursor
+            if crosshairs.contains(pt) {
+                panningGraphic = crosshairs
             } else if let node = canvas.graphics.first(where: { (graphic) -> Bool in
                 graphic is Node && graphic.contains(pt)
             }) as? Node {
@@ -50,8 +50,8 @@ class ViewController: UIViewController {
             
             if let node = panningGraphic as? Node {
                 relocateNode(node, translation: pan.translation(in: canvas))
-            } else if let cursor = panningGraphic as? Crosshairs {
-                relocateGraphic(cursor, translation: pan.translation(in: canvas))
+            } else if let crosshairs = panningGraphic as? Crosshairs {
+                relocateGraphic(crosshairs, translation: pan.translation(in: canvas))
             }
             
             pan.setTranslation(CGPoint.zero, in: canvas)
@@ -83,7 +83,7 @@ class ViewController: UIViewController {
     
     func addNodesTo(zones: [Int]) {
         for zone in zones {
-            assert(zone != NodeFreeZone)
+            assert(zone != NODE_FREE_ZONE)
             let node = newNode(at: randomLocation(in: zone))
             canvas.add(node)
             
@@ -100,14 +100,41 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
     }
     
-    var cursor: Crosshairs!
+    var testsSummaryController = TestsSummaryController()
+    
+    func prepareForTesting() {
+        guard let testsUrl = self.tests else {
+            fatalError("Failed to get tests")
+        }
+        installTestSummaryView()
+        testsSummaryController.routeBot = routeBot
+        
+        routeBot.loadData(from: testsUrl)
+    }
+    
+    func installTestSummaryView() {
+        let nib = UINib(nibName: "TestsSummaryView", bundle: nil)
+        let _ = nib.instantiate(withOwner: testsSummaryController, options: nil)
+        let testsSummaryView = testsSummaryController.view!
+        view.addSubview(testsSummaryController.view)
+        
+        let size = testsSummaryView.bounds.size
+        let maxY = canvas.convert(canvas.bounds, from: view).maxY
+        let origin = CGPoint(x: view.frame.midX - size.width * 0.5, y: maxY - 16 - size.height)
+        testsSummaryController.view.frame = CGRect(origin: origin, size: size)
+    }
+    
+    
+    var crosshairs: Crosshairs!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        cursor = Crosshairs(center: CGPoint(x: canvas.bounds.midX, y: canvas.bounds.maxX), size: CGSize(width: 120, height: 120))
-        canvas.add(cursor)
+        crosshairs = Crosshairs(center: CGPoint(x: canvas.bounds.midX, y: canvas.bounds.maxX), size: CGSize(width: 120, height: 120))
+        canvas.add(crosshairs)
+        prepareForTesting()
         updateButtons()
     }
     
@@ -195,19 +222,25 @@ class ViewController: UIViewController {
     }
     
     @IBAction func userTapped(_ tap: UITapGestureRecognizer) {
-        let loc = tap.location(in: canvas)
+        handleTap(at: tap.location(in: canvas))
         
-        guard let graphic = canvas.graphics.first(where: { $0.frame.contains(loc) }), let node = graphic as? Node else {
+        
+    }
+    
+    func handleTap(at point: CGPoint) {
+        let graphicsUnderPoint = canvas.graphics.filter({ $0.frame.contains(point) })
+        
+        guard !graphicsUnderPoint.contains(where: {$0 is Crosshairs}) else {
             updateSelection(to: nil)
             return
         }
         
-        guard !node.isLocked && !node.selected else {
+        guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
+            updateSelection(to: nil)
             return
         }
         
         updateSelection(to: node)
-        
     }
     
     @IBAction func undo(_ sender: Any) {
@@ -242,7 +275,7 @@ class ViewController: UIViewController {
             return
         }
         
-        let newNode = self.newNode(at: cursor.center)
+        let newNode = self.newNode(at: crosshairs.center)
         canvas.add(newNode)
         setArrow(arrow, toPointFrom: self.node(named: name), to: newNode)
         
@@ -279,7 +312,7 @@ class ViewController: UIViewController {
             canvas.setNeedsDisplay(dirty.union(arrow.frame))
         } else {
             arrow = makeArrow(from: subject, to: target)
-            canvas.insert(arrow, below: cursor)
+            canvas.insert(arrow, below: crosshairs)
         }
         updateSelection(to: target)
         arrows[subject.name] = arrow
@@ -289,7 +322,7 @@ class ViewController: UIViewController {
 
     
     func extendRoute(from existingNode: Node) {
-        let newNode = self.newNode(at: cursor.center)
+        let newNode = self.newNode(at: crosshairs.center)
         
         var arrow: Arrow!
         if let _ = route.next(of: existingNode.name), let existingArrow = arrows.removeValue(forKey: existingNode.name) {
@@ -299,7 +332,7 @@ class ViewController: UIViewController {
             canvas.setNeedsDisplay(dirty.union(existingArrow.frame))
         } else {
             arrow = makeArrow(from: existingNode, to: newNode)
-            canvas.insert(arrow, below: cursor)
+            canvas.insert(arrow, below: crosshairs)
         }
         arrows[existingNode.name] = arrow
         
@@ -308,7 +341,7 @@ class ViewController: UIViewController {
         route.setNext(of: existingNode.name, to: newNode.name)
         
         // update the view
-        canvas.insert(newNode, below: cursor)
+        canvas.insert(newNode, below: crosshairs)
         updateSelection(to: newNode)
         
         
@@ -327,13 +360,13 @@ class ViewController: UIViewController {
     }
     
     func addStandaloneNode() {
-        let node = newNode(at: cursor.center)
+        let node = newNode(at: crosshairs.center)
         
         // update the model
         route.add(node.name)
         
         // update the view
-        canvas.insert(node, below: cursor)
+        canvas.insert(node, below: crosshairs)
         updateSelection(to: node)
     }
     
@@ -352,7 +385,7 @@ class ViewController: UIViewController {
 
     var arrowUnderCursor: Arrow? {
         return canvas.graphics.first(where: { (graphic) -> Bool in
-            return (graphic is Arrow) && graphic.contains(cursor.center)
+            return (graphic is Arrow) && graphic.contains(crosshairs.center)
         }) as? Arrow
     }
     
@@ -360,7 +393,7 @@ class ViewController: UIViewController {
     
     func addNode(at centerpoint: CGPoint) {
         let node = newNode(at: centerpoint)
-        canvas.insert(node, below: cursor)
+        canvas.insert(node, below: crosshairs)
 
         selection = node
     }
@@ -410,7 +443,7 @@ class ViewController: UIViewController {
     
     var nodeUnderCursor: Node? {
         return canvas.graphics.first { (graphic) -> Bool in
-            return graphic is Node && graphic.contains(cursor.center)
+            return graphic is Node && graphic.contains(crosshairs.center)
         } as? Node
     }
     
@@ -460,10 +493,38 @@ class ViewController: UIViewController {
         return (start, end)
     }
     
+    @IBAction func clearRoute() {
+        route.clear()
+        canvas.graphics.forEach { (graphic) in
+            if !(graphic is Crosshairs) {
+                self.canvas.remove(graphic)
+            }
+        }
+    }
+    
     // MARK: Querying the model
     
     func node(_ node: Node, inCircularRelationshipWith other: Node) -> Bool {
         return route.circularRelationshipExistsBetween(node.name, and: other.name)
     }
+    
+    @IBAction func userTappedTest(_ sender: Any) {
+    }
+    
+    var tests = Bundle.main.url(forResource: "BotTests", withExtension: "plist")
+    
+    lazy var routeBot: RouteBot = {
+        let routeBot = RouteBot()
+        routeBot.routeViewController = self
+        routeBot.delegate = self.testsSummaryController
+        return routeBot
+    }()
+    
+    func move(_ graphic: Graphic, to point: CGPoint) {
+        canvas.setNeedsDisplay(graphic.frame)
+        graphic.center = point
+        canvas.setNeedsDisplay(graphic.frame)
+    }
+    
 }
 

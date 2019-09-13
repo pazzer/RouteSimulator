@@ -77,4 +77,8 @@ class Route: CustomStringConvertible {
     var locations: [String] {
         return Array(map.keys)
     }
+    
+    func clear() {
+        map = [String:String?]()
+    }
 }
