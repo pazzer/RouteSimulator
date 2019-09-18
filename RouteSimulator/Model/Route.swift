@@ -7,78 +7,113 @@
 //
 
 import Foundation
+import UIKit
+
+fileprivate class Waypoint {
+    var name: String
+    var location: CGPoint
+    var next: Waypoint?
+    
+    init(name: String, location: CGPoint) {
+        self.name = name
+        self.location = location
+    }
+}
 
 class Route: CustomStringConvertible {
     
-    private var map = [String:String?]()
+    private var waypoints = [Waypoint]()
     
-    var start: String?
+    private func waypoint(named name: String) -> Waypoint {
+        return waypoints.first(where: { $0.name == name })!
+    }
     
-    func remove(_ name: String) {
-        assert(map.keys.contains(name))
-        if let previous = self.previous(of: name) {
-            map.updateValue(nil, forKey: previous)
+    func remove(waypointNamed name: String) {
+        if let previous = nameOfWaypointPreceeding(waypointNamed: name) {
+            unsetNext(ofWaypointNamed: previous)
         }
-        map.removeValue(forKey: name)
+        waypoints.removeAll(where: { $0.name == name })
+    }
+    
+    func add(waypointNamed name: String, at location: CGPoint) {
+        assert(!waypointNames.contains(name))
+        let waypoint = Waypoint(name: name, location: location)
+        waypoints.append(waypoint)
+    }
+    
+    func unsetNext(ofWaypointNamed name: String) {
+        let waypoint = self.waypoint(named: name)
+        waypoint.next = nil
+    }
+    
+    func setNext(ofWaypointNamed name: String, toWaypointNamed nextName: String) {
+        if let previous = nameOfWaypointPreceeding(waypointNamed: nextName) {
+            unsetNext(ofWaypointNamed: previous)
+        }
         
+        let waypoint = self.waypoint(named: name)
+        let next = self.waypoint(named: nextName)
+        waypoint.next = next
     }
     
-    func add(_ name: String) {
-        assert(!map.keys.contains(name))
-        map.updateValue(nil, forKey: name)
+    func updateLocation(ofWaypointNamed name: String, to location: CGPoint) {
+        let waypoint = self.waypoint(named: name)
+        waypoint.location = location
     }
     
-    func setNext(of location: String, to otherLocation: String?) {
-        assert(map.keys.contains(location))
-        if let otherLocation = otherLocation {
-            assert(map.keys.contains(otherLocation))
-        }
-        
-        if let otherLocation = otherLocation, let previous = self.previous(of: otherLocation) {
-            map.updateValue(nil, forKey: previous)
-        }
-        map.updateValue(otherLocation, forKey: location)
+    func location(ofWaypointNamed name: String) -> CGPoint {
+        let waypoint = self.waypoint(named: name)
+        return waypoint.location
     }
     
-    func next(of location: String) -> String? {
-        assert(map.keys.contains(location))
-        return map[location]!
+    func nameOfWaypointFollowing(waypointNamed name: String) -> String? {
+        let waypoint = self.waypoint(named: name)
+        return waypoint.next?.name
     }
     
-    func previous(of name: String) -> String? {
-        return map.first(where: { (key, value) -> Bool in
-            return value == name
-        })?.key
+    func nameOfWaypointPreceeding(waypointNamed name: String) -> String? {
+        return waypoints.first(where: { $0.next?.name == name })?.name
     }
     
+    var numbeOfWaypoints: Int {
+        return waypoints.count
+    }
+    
+    var waypointNames: [String] {
+        return waypoints.map { $0.name }
+    }
+
     var description: String {
         var string = ""
-        for (k, v) in map {
-            if let v = v {
-                string.append("\(k) → \(v)\n")
+        
+        for name in waypointNames.sorted() {
+            let waypoint = self.waypoint(named: name)
+            if let next = waypoint.next?.name {
+                string.append("\(waypoint.name) → \(next)\n")
             } else {
-                string.append("\(k)\n")
+                string.append("\(waypoint.name)\n")
             }
         }
         return string
+        
+        
+        
     }
     
-    func circularRelationshipExistsBetween(_ location: String, and otherLocation: String) -> Bool {
-        guard let value⁰ = map[location], let next⁰ = value⁰ else {
-            return false
-        }
-        guard let value¹ = map[otherLocation], let next¹ = value¹ else {
+    func circularRelationshipExistsBetween(waypointNamed name⁰: String, and name¹: String) -> Bool {
+        guard let next⁰ = nameOfWaypointFollowing(waypointNamed: name⁰) else {
             return false
         }
         
-        return next⁰ == otherLocation && next¹ == location
+        guard let next¹ = nameOfWaypointFollowing(waypointNamed: name¹) else {
+            return false
+        }
+        
+        return next⁰ == name¹ && next¹ == name⁰
     }
-    
-    var locations: [String] {
-        return Array(map.keys)
-    }
+
     
     func clear() {
-        map = [String:String?]()
+        waypoints.removeAll(keepingCapacity: true)
     }
 }

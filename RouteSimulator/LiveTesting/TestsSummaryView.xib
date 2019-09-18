@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,7 +23,7 @@
                 <outlet property="skip" destination="aWk-Ai-C59" id="T6S-bK-rha"/>
                 <outlet property="step" destination="xIB-IN-g42" id="qpI-je-ttM"/>
                 <outlet property="testNumber" destination="yFU-CJ-3nV" id="1kg-Jf-clf"/>
-                <outlet property="view" destination="6KW-3u-Vbw" id="ytF-rW-u7J"/>
+                <outlet property="view" destination="6KW-3u-Vbw" id="xUf-JC-wfP"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -47,7 +48,7 @@
                 </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Cc-Mm-Ekn">
                     <rect key="frame" x="0.0" y="0.0" width="335" height="32"/>
-                    <color key="backgroundColor" white="0.29376650528169013" alpha="0.84705882352941175" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" red="0.58431372550000005" green="0.71372549019999998" blue="0.86274509799999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="32" id="3Zx-mV-LuL"/>
                     </constraints>
@@ -175,16 +176,15 @@
                 <constraint firstItem="8hV-cG-FuN" firstAttribute="top" secondItem="dzv-F7-B6g" secondAttribute="bottom" constant="13" id="whc-kS-rZr"/>
                 <constraint firstAttribute="bottom" secondItem="aWk-Ai-C59" secondAttribute="bottom" id="yEw-Eo-uaQ"/>
             </constraints>
-            <nil key="simulatedTopBarMetrics"/>
-            <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="ou2-SI-hJr"/>
             <userDefinedRuntimeAttributes>
                 <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                    <integer key="value" value="4"/>
+                    <integer key="value" value="6"/>
                 </userDefinedRuntimeAttribute>
                 <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
             </userDefinedRuntimeAttributes>
-            <point key="canvasLocation" x="229.71014492753625" y="213.61607142857142"/>
+            <point key="canvasLocation" x="1060" y="-525"/>
         </view>
     </objects>
     <resources>

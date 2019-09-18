@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+
+
 let NODE_FREE_ZONE = 0
 
 protocol RouteBotDelegate {
@@ -46,27 +48,40 @@ class RouteBot {
     enum Operation: String {
         
         // Construction
-        case setCrosshairsOnNode = "SET_CROSSHAIRS_ON_NODE"
+        case setCrosshairsOnWaypoint = "SET_CROSSHAIRS_ON_WAYPOINT"
         case setCrosshairsOnArrow = "SET_CROSSHAIRS_ON_POLYLINE"
         case setCrosshairsInZone = "SET_CROSSHAIRS_IN_ZONE"
         
-        case addNodesToZones = "ADD_NODES_TO_ZONES"
+        case addWaypointsToZones = "ADD_WAYPOINTS_TO_ZONES"
         
-        case deleteNode = "DELETE_NODE"
+        case deleteWaypoint = "DELETE_WAYPOINT"
         case deleteArrow = "DELETE_ARROW"
-        case insertNode = "INSERT_NODE"
+        case insertWaypoint = "INSERT_WAYPOINT"
         
-        case selectNode = "SELECT_NODE"
+        case selectWaypoint = "SELECT_WAYPOINT"
         case setNext = "SET_NEXT"
         
+        case moveWaypoint = "MOVE_WAYPOINT_TO_POINT"
+        case moveWaypointToZone = "MOVE_WAYPOINT_TO_ZONE"
+        
         //Evaluation
-        case countNodes = "COUNT_NODES"
+        case countWaypoints = "COUNT_WAYPOINTS"
         case countArrows = "COUNT_ARROWS"
-        case countArrowMap = "COUNT_ARROW_MAP"
+        
+        case validateArrowPresence = "VALIDATE_ARROW_PRESENCE"
+        case validateArrowAbsence = "VALIDATE_ARROW_ABSENCE"
+        
         case validateRouteNext = "VALIDATE_ROUTE_NEXT"
+        case validateRoutePrevious = "VALIDATE_ROUTE_PREVIOUS"
+        
+        case validateArrowPosition = "VALIDATE_ARROW_POSITION"
+        
+        case validateSelection = "VALIDATE_SELECTION"
+        
+        case validateNodeLocation = "VALIDATE_NODE_LOCATION"
         
         var isTest: Bool {
-            return [.countArrows, .countNodes, .countArrowMap, .validateRouteNext].contains(self)
+            return [.countArrows, .countWaypoints, .validateRouteNext, .validateSelection, .validateRoutePrevious, .validateNodeLocation, .validateArrowAbsence, .validateArrowPresence, .validateArrowPosition].contains(self)
         }
     }
     
@@ -185,30 +200,46 @@ class RouteBot {
         let operation = Operation(rawValue: operationName)!
         
         switch operation {
+            
             // Route Editing
-        case .addNodesToZones:
-            block = { self.addNodesToZones(rawData: data as! NSDictionary) }
+        case .addWaypointsToZones:
+            block = { self.addWaypointsToZones(rawData: data as! NSDictionary) }
         case .setNext:
-            block = { self.setNext(rawData: data as! NSDictionary) }
-        case .selectNode:
-            block = { self.selectNode(named: data as! String)}
+            block = { self.setNext(diagram: data as! String) }
+        case .selectWaypoint:
+            block = { self.selectWaypoint(named: data as! String)}
         case .deleteArrow:
             block = { self.deleteArrow(startingAt: data as! String) }
-        case .deleteNode:
+        case .deleteWaypoint:
             block = { self.deleteNode(named: data as! String)}
-        case .insertNode:
-            block = { self.insertNode(onArrowStartingAtNodeNamed: data as! String)}
+        case .insertWaypoint:
+            block = { self.insertWaypoint(onArrowAssociatedWithWaypointNamed: data as! String)}
+        case .moveWaypoint:
+            block = { self.moveWaypointToPoint(rawData: data as! NSDictionary) }
+        case .moveWaypointToZone:
+            block = { self.moveWaypointToZone(rawData: data as! NSDictionary) }
+            
             
             // Tests
         case .countArrows:
             block = { self.countArrows(expected: data as! Int) }
-        case .countNodes:
-            block = { self.countNodes(expected: data as! Int) }
-        case .countArrowMap:
-            block = { self.countArrowMap(expected: data as! Int) }
+        case .countWaypoints:
+            block = { self.countWaypoints(expectedWaypoints: data as! Int) }
         case .validateRouteNext:
             block = { self.validateRouteNext(diagram: data as! String)}
-            
+        case .validateSelection:
+            block = { self.validateSelection(expectedSelectionName: data as! String)}
+        case .validateRoutePrevious:
+            block = { self.validateRoutePrevious(diagram: data as! String) }
+        case .validateNodeLocation:
+            block = { self.validateNodeLocation(data as! String) }
+        case .validateArrowAbsence:
+            block = { self.validateArrowAbsence(waypointName: data as! String)}
+        case .validateArrowPresence:
+            block = { self.validateArrowPresence(waypointName: data as! String)}
+        case .validateArrowPosition:
+            block = { self.validateArrowPosition(waypointName: data as! String)}
+
         default:
             break
         }
@@ -226,12 +257,12 @@ class RouteBot {
         routeViewController.move(crosshairs, to: point)
     }
     
-    func setCrosshairsOnNode(named name: String) {
+    func setCrosshairsOnWaypoint(named name: String) {
         let node = self.node(named: name)
         routeViewController.move(crosshairs, to: node.center)
     }
     
-    func setCrosshairsOnArrowBetween(nodeNamed start: String, and end: String) {
+    func setCrosshairsOnArrowBetween(waypointNamed start: String, and end: String) {
         let node⁰ = node(named: start)
         let node¹ = node(named: end)
         
@@ -239,15 +270,14 @@ class RouteBot {
         routeViewController.move(crosshairs, to: midpoint)
     }
     
-    func addNodesToZones(rawData: NSDictionary) {
+    func addWaypointsToZones(rawData: NSDictionary) {
         let zonesString = rawData["zones"] as! String
         let connected = rawData["connected"] as! Bool
         for string in zonesString.components(separatedBy: ",") {
             let trimmed = string.trimmingCharacters(in: .whitespaces)
             let zone = Int(trimmed)!
             assert(zone != NODE_FREE_ZONE)
-            let point = randomPoint(in: zone)
-            routeViewController.move(crosshairs, to: point)
+            routeViewController.move(crosshairs, to: center(of: zone))
             routeViewController.userTappedAdd(self)
             if !connected {
                 routeViewController.handleTap(at: crosshairs.center)
@@ -255,8 +285,7 @@ class RouteBot {
         }
     }
     
-    
-    func selectNode(named name: String) {
+    func selectWaypoint(named name: String) {
         
         if name == "*" {
             if routeViewController.selection != nil {
@@ -275,40 +304,53 @@ class RouteBot {
         routeViewController.move(crosshairs, to: CGPoint(x: 10, y: 10))
     }
     
-    func insertNode(onArrowStartingAtNodeNamed nodeName: String) {
+    func insertWaypoint(onArrowAssociatedWithWaypointNamed waypointName: String) {
         clearSelection()
-        let nextName = routeViewController.route.next(of: nodeName)!
-        setCrosshairsOnArrowBetween(nodeNamed: nodeName, and: nextName)
+        let nextName = routeViewController.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+        setCrosshairsOnArrowBetween(waypointNamed: waypointName, and: nextName)
         routeViewController.userTappedAdd(self)
     }
     
-    func setNext(rawData: NSDictionary) {
-        let diagram = rawData["diagram"] as! String
+    func setNext(diagram: String) {
         let comps = diagram.components(separatedBy: "→")
         assert(comps.count == 2)
         let origin = comps.first!
         let source = comps.last!
         
-        selectNode(named: origin)
-        setCrosshairsOnNode(named: source)
+        selectWaypoint(named: origin)
+        setCrosshairsOnWaypoint(named: source)
         routeViewController.userTappedAdd(self)
     }
     
     func deleteArrow(startingAt nodeName: String) {
         clearSelection()
-        let nextName = routeViewController.route.next(of: nodeName)!
-        setCrosshairsOnArrowBetween(nodeNamed: nodeName, and: nextName)
+        let nextName = routeViewController.route.nameOfWaypointFollowing(waypointNamed: nodeName)!
+        setCrosshairsOnArrowBetween(waypointNamed: nodeName, and: nextName)
         routeViewController.userTappedRemove(self)
     }
     
     func deleteNode(named nodeName: String) {
-        setCrosshairsOnNode(named: nodeName)
+        setCrosshairsOnWaypoint(named: nodeName)
         routeViewController.userTappedRemove(self)
     }
     
     func clearSelection() {
         let pt = randomPoint(in: NODE_FREE_ZONE)
         routeViewController.handleTap(at: pt)
+    }
+    
+    func moveWaypointToPoint(rawData: NSDictionary) {
+        let waypointName = rawData["waypoint"] as! String
+        let point = CGPoint(from: rawData["point"] as! NSDictionary)
+        let node = routeViewController.node(named: waypointName)
+        routeViewController.move(node, to: point)
+    }
+    
+    func moveWaypointToZone(rawData: NSDictionary) {
+        let waypointName = rawData["waypoint"] as! String
+        let zone = rawData["zone"] as! Int
+        let node = routeViewController.node(named: waypointName)
+        routeViewController.move(node, to: center(of: zone))
     }
     
     // MARK: Evaluation
@@ -323,33 +365,48 @@ class RouteBot {
             msg = "Node count is \(actual), not \(expected)"
         }
         
-        delegate.routeBot(self, evaluated: Operation.countNodes.rawValue, didPass: pass, details: msg)
+        delegate.routeBot(self, evaluated: Operation.countWaypoints.rawValue, didPass: pass, details: msg)
     }
     
+    func countWaypoints(expectedWaypoints: Int) {
+        let pass: Bool
+        let msg: String
+        let actualWaypoints = routeViewController.route.numbeOfWaypoints
+        let actualCircles = routeViewController.canvas.graphics.filter { $0 is Node }.count
+        if actualWaypoints == expectedWaypoints {
+            if actualCircles == actualWaypoints {
+                pass = true
+                msg = "Number of waypoints is \(expectedWaypoints)"
+            } else {
+                pass = false
+                msg = "Number of waypoints is as expected \(expectedWaypoints), but number of circles on the canvas is not \(actualCircles)"
+            }
+        } else {
+            pass = false
+            msg = "Number of waypoints is \(actualWaypoints), not \(expectedWaypoints)"
+        }
+        delegate.routeBot(self, evaluated: Operation.countWaypoints.rawValue, didPass: pass
+            , details: msg)
+    }
+
     func countArrows(expected: Int) {
-        let actual = routeViewController.canvas.graphics.filter { $0 is Arrow}.count
-        let pass = actual == expected
-        var msg: String
-        if pass {
-            msg = "Arrow count is \(actual)"
+        let graphicsCount = routeViewController.canvas.graphics.filter { $0 is Arrow}.count
+        let mapCount = routeViewController.arrows.count
+        let pass: Bool
+        let msg: String
+        if expected == mapCount {
+            if expected == graphicsCount {
+                pass = true
+                msg = "number of arrows is \(expected)"
+            } else {
+                pass = false
+                msg = "arrow-map contains expected number of arrows \(expected), but number graphics on canvas is reported as \(graphicsCount)"
+            }
         } else {
-            msg = "Arrow count is \(actual), not \(expected)"
+            pass = false
+            msg = "number of arrows in arrow map is \(mapCount), not \(expected)"
         }
-        
         delegate.routeBot(self, evaluated: Operation.countArrows.rawValue, didPass: pass, details: msg)
-    }
-    
-    func countArrowMap(expected: Int) {
-        let actual = routeViewController.arrows.count
-        let pass = actual == expected
-        var msg: String
-        if pass {
-            msg = "Arrow map contains \(actual) entries."
-        } else {
-            msg = "Arrow map contains is \(actual), not \(expected)."
-        }
-        
-        delegate.routeBot(self, evaluated: Operation.countArrowMap.rawValue, didPass: pass, details: msg)
     }
     
     func validateRouteNext(diagram: String) {
@@ -358,7 +415,7 @@ class RouteBot {
         var expectedNext = comps.last!
         var pass: Bool
         var msg: String
-        if let actualNext = routeViewController.route.next(of: name) {
+        if let actualNext = routeViewController.route.nameOfWaypointFollowing(waypointNamed: name) {
             pass = actualNext == expectedNext
             if pass {
                 msg = "next of '\(name)' is \(actualNext)."
@@ -377,26 +434,197 @@ class RouteBot {
         delegate.routeBot(self, evaluated: Operation.validateRouteNext.rawValue, didPass: pass, details: msg)
     }
     
+    func validateRoutePrevious(diagram: String) {
+        let comps = diagram.components(separatedBy: "→")
+        let expectedPrevious = comps.first!
+        let name = comps.last!
+        guard expectedPrevious != "*" else {
+            validatePreviousIsNil(waypointName: name)
+            return
+        }
+        var pass: Bool
+        var msg: String
+        if let actualPrevious = routeViewController.route.nameOfWaypointPreceeding(waypointNamed: name) {
+            pass = actualPrevious == expectedPrevious
+            msg = pass ? "previous of \(name) is \(expectedPrevious)" : "previous of \(name) is \(actualPrevious), not \(expectedPrevious)"
+        } else {
+            pass = false
+            msg = "previous of \(name) is nil, not \(expectedPrevious)"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateRoutePrevious.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validatePreviousIsNil(waypointName: String) {
+        let pass: Bool
+        let msg: String
+        if let previous = routeViewController.route.nameOfWaypointPreceeding(waypointNamed: waypointName) {
+            pass = false
+            msg = "previous of \(waypointName) is \(previous), not nil"
+        } else {
+            pass = true
+            msg = "previous of \(waypointName) is nil"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateRoutePrevious.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateSelection(expectedSelectionName: String) {
+        guard expectedSelectionName != "*" else {
+            validateSelectionIsNil()
+            return
+        }
+        
+        let pass: Bool
+        let msg: String
+        if let selectionName = routeViewController.selection?.name {
+            pass = selectionName == expectedSelectionName
+            msg = pass ? "selection is \(expectedSelectionName)" : "selection is \(selectionName) not \(expectedSelectionName)"
+        } else {
+            pass = false
+            msg = "selection is nil, not \(expectedSelectionName)"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateSelection.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateSelectionIsNil() {
+        let pass: Bool
+        let msg: String
+        if let selectionName = routeViewController.selection?.name {
+            pass = false
+            msg = "selection is \(selectionName), not nil"
+        } else {
+            pass = true
+            msg = "selection is nil"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateSelection.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateNodeLocation(_ waypointName: String) {
+        let routePoint = routeViewController.route.location(ofWaypointNamed: waypointName)
+        let nodePoint = routeViewController.node(named: waypointName).center
+        let pass: Bool
+        let msg: String
+        if nodePoint == routePoint {
+            pass = true
+            msg = "waypoint and corresponding node report same location (\(routePoint))"
+        } else {
+            pass = false
+            msg = "waypoint location \(routePoint) (zone \(zone(containing: routePoint)) differs from node location \(nodePoint) (zone \(zone(containing: nodePoint))"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateNodeLocation.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateArrowPresence(waypointName: String) {
+        var pass: Bool
+        var msg: String
+        if let arrow = routeViewController.arrows[waypointName] {
+            if let _ = routeViewController.canvas.graphics.first(where: {$0 === arrow}) {
+                pass = true
+                msg = "found valid arrow for \(waypointName)"
+            } else {
+                pass = false
+                msg = "found arrow in arrow-map for \(waypointName), but arrow not present on canvas"
+            }
+        } else {
+            pass = false
+            msg = "no key '\(waypointName)' in arrow-map"
+        }
+        
+        delegate.routeBot(self, evaluated: Operation.validateArrowPresence.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateArrowAbsence(waypointName: String) {
+        let pass: Bool
+        let msg: String
+        if let arrow = routeViewController.arrows[waypointName] {
+            pass = false
+            if let _ = routeViewController.canvas.graphics.first(where: {$0 === arrow}) {
+                msg = "\(waypointName) does have arrow in arrow-map, and this arrow is on the canvas"
+            } else {
+                msg = "\(waypointName) does have arrow in arrow-map, but this arrow is not present on the canvas"
+            }
+        } else {
+            pass = true
+            msg = "\(waypointName) does not appear as a key in arrow-map"
+        }
+        delegate.routeBot(self, evaluated: Operation.validateArrowAbsence.rawValue, didPass: pass, details: msg)
+    }
+    
+    func validateArrowPosition(waypointName: String) {
+        let pass: Bool
+        let msg: String
+        
+        let arrow = routeViewController.arrows[waypointName]!
+        
+        let location⁰ = routeViewController.route.location(ofWaypointNamed: waypointName)
+        let nextName = routeViewController.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+        let location¹ = routeViewController.route.location(ofWaypointNamed: nextName)
+        let midpoint = location⁰.midpoint(location¹)
+        
+        let arrowGradient = LineSector(start: arrow.start, end: arrow.end).gradient
+        let pointsGradient = LineSector(start: location⁰, end: location¹).gradient
+        
+        let gradsOk: Bool
+        switch (arrowGradient, pointsGradient) {
+        case let (arrowGradient?, pointsGradient?):
+            gradsOk = abs(arrowGradient - pointsGradient) < 0.0001
+        case (_?, nil), (nil, _?):
+            gradsOk = false
+        case (nil, nil):
+            gradsOk = true
+        }
+        
+        assert(routeViewController.canvas.graphics.first(where: {$0 === arrow}) != nil)
+        if arrow.contains(midpoint) && gradsOk {
+            msg = "arrow emanating from \(waypointName) is correctly positioned"
+            pass = true
+        } else {
+            msg = "arrow emanating from \(waypointName) is not correctly positioned"
+            pass = false
+        }
+        delegate.routeBot(self, evaluated: Operation.validateArrowPosition.rawValue, didPass: pass, details: msg)
+    }
+    
+    
+    
+
     
     
     
     // Working with zones
     
-    func randomPoint(in zone: Int) -> CGPoint {
-        
+    var zoneSize: CGSize {
         let nRows = CGFloat(grid.rows)
         let nCols = CGFloat(grid.columns)
         
         let zoneWidth = routeViewController.canvas.bounds.width / nCols
         let zoneHeight = routeViewController.canvas.bounds.height / nRows
         
+        return CGSize(width: zoneWidth, height: zoneHeight)
+    }
+    
+    func origin(of zone: Int) -> CGPoint {
+        
+        let nCols = CGFloat(grid.columns)
+        
         let (row, _) = modf(CGFloat(zone) / nCols)
         let col = CGFloat(zone) - (row * nCols)
         
-        let minX = col * zoneWidth
-        let minY = row * zoneHeight
-        let x = CGFloat(arc4random_uniform(UInt32(zoneWidth)) + UInt32(minX))
-        let y = CGFloat(arc4random_uniform(UInt32(zoneHeight)) + UInt32(minY))
+        let minX = col * zoneSize.width
+        let minY = row * zoneSize.height
+        
+        return CGPoint(x: minX, y: minY)
+    }
+    
+    func center(of zone: Int) -> CGPoint {
+        let origin = self.origin(of: zone)
+        return CGPoint(x: origin.x + zoneSize.width * 0.5, y: origin.y + zoneSize.height * 0.5)
+    }
+    
+    func randomPoint(in zone: Int) -> CGPoint {
+        let origin = self.origin(of: zone)
+        
+        let x = CGFloat(arc4random_uniform(UInt32(zoneSize.width)) + UInt32(origin.x))
+        let y = CGFloat(arc4random_uniform(UInt32(zoneSize.height)) + UInt32(origin.y))
         return CGPoint(x: x, y: y)
     }
     

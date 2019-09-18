@@ -13,21 +13,21 @@ class RouteSimulatorTests: XCTestCase {
 
     var routeA: Route {
         let route = Route()
-        ["a", "b", "c", "d"].forEach({route.add($0)})
-        route.setNext(of: "a", to: "b")
-        route.setNext(of: "b", to: "c")
+        ["a", "b", "c", "d"].forEach { route.add(waypointNamed: $0, at: .zero) }
+        route.setNext(ofWaypointNamed: "a", toWaypointNamed: "b")
+        route.setNext(ofWaypointNamed: "b", toWaypointNamed: "c")
         return route
     }
     
     var routeB: Route {
         let route = Route()
-        ["a", "b", "c", "d", "e", "f"].forEach({route.add($0)})
-        route.setNext(of: "a", to: "b")
-        route.setNext(of: "b", to: "c")
-        route.setNext(of: "c", to: "d")
-        route.setNext(of: "d", to: "e")
-        route.setNext(of: "e", to: "f")
-        route.setNext(of: "f", to: "a")
+        ["a", "b", "c", "d", "e", "f"].forEach({route.add(waypointNamed: $0, at: .zero)})
+        route.setNext(ofWaypointNamed: "a", toWaypointNamed: "b")
+        route.setNext(ofWaypointNamed: "b", toWaypointNamed: "c")
+        route.setNext(ofWaypointNamed: "c", toWaypointNamed: "d")
+        route.setNext(ofWaypointNamed: "d", toWaypointNamed: "e")
+        route.setNext(ofWaypointNamed: "e", toWaypointNamed: "f")
+        route.setNext(ofWaypointNamed: "f", toWaypointNamed: "a")
         return route
         
     }
@@ -40,59 +40,59 @@ class RouteSimulatorTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func numberOfDeadEnds(in route: Route) -> Int {
-        return route.locations.map({route.next(of: $0)}).filter({$0 == nil}).count
-    }
     
     func deadEnds(in route: Route) -> [String] {
-        return route.locations.sorted().filter { route.next(of: $0) == nil }
+        return route.waypointNames.filter { (name) -> Bool in
+            return route.nameOfWaypointFollowing(waypointNamed: name) == nil
+        }
     }
     
-    func next(of locations: [String], from route: Route) -> [String?] {
-        return locations.sorted().map { route.next(of: $0) }
+    func next(of names: [String], from route: Route) -> [String?] {
+        return names.sorted().map({route.nameOfWaypointFollowing(waypointNamed: $0)})
     }
     
     func testA() {
         let routeA = self.routeA
-        XCTAssertEqual(routeA.previous(of: "c"), "b")
-        routeA.setNext(of: "b", to: "d")
-        XCTAssertEqual(routeA.previous(of: "c"), nil)
-        XCTAssertEqual(routeA.previous(of: "d"), "b")
         
+        XCTAssertEqual(routeA.nameOfWaypointPreceeding(waypointNamed: "c"), "b")
+        routeA.setNext(ofWaypointNamed: "b", toWaypointNamed: "d")
+        XCTAssertEqual(routeA.nameOfWaypointPreceeding(waypointNamed: "c"), nil)
+        XCTAssertEqual(routeA.nameOfWaypointPreceeding(waypointNamed: "d"), "b")
         
-        XCTAssertFalse(routeA.circularRelationshipExistsBetween("c", and: "d"))
-        routeA.setNext(of: "c", to: "d")
-        routeA.setNext(of: "d", to: "c")
-        XCTAssertTrue(routeA.circularRelationshipExistsBetween("c", and: "d"))
+        XCTAssertFalse(routeA.circularRelationshipExistsBetween(waypointNamed: "c", and: "d"))
+        routeA.setNext(ofWaypointNamed: "c", toWaypointNamed: "d")
+        routeA.setNext(ofWaypointNamed: "d", toWaypointNamed: "c")
+        XCTAssertTrue(routeA.circularRelationshipExistsBetween(waypointNamed: "c", and: "d"))
+
+        routeA.setNext(ofWaypointNamed: "b", toWaypointNamed: "c")
+
+        XCTAssertEqual(deadEnds(in: routeA).count, 1)
+        routeA.setNext(ofWaypointNamed: "d", toWaypointNamed: "a")
+        XCTAssertEqual(deadEnds(in: routeA).count, 0)
         
-        routeA.setNext(of: "b", to: "c")
-        
-        
-        XCTAssertEqual(numberOfDeadEnds(in: routeA), 1)
-        routeA.setNext(of: "d", to: "a")
-        XCTAssertEqual(numberOfDeadEnds(in: routeA), 0)
-        XCTAssertFalse(routeA.circularRelationshipExistsBetween("d", and: "a"))
+        XCTAssertFalse(routeA.circularRelationshipExistsBetween(waypointNamed: "d", and: "a"))
     }
     
     func testB() {
         let routeB = self.routeB
-        XCTAssertEqual(numberOfDeadEnds(in: routeB), 0)
-        routeB.remove("c")
-        XCTAssertEqual(routeB.locations.count, 5)
+        XCTAssertEqual(deadEnds(in: routeB).count, 0)
+        routeB.remove(waypointNamed: "c")
+        XCTAssertEqual(routeB.waypointNames.count, 5)
         XCTAssertEqual(deadEnds(in: routeB), ["b"])
-        
-        routeB.setNext(of: "e", to: "b")
-        XCTAssertEqual(next(of: ["d","e","f"], from: routeB), ["e", "b", "a"])
+
+        routeB.setNext(ofWaypointNamed: "e", toWaypointNamed: "b")
+        XCTAssertEqual(next(of: ["d", "e", "f"], from: routeB), ["e", "b", "a"])
         XCTAssertEqual(next(of: ["a", "b"], from: routeB), [nil, nil])
-        
-        routeB.remove("e")
+
+
+        routeB.remove(waypointNamed: "e")
         XCTAssertEqual(deadEnds(in: routeB), ["a", "b", "d"])
-        
-        routeB.remove("a")
+
+        routeB.remove(waypointNamed: "a")
         XCTAssertEqual(deadEnds(in: routeB), ["b", "d", "f"])
-        
-        routeB.add("g")
-        routeB.setNext(of: "g", to: "b")
-        XCTAssertEqual(routeB.previous(of: "b"), "g")
+
+        routeB.add(waypointNamed: "g", at: .zero)
+        routeB.setNext(ofWaypointNamed: "g", toWaypointNamed: "b")
+        XCTAssertEqual(routeB.nameOfWaypointPreceeding(waypointNamed: "b"), "g")
     }
 }

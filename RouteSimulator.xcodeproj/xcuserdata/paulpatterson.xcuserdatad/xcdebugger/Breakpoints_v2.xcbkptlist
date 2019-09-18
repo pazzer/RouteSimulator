@@ -10,13 +10,29 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/LiveTesting/RouteBot.swift"
-            timestampString = "590088299.246194"
+            timestampString = "590443485.137854"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
-            landmarkName = "RouteBot"
-            landmarkType = "3">
+            startingLineNumber = "283"
+            endingLineNumber = "283"
+            landmarkName = "addWaypointsToZones(rawData:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RouteSimulator/LiveTesting/RouteBot.swift"
+            timestampString = "590443485.137992"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "395"
+            endingLineNumber = "395"
+            landmarkName = "countArrows(expected:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -26,12 +42,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/RouteViewController.swift"
-            timestampString = "590088299.246367"
+            timestampString = "590443485.138038"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "prepareForTesting()"
+            startingLineNumber = "433"
+            endingLineNumber = "433"
+            landmarkName = "remove(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

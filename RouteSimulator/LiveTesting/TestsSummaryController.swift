@@ -9,13 +9,6 @@
 import UIKit
 
 class TestsSummaryController: NSObject, RouteBotDelegate {
-
-    
-
-    
-    
-    //var routeViewController: RouteViewController!
-    
     
     @IBOutlet var view: UIView!
     
@@ -96,6 +89,7 @@ class TestsSummaryController: NSObject, RouteBotDelegate {
         
         leftOperation.text = nil
         step.isHidden = true
+        skip.isHidden = true
         
         totalFails += sequenceFails
         totalPasses += sequencePasses
@@ -110,10 +104,14 @@ class TestsSummaryController: NSObject, RouteBotDelegate {
     }
     
     func routeBot(_ routeBot: RouteBot, evaluated operation: String, didPass: Bool, details: String?) {
+        
         if didPass {
             sequencePasses += 1
+            leftOperation.textColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
         } else {
             sequenceFails += 1
+            leftOperation.textColor = .red
+            print(details ?? "no details")
         }
     }
     
