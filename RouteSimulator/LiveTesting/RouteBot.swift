@@ -64,6 +64,9 @@ class RouteBot {
         case moveWaypoint = "MOVE_WAYPOINT_TO_POINT"
         case moveWaypointToZone = "MOVE_WAYPOINT_TO_ZONE"
         
+        case undo = "UNDO"
+        case redo = "REDO"
+        
         //Evaluation
         case countWaypoints = "COUNT_WAYPOINTS"
         case countArrows = "COUNT_ARROWS"
@@ -79,9 +82,10 @@ class RouteBot {
         case validateSelection = "VALIDATE_SELECTION"
         
         case validateNodeLocation = "VALIDATE_NODE_LOCATION"
+        case deletedWaypoints = "DELETED_WAYPOINTS"
         
         var isTest: Bool {
-            return [.countArrows, .countWaypoints, .validateRouteNext, .validateSelection, .validateRoutePrevious, .validateNodeLocation, .validateArrowAbsence, .validateArrowPresence, .validateArrowPosition].contains(self)
+            return [.countArrows, .countWaypoints, .validateRouteNext, .validateSelection, .validateRoutePrevious, .validateNodeLocation, .validateArrowAbsence, .validateArrowPresence, .validateArrowPosition, .deletedWaypoints].contains(self)
         }
     }
     
@@ -181,15 +185,11 @@ class RouteBot {
     
     func teeUpNextSequence() {
         assert(sequenceIndex < sequences.count)
-        
         let sequence = sequences[sequenceIndex]
         sequenceIndex += 1
-        let skip = sequence["skip"] as! Bool
-        if skip == false {
-            delegate.routeBot(self, loadedSequence: sequenceIndex - 1, named: currentSequenceName)
-            operations = sequence["operations"] as? [NSDictionary]
-            operationIndex = 0
-        }
+        delegate.routeBot(self, loadedSequence: sequenceIndex - 1, named: currentSequenceName)
+        operations = sequence["operations"] as? [NSDictionary]
+        operationIndex = 0
     }
     
     func fetchOperationBlock(atIndex index: Int) -> (() -> Void) {
@@ -218,6 +218,10 @@ class RouteBot {
             block = { self.moveWaypointToPoint(rawData: data as! NSDictionary) }
         case .moveWaypointToZone:
             block = { self.moveWaypointToZone(rawData: data as! NSDictionary) }
+        case .undo:
+            block = { self.undo(count: data as! Int)}
+        case .redo:
+            block = { self.redo(count: data as! Int)}
             
             
             // Tests
@@ -239,6 +243,8 @@ class RouteBot {
             block = { self.validateArrowPresence(waypointName: data as! String)}
         case .validateArrowPosition:
             block = { self.validateArrowPosition(waypointName: data as! String)}
+        case .deletedWaypoints:
+            block = { self.deletedWaypoints(names: data as! String) }
 
         default:
             break
@@ -250,7 +256,36 @@ class RouteBot {
         
     }
     
+    var scheduleCounter = 0
+    var scheduleInterval = 0.025
+    
     // MARK: Operations
+    
+    func undo(count: Int) {
+        var soFar = 0
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { (timer) in
+            soFar += 1
+            if soFar == count {
+                timer.invalidate()
+            }
+            DispatchQueue.main.async {
+                self.routeViewController.undo(self)
+            }
+        }
+    }
+    
+    func redo(count: Int) {
+        var soFar = 0
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { (timer) in
+            soFar += 1
+            if soFar == count {
+                timer.invalidate()
+            }
+            DispatchQueue.main.async {
+                self.routeViewController.redo(self)
+            }
+        }
+    }
     
     func setCrosshairsOnPoint(rawData: NSDictionary) {
         let point = CGPoint(from: rawData)
@@ -270,19 +305,39 @@ class RouteBot {
         routeViewController.move(crosshairs, to: midpoint)
     }
     
+    var interval = 0.025
+    
     func addWaypointsToZones(rawData: NSDictionary) {
         let zonesString = rawData["zones"] as! String
         let connected = rawData["connected"] as! Bool
-        for string in zonesString.components(separatedBy: ",") {
-            let trimmed = string.trimmingCharacters(in: .whitespaces)
-            let zone = Int(trimmed)!
+        let zones = zonesString.components(separatedBy: ",").map({Int($0.trimmingCharacters(in: .whitespaces))!})
+        interval = 0.025
+        
+        for zone in zones {
             assert(zone != NODE_FREE_ZONE)
-            routeViewController.move(crosshairs, to: center(of: zone))
-            routeViewController.userTappedAdd(self)
-            if !connected {
-                routeViewController.handleTap(at: crosshairs.center)
+            schedule {
+                self.routeViewController.move(self.crosshairs, to: self.center(of: zone))
+            }
+            
+            schedule {
+                self.routeViewController.userTappedAdd(self)
+            }
+            
+            guard !connected else {
+                continue
+            }
+            
+            schedule {
+                self.routeViewController.handleTap(at: self.crosshairs.center)
             }
         }
+    }
+    
+    func schedule(block: @escaping () -> Void) {
+        Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { (_) in
+            block()
+        }
+        interval += 0.025
     }
     
     func selectWaypoint(named name: String) {
@@ -320,6 +375,7 @@ class RouteBot {
         selectWaypoint(named: origin)
         setCrosshairsOnWaypoint(named: source)
         routeViewController.userTappedAdd(self)
+        
     }
     
     func deleteArrow(startingAt nodeName: String) {
@@ -354,6 +410,14 @@ class RouteBot {
     }
     
     // MARK: Evaluation
+    
+    func deletedWaypoints(names: String) {
+        let expected = ConvertSeparatedStringToArray(names).sorted()
+        let actual = routeViewController.deletedWaypoints.map({$0.name}).sorted()
+        let pass = expected == actual
+        let msg = pass ? "deleted waypoints array does consist of \(expected)" : "deleted waypoints array consists of \(actual), not \(expected)"
+        delegate.routeBot(self, evaluated: Operation.deletedWaypoints.rawValue, didPass: pass, details: msg)
+    }
     
     func countNodes(expected: Int) {
         let actual = routeViewController.canvas.graphics.filter { $0 is Node}.count
@@ -651,4 +715,16 @@ class RouteBot {
         }) as! Node
     }
     
+}
+
+
+func ConvertSeparatedStringToArray(_ separatedString: String, separator: String = ",") -> [String] {
+    var array: [String]
+    if separatedString.contains(separator) {
+        array = separatedString.components(separatedBy: separator)
+        array = array.map({$0.trimmingCharacters(in: .whitespaces)})
+    } else {
+        array = [separatedString.trimmingCharacters(in: .whitespaces)]
+    }
+    return array
 }

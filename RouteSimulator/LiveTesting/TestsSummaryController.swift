@@ -47,7 +47,7 @@ class TestsSummaryController: NSObject, RouteBotDelegate {
         sequencePasses = 0
         
         routeBot.routeViewController.clearRoute()
-        routeBot.routeViewController.nextName = UNICODE_CAP_A
+        routeBot.routeViewController.unicodePoint = UNICODE_CAP_A
         
         currentTest.text = named
         currentFails.text = "\(0)"

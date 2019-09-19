@@ -55,6 +55,15 @@ class Canvas: UIView {
             graphic.draw(in: context, rect: rect)
         }
     }
-    
+}
 
+extension Canvas {
+    func node(named name: String) -> Node {
+        return graphics.first { (graphic) -> Bool in
+            if let node = graphic as? Node {
+                return node.name == name
+            }
+            return false
+        } as! Node
+    }
 }

@@ -67,4 +67,15 @@
         <key>operation</key>
         <string>VALIDATE_ARROW_POSITION</string>
     </dict>
+    
+    
+### Deleted Waypoints
+
+    <dict>
+        <key></key>
+        <string></string>
+        <key>operation</key>
+        <string>DELETED_WAYPOINTS</string>
+    </dict>
+    
 

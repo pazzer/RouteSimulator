@@ -9,29 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "RouteSimulator/LiveTesting/RouteBot.swift"
-            timestampString = "590443485.137854"
+            filePath = "RouteSimulator/RouteViewController.swift"
+            timestampString = "590534829.7676769"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "283"
-            endingLineNumber = "283"
-            landmarkName = "addWaypointsToZones(rawData:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "RouteSimulator/LiveTesting/RouteBot.swift"
-            timestampString = "590443485.137992"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "395"
-            endingLineNumber = "395"
-            landmarkName = "countArrows(expected:)"
+            startingLineNumber = "477"
+            endingLineNumber = "477"
+            landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,12 +26,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/RouteViewController.swift"
-            timestampString = "590443485.138038"
+            timestampString = "590534829.768333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "433"
-            endingLineNumber = "433"
-            landmarkName = "remove(_:)"
+            startingLineNumber = "484"
+            endingLineNumber = "484"
+            landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "RouteSimulator/RouteViewController.swift"
+            timestampString = "590534829.768844"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "476"
+            endingLineNumber = "476"
+            landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
