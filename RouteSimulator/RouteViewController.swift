@@ -165,30 +165,16 @@ class RouteViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        
-        let observer = CFRunLoopObserverCreate(kCFAllocatorDefault, CFRunLoopActivity.beforeSources.rawValue | CFRunLoopActivity.beforeTimers.rawValue | CFRunLoopActivity.beforeWaiting.rawValue | CFRunLoopActivity.afterWaiting.rawValue, true, 0, { (observer, activity, _) in
-            print("- - - -")
-            if activity.contains(.beforeSources) {
-                print("before source")
-            }
-            if activity.contains(.beforeTimers) {
-                print("before timers")
-            }
-            
-            if activity.contains(.beforeWaiting) {
-                print("before waiting")
-            }
-            
-            if activity.contains(.afterWaiting) {
-                print("after waiting")
-            }
-            
-            
-        }, nil)
-        
-        CFRunLoopAddObserver(CFRunLoopGetMain(), observer!, CFRunLoopMode.commonModes)
-        
-        
+//
+//        let observer = CFRunLoopObserverCreate(kCFAllocatorDefault, CFRunLoopActivity.beforeSources.rawValue |  CFRunLoopActivity.beforeWaiting.rawValue, true, 0, { (observer, activity, _) in
+//        
+//            if activity.contains(.beforeWaiting) {
+//                print("before waiting")
+//            }
+//
+//        }, nil)
+//
+//        CFRunLoopAddObserver(CFRunLoopGetMain(), observer!, CFRunLoopMode.commonModes)
     }
     
     
@@ -290,14 +276,16 @@ class RouteViewController: UIViewController {
         
         guard !graphicsUnderPoint.contains(where: {$0 is Crosshairs}) else {
             updateSelection(to: nil, isUndoable: true)
+            print("tap in crosshairs")
             return
         }
         
         guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
+            print("setting to nil")
             updateSelection(to: nil, isUndoable: true)
             return
         }
-        
+        print("updating")
         updateSelection(to: node.name, isUndoable: true)
     }
     

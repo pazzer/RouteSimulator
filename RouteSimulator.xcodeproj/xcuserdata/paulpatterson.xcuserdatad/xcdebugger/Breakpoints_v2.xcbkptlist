@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/RouteViewController.swift"
-            timestampString = "590534829.7676769"
+            timestampString = "590601170.858449"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "477"
-            endingLineNumber = "477"
+            startingLineNumber = "465"
+            endingLineNumber = "465"
             landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/RouteViewController.swift"
-            timestampString = "590534829.768333"
+            timestampString = "590601170.85967"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "484"
-            endingLineNumber = "484"
+            startingLineNumber = "472"
+            endingLineNumber = "472"
             landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "RouteSimulator/RouteViewController.swift"
-            timestampString = "590534829.768844"
+            timestampString = "590601170.860743"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "476"
-            endingLineNumber = "476"
+            startingLineNumber = "464"
+            endingLineNumber = "464"
             landmarkName = "removeExtension(toNodeNamed:fromNodeNamed:)"
             landmarkType = "7">
          </BreakpointContent>

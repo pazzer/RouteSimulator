@@ -48,24 +48,15 @@ class RouteBot {
     enum Operation: String {
         
         // Construction
-        case setCrosshairsOnWaypoint = "SET_CROSSHAIRS_ON_WAYPOINT"
-        case setCrosshairsOnArrow = "SET_CROSSHAIRS_ON_POLYLINE"
-        case setCrosshairsInZone = "SET_CROSSHAIRS_IN_ZONE"
+        case tapAdd = "TAP_ADD"
+        case tapRemove = "TAP_REMOVE"
+        case tapWaypoint = "TAP_WAYPOINT"
         
-        case addWaypointsToZones = "ADD_WAYPOINTS_TO_ZONES"
-        
-        case deleteWaypoint = "DELETE_WAYPOINT"
-        case deleteArrow = "DELETE_ARROW"
-        case insertWaypoint = "INSERT_WAYPOINT"
-        
-        case selectWaypoint = "SELECT_WAYPOINT"
-        case setNext = "SET_NEXT"
-        
-        case moveWaypoint = "MOVE_WAYPOINT_TO_POINT"
+        case moveCrosshairsToZone = "MOVE_CROSSHAIRS_TO_ZONE"
         case moveWaypointToZone = "MOVE_WAYPOINT_TO_ZONE"
         
-        case undo = "UNDO"
-        case redo = "REDO"
+        case setCrosshairsOnWaypoint = "SET_CROSSHAIRS_ON_WAYPOINT"
+        case setCrosshairsOnArrow = "SET_CROSSHAIRS_ON_ARROW"
         
         //Evaluation
         case countWaypoints = "COUNT_WAYPOINTS"
@@ -99,11 +90,11 @@ class RouteBot {
     
     var operationIndex: Int! {
         didSet {
-            block = fetchOperationBlock(atIndex: operationIndex)
+            blockData = fetchOperationBlock(atIndex: operationIndex)
         }
     }
     
-    var block: (() -> (Void))?
+    var blockData: (block: (() -> (Void)), operation: Operation)?
     
     var sequenceIndex = 0
     
@@ -129,10 +120,13 @@ class RouteBot {
         return sequences[sequenceIndex - 1].value(forKey: "name") as? String
     }
     
+    var queue = [() -> Void]()
+    
     @IBAction func step(_ sender: Any) {
-        self.block!()
+        scheduleCounter = 0
+        self.blockData!.block()
         if operationIndex == operations.count - 1 {
-            block = nil
+            blockData = nil
             delegate.routeBot(self, didCompleteSequence: sequenceIndex, named: currentSequenceName)
         } else {
             operationIndex += 1
@@ -141,7 +135,8 @@ class RouteBot {
     
     @IBAction func jump(_ sender: Any) {
         
-        if let _ = block {
+        if let _ = blockData {
+            
             completeSequence()
         } else {
             if sequenceIndex > sequences.count - 1 {
@@ -153,7 +148,7 @@ class RouteBot {
     }
     
     @IBAction func skip(_ sender: Any) {
-        guard operationIndex == 0 && block != nil else {
+        guard operationIndex == 0 && blockData != nil else {
             return
         }
         delegate.routeBot(self, isSkippingSequence: sequenceIndex, named: currentSequenceName)
@@ -167,11 +162,13 @@ class RouteBot {
     
     func completeSequence() {
         while true {
-            let start = DispatchTime.now()
-            block!()
-            let finish = DispatchTime.now()
-            let duration = Double(finish.rawValue - start.rawValue)
-            let remaining = Double(NSEC_PER_SEC / 4) - duration
+            let block = blockData!.block
+            if blockData!.operation.isTest {
+                schedule { block() }
+            } else {
+                block()
+            }
+            
             let nextOperation = operationIndex + 1
             if nextOperation == operations.count {
                 break
@@ -179,8 +176,12 @@ class RouteBot {
                 operationIndex = nextOperation
             }
         }
-        block = nil
-        delegate.routeBot(self, didCompleteSequence: sequenceIndex, named: currentSequenceName)
+        schedule {
+            self.blockData = nil
+            self.delegate.routeBot(self, didCompleteSequence: self.sequenceIndex, named: self.currentSequenceName)
+        }
+        
+        
     }
     
     func teeUpNextSequence() {
@@ -192,9 +193,9 @@ class RouteBot {
         operationIndex = 0
     }
     
-    func fetchOperationBlock(atIndex index: Int) -> (() -> Void) {
+    func fetchOperationBlock(atIndex index: Int) -> ((() -> Void), Operation) {
         let rawOperation = operations[index]
-        let data = rawOperation["data"] as Any
+        let data = rawOperation["data"] as Any?
         var block: (() -> Void)!
         let operationName = rawOperation["operation"] as! String
         let operation = Operation(rawValue: operationName)!
@@ -202,26 +203,21 @@ class RouteBot {
         switch operation {
             
             // Route Editing
-        case .addWaypointsToZones:
-            block = { self.addWaypointsToZones(rawData: data as! NSDictionary) }
-        case .setNext:
-            block = { self.setNext(diagram: data as! String) }
-        case .selectWaypoint:
-            block = { self.selectWaypoint(named: data as! String)}
-        case .deleteArrow:
-            block = { self.deleteArrow(startingAt: data as! String) }
-        case .deleteWaypoint:
-            block = { self.deleteNode(named: data as! String)}
-        case .insertWaypoint:
-            block = { self.insertWaypoint(onArrowAssociatedWithWaypointNamed: data as! String)}
-        case .moveWaypoint:
-            block = { self.moveWaypointToPoint(rawData: data as! NSDictionary) }
+            
+        case .moveCrosshairsToZone:
+            block = { self.moveCrosshairsToZone(data as! Int) }
+        case .tapAdd:
+            block = { self.tapAdd() }
+        case .tapRemove:
+            block = { self.tapRemove() }
+        case .setCrosshairsOnWaypoint:
+            block = { self.setCrosshairsOnWaypoint(named: data as! String) }
+        case .tapWaypoint:
+            block = { self.tapWaypoint(named: data as! String) }
+        case .setCrosshairsOnArrow:
+            block = { self.setCrosshairsOnArrow(originatingAt: data as! String) }
         case .moveWaypointToZone:
             block = { self.moveWaypointToZone(rawData: data as! NSDictionary) }
-        case .undo:
-            block = { self.undo(count: data as! Int)}
-        case .redo:
-            block = { self.redo(count: data as! Int)}
             
             
             // Tests
@@ -250,9 +246,12 @@ class RouteBot {
             break
         }
         
-        delegate.routeBot(self, loadedOperation: operationIndex, named: operationName, isTest: operation.isTest)
+        schedule {
+            self.delegate.routeBot(self, loadedOperation: self.operationIndex, named: operationName, isTest: operation.isTest)
+        }
         
-        return block
+        
+        return (block, operation)
         
     }
     
@@ -261,153 +260,73 @@ class RouteBot {
     
     // MARK: Operations
     
-    func undo(count: Int) {
-        var soFar = 0
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { (timer) in
-            soFar += 1
-            if soFar == count {
-                timer.invalidate()
-            }
-            DispatchQueue.main.async {
-                self.routeViewController.undo(self)
-            }
+    func setCrosshairsOnWaypoint(named name: String){
+        schedule {
+            let node = self.routeViewController.canvas.node(named: name)
+            self.routeViewController.move(self.routeViewController.crosshairs, to: node.center)
         }
     }
     
-    func redo(count: Int) {
-        var soFar = 0
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { (timer) in
-            soFar += 1
-            if soFar == count {
-                timer.invalidate()
-            }
-            DispatchQueue.main.async {
-                self.routeViewController.redo(self)
-            }
+    func tapAdd() {
+        schedule {
+            self.routeViewController.userTappedAdd(self)
         }
     }
     
-    func setCrosshairsOnPoint(rawData: NSDictionary) {
-        let point = CGPoint(from: rawData)
-        routeViewController.move(crosshairs, to: point)
-    }
-    
-    func setCrosshairsOnWaypoint(named name: String) {
-        let node = self.node(named: name)
-        routeViewController.move(crosshairs, to: node.center)
-    }
-    
-    func setCrosshairsOnArrowBetween(waypointNamed start: String, and end: String) {
-        let node⁰ = node(named: start)
-        let node¹ = node(named: end)
-        
-        let midpoint = node⁰.center.midpoint(node¹.center)
-        routeViewController.move(crosshairs, to: midpoint)
-    }
-    
-    var interval = 0.025
-    
-    func addWaypointsToZones(rawData: NSDictionary) {
-        let zonesString = rawData["zones"] as! String
-        let connected = rawData["connected"] as! Bool
-        let zones = zonesString.components(separatedBy: ",").map({Int($0.trimmingCharacters(in: .whitespaces))!})
-        interval = 0.025
-        
-        for zone in zones {
-            assert(zone != NODE_FREE_ZONE)
-            schedule {
-                self.routeViewController.move(self.crosshairs, to: self.center(of: zone))
-            }
-            
-            schedule {
-                self.routeViewController.userTappedAdd(self)
-            }
-            
-            guard !connected else {
-                continue
-            }
-            
-            schedule {
-                self.routeViewController.handleTap(at: self.crosshairs.center)
-            }
+    func tapRemove() {
+        schedule {
+            self.routeViewController.userTappedRemove(self)
         }
     }
     
-    func schedule(block: @escaping () -> Void) {
-        Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { (_) in
-            block()
+    func moveCrosshairsToZone(_ zone: Int) {
+        schedule {
+            let pt = self.center(of: zone)
+            self.routeViewController.move(self.routeViewController.crosshairs, to: pt)
         }
-        interval += 0.025
     }
     
-    func selectWaypoint(named name: String) {
-        
-        if name == "*" {
-            if routeViewController.selection != nil {
-                clearSelection()
-            }
-            return
+    func tapWaypoint(named name: String) {
+        schedule {
+            let node = self.routeViewController.canvas.node(named: name)
+            self.routeViewController.handleTap(at: node.center)
         }
-        
-        if let selected = routeViewController.selection?.name, selected == name {
-            return
+    }
+    
+    func setCrosshairsOnArrow(originatingAt waypointName: String) {
+        schedule {
+            let next = self.routeViewController.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+            let pt⁰ = self.routeViewController.route.location(ofWaypointNamed: waypointName)
+            let pt¹ = self.routeViewController.route.location(ofWaypointNamed: next)
+            let midPoint = pt⁰.midpoint(pt¹)
+            self.routeViewController.move(self.crosshairs, to: midPoint)
         }
-        
-        routeViewController.move(crosshairs, to: CGPoint(x: -100, y: -100))
-        let node = self.node(named: name)
-        routeViewController.handleTap(at: node.center)
-        routeViewController.move(crosshairs, to: CGPoint(x: 10, y: 10))
-    }
-    
-    func insertWaypoint(onArrowAssociatedWithWaypointNamed waypointName: String) {
-        clearSelection()
-        let nextName = routeViewController.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
-        setCrosshairsOnArrowBetween(waypointNamed: waypointName, and: nextName)
-        routeViewController.userTappedAdd(self)
-    }
-    
-    func setNext(diagram: String) {
-        let comps = diagram.components(separatedBy: "→")
-        assert(comps.count == 2)
-        let origin = comps.first!
-        let source = comps.last!
-        
-        selectWaypoint(named: origin)
-        setCrosshairsOnWaypoint(named: source)
-        routeViewController.userTappedAdd(self)
-        
-    }
-    
-    func deleteArrow(startingAt nodeName: String) {
-        clearSelection()
-        let nextName = routeViewController.route.nameOfWaypointFollowing(waypointNamed: nodeName)!
-        setCrosshairsOnArrowBetween(waypointNamed: nodeName, and: nextName)
-        routeViewController.userTappedRemove(self)
-    }
-    
-    func deleteNode(named nodeName: String) {
-        setCrosshairsOnWaypoint(named: nodeName)
-        routeViewController.userTappedRemove(self)
-    }
-    
-    func clearSelection() {
-        let pt = randomPoint(in: NODE_FREE_ZONE)
-        routeViewController.handleTap(at: pt)
-    }
-    
-    func moveWaypointToPoint(rawData: NSDictionary) {
-        let waypointName = rawData["waypoint"] as! String
-        let point = CGPoint(from: rawData["point"] as! NSDictionary)
-        let node = routeViewController.node(named: waypointName)
-        routeViewController.move(node, to: point)
     }
     
     func moveWaypointToZone(rawData: NSDictionary) {
-        let waypointName = rawData["waypoint"] as! String
-        let zone = rawData["zone"] as! Int
-        let node = routeViewController.node(named: waypointName)
-        routeViewController.move(node, to: center(of: zone))
+        schedule {
+            let waypointName = rawData["waypoint"] as! String
+            let zone = rawData["zone"] as! Int
+            self.routeViewController.move(waypointNamed: waypointName, to: self.center(of: zone))
+        }
     }
+    
+    // OLD -->
+
+    
+    
+    
+    func schedule(block: @escaping () -> Void) {
+        Timer.scheduledTimer(withTimeInterval: Double(scheduleCounter) * scheduleInterval, repeats: false) { (_) in
+            block()
+        }
+        scheduleCounter += 1
+    }
+    
+    
+    
+    
+
     
     // MARK: Evaluation
     
@@ -451,6 +370,7 @@ class RouteBot {
         }
         delegate.routeBot(self, evaluated: Operation.countWaypoints.rawValue, didPass: pass
             , details: msg)
+        
     }
 
     func countArrows(expected: Int) {
