@@ -14,11 +14,26 @@ class DashedLineView: UIView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        commonInit()
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    func commonInit() {
         guard dashedLine.superlayer == nil else {
             return
         }
         layer.addSublayer(dashedLine)
         buildDashedLineLayer()
+        
     }
     
     func buildDashedLineLayer() {
@@ -34,18 +49,9 @@ class DashedLineView: UIView {
         }
         
         dashedLine.lineWidth = 1
-        dashedLine.lineDashPattern = [4,4]
+        dashedLine.lineDashPattern = [2,2]
         dashedLine.fillColor = UIColor.clear.cgColor
         dashedLine.strokeColor = UIColor.gray.cgColor
         dashedLine.path = path.cgPath
     }
-    
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
-
 }

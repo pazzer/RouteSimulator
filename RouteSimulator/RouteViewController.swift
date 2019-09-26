@@ -8,7 +8,7 @@
 
 import UIKit
 
-
+let NODE_FREE_ZONE = 0
 let UNICODE_CAP_A = 65
 
 let grid: (rows: Int, columns: Int) = (15, 8)
@@ -113,16 +113,17 @@ class RouteViewController: UIViewController {
         _undoManager = UndoManager()
     }
     
-    var testsSummaryController = TestsSummaryController()
+    lazy var testsSummaryController: TestsSummaryController = {
+        let testsSummaryController = TestsSummaryController()
+        testsSummaryController.routeViewController = self
+        return testsSummaryController
+    }()
     
     func prepareForTesting() {
-        guard let testsUrl = self.tests else {
-            fatalError("Failed to get tests")
-        }
         installTestSummaryView()
-        testsSummaryController.routeBot = routeBot
+        testsSummaryController.uiBot = uiBot
         
-        routeBot.loadData(from: testsUrl)
+        
     }
     
     func installTestSummaryView() {
@@ -162,23 +163,7 @@ class RouteViewController: UIViewController {
         updateButtons()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-//
-//        let observer = CFRunLoopObserverCreate(kCFAllocatorDefault, CFRunLoopActivity.beforeSources.rawValue |  CFRunLoopActivity.beforeWaiting.rawValue, true, 0, { (observer, activity, _) in
-//        
-//            if activity.contains(.beforeWaiting) {
-//                print("before waiting")
-//            }
-//
-//        }, nil)
-//
-//        CFRunLoopAddObserver(CFRunLoopGetMain(), observer!, CFRunLoopMode.commonModes)
-    }
-    
-    
-    
+
     func randomLocation(in zone: Int) -> CGPoint {
         
         let nRows = CGFloat(grid.rows)
@@ -281,11 +266,11 @@ class RouteViewController: UIViewController {
         }
         
         guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
-            print("setting to nil")
+            
             updateSelection(to: nil, isUndoable: true)
             return
         }
-        print("updating")
+        
         updateSelection(to: node.name, isUndoable: true)
     }
     
@@ -304,11 +289,11 @@ class RouteViewController: UIViewController {
             if let arrow = arrowUnderCursor {
                 insertCirle(on: arrow)
             } else {
-                print("calling <addStandaloneNode>")
+                
                 addStandaloneNode(at: crosshairs.center, named: autoName())
             }
         case let (nil, selection?):
-            print("calling <extend>")
+            
             extend(from: selection, to: crosshairs.center, withName: autoName())
         case let (nodeUnderCursor?, selection?):
             updateNext(of: selection, to: nodeUnderCursor)
@@ -453,15 +438,12 @@ class RouteViewController: UIViewController {
         updateSelection(to: newNode.name, isUndoable: false)
         
         undoManager?.setActionName("undo <extend>")
-        print("adding undo <extend>")
         undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            print("executing undo <extend>")
             self.removeExtension(toNodeNamed: name, fromNodeNamed: existingName)
         })
     }
     
     func removeExtension(toNodeNamed name¹: String, fromNodeNamed name⁰: String) {
-        print("remove")
         guard route.nameOfWaypointFollowing(waypointNamed: name¹) == nil else {
             fatalError("<removeExtension> assumes node being removed has no next")
         }
@@ -527,8 +509,6 @@ class RouteViewController: UIViewController {
     
     
     var deletedWaypoints = [(name: String, location: CGPoint)]()
-    
-    
     
     @IBAction func userTappedRemove(_ sender: Any) {
         
@@ -638,11 +618,9 @@ class RouteViewController: UIViewController {
     
     var tests = Bundle.main.url(forResource: "BotTests", withExtension: "plist")
     
-    lazy var routeBot: RouteBot = {
-        let routeBot = RouteBot()
-        routeBot.routeViewController = self
-        routeBot.delegate = self.testsSummaryController
-        return routeBot
+    lazy var uiBot: UIBot = {
+        let uiBot = UIBot(url: self.tests!, delegate: self.testsSummaryController, dataSource: self)
+        return uiBot
     }()
     
     
@@ -696,3 +674,205 @@ class RouteViewController: UIViewController {
     }
 }
 
+
+// Testing extension
+
+extension RouteViewController: UIBotDataSource {
+    
+    func uiBot(_ uiBot: UIBot, executeTestNamed testName: String, data: Any?) -> (pass: Bool, msg: String) {
+        switch testName {
+        case "COUNT_WAYPOINTS":
+            return countWaypoints(expectedWaypoints: data as! Int)
+        case "COUNT_ARROWS":
+            return countArrows(expected: data as! Int)
+        default:
+            fatalError()
+        }
+    }
+    
+    
+    func uiBot(_ uiBot: UIBot, operationIsTest operationName: String) -> Bool {
+        return ["COUNT_WAYPOINTS", "COUNT_ARROWS", "VALIDATE_ARROW_PRESENCE"].contains(operationName)
+    }
+
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void) {
+        switch operationName {
+            
+        // Editing
+        case "TAP_ADD":
+            return tapAdd()
+        case "TAP_REMOVE":
+            return tapRemove()
+        case "TAP_WAYPOINT":
+            return tapWaypoint(named: operationData as! String)
+        case "MOVE_CROSSHAIRS_TO_ZONE":
+            return moveCrosshairsToZone(operationData as! Int)
+        case "MOVE_WAYPOINT_TO_ZONE":
+            return moveWaypointToZone(rawData: operationData as! NSDictionary)
+        case "SET_CROSSHAIRS_ON_WAYPOINT":
+            return setCrosshairsOnWaypoint(named: operationData as! String)
+        case "SET_CROSSHAIRS_ON_ARROW":
+            return setCrosshairsOnArrow(originatingAt: operationData as! String)
+        default:
+            fatalError("\(operationName) not recognised")
+        }
+    }
+    
+    func setCrosshairsOnWaypoint(named name: String) -> () -> Void {
+        return {
+            let node = self.canvas.node(named: name)
+            self.move(self.crosshairs, to: node.center)
+        }
+    }
+    
+    func tapAdd() -> () -> Void {
+        return {
+            self.userTappedAdd(self)
+        }
+    }
+    
+    func tapRemove() -> () -> Void {
+        return {
+            self.userTappedRemove(self)
+        }
+    }
+    
+    func moveCrosshairsToZone(_ zone: Int) -> () -> Void {
+        return {
+            let pt = self.center(of: zone)
+            self.move(self.crosshairs, to: pt)
+        }
+    }
+    
+    func tapWaypoint(named name: String) -> () -> Void {
+        return {
+            let node = self.canvas.node(named: name)
+            self.handleTap(at: node.center)
+        }
+    }
+    
+    func setCrosshairsOnArrow(originatingAt waypointName: String) -> () -> Void {
+        return {
+            let next = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+            let pt⁰ = self.route.location(ofWaypointNamed: waypointName)
+            let pt¹ = self.route.location(ofWaypointNamed: next)
+            let midPoint = pt⁰.midpoint(pt¹)
+            self.move(self.crosshairs, to: midPoint)
+        }
+    }
+    
+    func moveWaypointToZone(rawData: NSDictionary) -> () -> Void {
+        return {
+            let waypointName = rawData["waypoint"] as! String
+            let zone = rawData["zone"] as! Int
+            self.move(waypointNamed: waypointName, to: self.center(of: zone))
+        }
+    }
+    
+    // TESTS
+    
+    func countWaypoints(expectedWaypoints: Int) -> (Bool, String) {
+        let pass: Bool
+        let msg: String
+        let actualWaypoints = route.numbeOfWaypoints
+        let actualCircles = canvas.graphics.filter { $0 is Node }.count
+        if actualWaypoints == expectedWaypoints {
+            if actualCircles == actualWaypoints {
+                pass = true
+                msg = "Number of waypoints is \(expectedWaypoints)"
+            } else {
+                pass = false
+                msg = "Number of waypoints is as expected \(expectedWaypoints), but number of circles on the canvas is not \(actualCircles)"
+            }
+        } else {
+            pass = false
+            msg = "Number of waypoints is \(actualWaypoints), not \(expectedWaypoints)"
+        }
+        return (pass, msg)
+    }
+    
+    func countArrows(expected: Int) -> (Bool, String) {
+        let graphicsCount = canvas.graphics.filter { $0 is Arrow}.count
+        let mapCount = arrows.count
+        let pass: Bool
+        let msg: String
+        if expected == mapCount {
+            if expected == graphicsCount {
+                pass = true
+                msg = "number of arrows is \(expected)"
+            } else {
+                pass = false
+                msg = "arrow-map contains expected number of arrows \(expected), but number graphics on canvas is reported as \(graphicsCount)"
+            }
+        } else {
+            pass = false
+            msg = "number of arrows in arrow map is \(mapCount), not \(expected)"
+        }
+        
+        return (pass, msg)
+    }
+    
+    func deletedWaypoints(names: String) -> (Bool, String) {
+        let expected = ConvertSeparatedStringToArray(names).sorted()
+        let actual = deletedWaypoints.map({$0.name}).sorted()
+        let pass = expected == actual
+        let msg = pass ? "deleted waypoints array does consist of \(expected)" : "deleted waypoints array consists of \(actual), not \(expected)"
+        return (pass, msg)
+    }
+    
+    func validateRouteNext(diagram: String) -> (Bool, String) {
+        let comps = diagram.components(separatedBy: "→")
+        let name = comps.first!
+        var expectedNext = comps.last!
+        var pass: Bool
+        var msg: String
+        if let actualNext = route.nameOfWaypointFollowing(waypointNamed: name) {
+            pass = actualNext == expectedNext
+            if pass {
+                msg = "next of '\(name)' is \(actualNext)."
+            } else {
+                expectedNext = expectedNext == "*" ? "nil" : expectedNext
+                msg = "next of '\(name) is \(actualNext), not \(expectedNext)"
+            }
+        } else {
+            pass = expectedNext == "*"
+            if pass {
+                msg = "next of \(name) is nil"
+            } else {
+                msg = "next of \(name) is nil, not \(expectedNext)"
+            }
+        }
+        return (pass, msg)
+    }
+    
+    
+    // Working with zones
+    
+    private var zoneSize: CGSize {
+        let nRows = CGFloat(grid.rows)
+        let nCols = CGFloat(grid.columns)
+        
+        let zoneWidth = canvas.bounds.width / nCols
+        let zoneHeight = canvas.bounds.height / nRows
+        
+        return CGSize(width: zoneWidth, height: zoneHeight)
+    }
+    
+    private func origin(of zone: Int) -> CGPoint {
+        
+        let nCols = CGFloat(grid.columns)
+        
+        let (row, _) = modf(CGFloat(zone) / nCols)
+        let col = CGFloat(zone) - (row * nCols)
+        
+        let minX = col * zoneSize.width
+        let minY = row * zoneSize.height
+        
+        return CGPoint(x: minX, y: minY)
+    }
+    
+    private func center(of zone: Int) -> CGPoint {
+        let origin = self.origin(of: zone)
+        return CGPoint(x: origin.x + zoneSize.width * 0.5, y: origin.y + zoneSize.height * 0.5)
+    }
+}

@@ -11,6 +11,8 @@ import XCTest
 
 class RouteSimulatorTests: XCTestCase {
 
+    
+
     var routeA: Route {
         let route = Route()
         ["a", "b", "c", "d"].forEach { route.add(waypointNamed: $0, at: .zero) }

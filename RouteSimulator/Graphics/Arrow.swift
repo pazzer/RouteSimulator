@@ -16,7 +16,7 @@ struct ArrowMetrics {
 }
 
 
-class Arrow: Graphic {
+public class Arrow: Graphic {
     
     static var defaultMetrics = ArrowMetrics(tipHeight: 20, tipWidth: 20, shaftWidth: 5)
     
@@ -151,8 +151,6 @@ class Arrow: Graphic {
     func draw(in context: CGContext, rect: CGRect) {
         UIColor.gray.setFill()
         path.fill()
-        
-        
     }
     
 

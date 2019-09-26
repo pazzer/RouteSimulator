@@ -11,7 +11,7 @@ import UIKit
 import Foundation
 import UIKit
 
-extension NSLayoutConstraint {
+public extension NSLayoutConstraint {
     
     class func fitSubviewIntoSuperview(subview: UIView) {
         let superview = subview.superview!

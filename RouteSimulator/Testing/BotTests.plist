@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>name</key>
+		<string>All Standard Ops (No Undo)</string>
+		<key>operations</key>
+		<array>
+			<string>Adding waypoints a,b,c and d</string>
+			<dict>
+				<key>data</key>
+				<integer>49</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>18</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>22</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>47</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Deleting B</string>
+			<dict>
+				<key>data</key>
+				<string>B</string>
+				<key>name</key>
+				<string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+			</dict>
+			<string>Counting Tests</string>
+			<dict>
+				<key>data</key>
+				<integer>4</integer>
+				<key>name</key>
+				<string>COUNT_WAYPOINTS</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>3</integer>
+				<key>name</key>
+				<string>COUNT_ARROWS</string>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>Extension Undos</string>
+		<key>operations</key>
+		<array>
+			<dict>
+				<key>data</key>
+				<integer>18</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+		</array>
+	</dict>
+</array>
+</plist>

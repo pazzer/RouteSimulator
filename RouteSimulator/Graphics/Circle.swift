@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class Node: Graphic {
+public class Node: Graphic {
     
     init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, name: String) {
         self.frame = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)

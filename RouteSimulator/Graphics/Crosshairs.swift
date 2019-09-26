@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class Crosshairs: Graphic {
+public class Crosshairs: Graphic {
     var frame: CGRect = .zero {
         didSet {
             updatePaths()

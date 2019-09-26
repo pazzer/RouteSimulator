@@ -7,21 +7,24 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TestsSummaryController" customModule="RouteSimulator" customModuleProvider="target">
             <connections>
+                <outlet property="buttonStack" destination="p2T-Os-q4i" id="SLh-ev-Py0"/>
                 <outlet property="currentFails" destination="dzv-F7-B6g" id="Qsa-xz-Dha"/>
                 <outlet property="currentPasses" destination="jcM-ik-yDs" id="Ugg-8r-d6p"/>
                 <outlet property="currentTest" destination="aE2-yR-IFt" id="3lY-g7-p79"/>
-                <outlet property="jump" destination="483-o2-4ux" id="Hxs-vZ-AOK"/>
                 <outlet property="leftOperation" destination="Jv9-Y4-5wj" id="MX6-nl-xPQ"/>
                 <outlet property="mainSummary" destination="2Cc-Mm-Ekn" id="6g7-7r-mcX"/>
                 <outlet property="middleOperation" destination="Ru9-P7-mP6" id="Zun-ke-9lx"/>
                 <outlet property="rightOperation" destination="xnH-gW-jRk" id="Ued-9J-yNf"/>
-                <outlet property="skip" destination="aWk-Ai-C59" id="T6S-bK-rha"/>
-                <outlet property="step" destination="xIB-IN-g42" id="qpI-je-ttM"/>
+                <outlet property="sectionStep" destination="xIB-IN-g42" id="XtK-SP-XYW"/>
+                <outlet property="sequenceSkip" destination="aWk-Ai-C59" id="79r-4V-6jQ"/>
+                <outlet property="sequenceStep" destination="483-o2-4ux" id="98i-0e-bgm"/>
+                <outlet property="step" destination="ucm-AB-5Fg" id="xAf-ma-JUg"/>
                 <outlet property="testNumber" destination="yFU-CJ-3nV" id="1kg-Jf-clf"/>
                 <outlet property="view" destination="6KW-3u-Vbw" id="xUf-JC-wfP"/>
             </connections>
@@ -31,21 +34,6 @@
             <rect key="frame" x="0.0" y="0.0" width="335" height="168"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="62C-Bd-rqf" customClass="DashedLineView" customModule="RouteSimulator" customModuleProvider="target">
-                    <rect key="frame" x="223" y="120" width="3" height="48"/>
-                    <constraints>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="48" id="3oc-uR-Sph"/>
-                        <constraint firstAttribute="height" constant="48" id="IGZ-64-Eil"/>
-                        <constraint firstAttribute="width" constant="3" id="QJg-ai-o5S"/>
-                    </constraints>
-                </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C73-9P-fO7" customClass="DashedLineView" customModule="RouteSimulator" customModuleProvider="target">
-                    <rect key="frame" x="109" y="120" width="3" height="48"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="3" id="TWe-1b-2Hs"/>
-                        <constraint firstAttribute="height" constant="48" id="akV-ZK-Doc"/>
-                    </constraints>
-                </view>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Cc-Mm-Ekn">
                     <rect key="frame" x="0.0" y="0.0" width="335" height="32"/>
                     <color key="backgroundColor" red="0.58431372550000005" green="0.71372549019999998" blue="0.86274509799999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -81,21 +69,6 @@
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xIB-IN-g42">
-                    <rect key="frame" x="0.0" y="120" width="109" height="48"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="109" id="9WS-xc-hfB"/>
-                        <constraint firstAttribute="height" constant="48" id="cEx-Mv-bTx"/>
-                    </constraints>
-                    <state key="normal" image="Step"/>
-                </button>
-                <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="483-o2-4ux">
-                    <rect key="frame" x="112" y="120" width="111" height="48"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="48" id="4B0-V5-JNz"/>
-                    </constraints>
-                    <state key="normal" image="Jump"/>
-                </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dzv-F7-B6g">
                     <rect key="frame" x="319" y="44" width="8" height="16"/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
@@ -131,24 +104,46 @@
                         </label>
                     </subviews>
                 </stackView>
-                <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aWk-Ai-C59">
-                    <rect key="frame" x="226" y="120" width="109" height="48"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="109" id="eKv-ia-uGK"/>
-                        <constraint firstAttribute="height" constant="48" id="uSD-Q2-H3X"/>
-                    </constraints>
-                    <state key="normal" image="Skip"/>
-                </button>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="p2T-Os-q4i">
+                    <rect key="frame" x="0.0" y="120" width="335" height="48"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ucm-AB-5Fg">
+                            <rect key="frame" x="0.0" y="13" width="78" height="22"/>
+                            <state key="normal" image="SmallPlay"/>
+                            <connections>
+                                <action selector="step:" destination="-1" eventType="touchUpInside" id="M3K-Lp-ijW"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xIB-IN-g42">
+                            <rect key="frame" x="86" y="9" width="77.5" height="30"/>
+                            <state key="normal" image="Step"/>
+                            <connections>
+                                <action selector="sectionStep:" destination="-1" eventType="touchUpInside" id="Sxb-Xx-GXK"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="483-o2-4ux">
+                            <rect key="frame" x="171.5" y="10" width="78" height="28"/>
+                            <state key="normal" image="Jump"/>
+                            <connections>
+                                <action selector="sequenceSkip:" destination="-1" eventType="touchUpInside" id="LoQ-au-04M"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aWk-Ai-C59">
+                            <rect key="frame" x="257.5" y="8" width="77.5" height="32"/>
+                            <state key="normal" image="Skip"/>
+                            <connections>
+                                <action selector="sequenceStep:" destination="-1" eventType="touchUpInside" id="ZkU-oY-veM"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
             </subviews>
             <color key="backgroundColor" red="0.9454152920703196" green="0.9454152920703196" blue="0.9454152920703196" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="YRD-ta-6k8" firstAttribute="top" secondItem="8hV-cG-FuN" secondAttribute="bottom" constant="1" id="0nF-At-ysP"/>
-                <constraint firstItem="62C-Bd-rqf" firstAttribute="leading" secondItem="483-o2-4ux" secondAttribute="trailing" id="0s4-vn-x0n"/>
-                <constraint firstAttribute="bottom" secondItem="62C-Bd-rqf" secondAttribute="bottom" id="3TF-D0-hkS"/>
-                <constraint firstItem="483-o2-4ux" firstAttribute="leading" secondItem="C73-9P-fO7" secondAttribute="trailing" id="5Ot-Vu-jre"/>
                 <constraint firstItem="BUS-Ul-v8V" firstAttribute="top" secondItem="8hV-cG-FuN" secondAttribute="bottom" constant="41" id="6PC-7N-Jtr"/>
                 <constraint firstAttribute="bottom" secondItem="BUS-Ul-v8V" secondAttribute="bottom" constant="48" id="ArE-uP-7YO"/>
-                <constraint firstItem="C73-9P-fO7" firstAttribute="leading" secondItem="xIB-IN-g42" secondAttribute="trailing" id="CH7-yG-F2b"/>
+                <constraint firstItem="p2T-Os-q4i" firstAttribute="leading" secondItem="ou2-SI-hJr" secondAttribute="leading" id="BHA-AP-p2r"/>
                 <constraint firstAttribute="trailing" secondItem="BUS-Ul-v8V" secondAttribute="trailing" id="FSB-AW-Erc"/>
                 <constraint firstItem="yFU-CJ-3nV" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" constant="8" id="GdQ-yH-4Xt"/>
                 <constraint firstItem="8hV-cG-FuN" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" id="HEd-SV-h6R"/>
@@ -157,24 +152,19 @@
                 <constraint firstAttribute="trailing" secondItem="YRD-ta-6k8" secondAttribute="trailing" constant="6" id="NY3-AB-2vz"/>
                 <constraint firstItem="aE2-yR-IFt" firstAttribute="top" secondItem="2Cc-Mm-Ekn" secondAttribute="bottom" constant="12" id="P0L-3u-TxT"/>
                 <constraint firstItem="dzv-F7-B6g" firstAttribute="leading" secondItem="jcM-ik-yDs" secondAttribute="trailing" constant="8" id="P2t-2X-cV0"/>
-                <constraint firstAttribute="bottom" secondItem="62C-Bd-rqf" secondAttribute="bottom" id="PCT-ZI-bXc"/>
                 <constraint firstItem="YRD-ta-6k8" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" constant="6" id="Sf3-Xv-j6P"/>
-                <constraint firstAttribute="bottom" secondItem="C73-9P-fO7" secondAttribute="bottom" id="WSP-fW-8MJ"/>
+                <constraint firstItem="p2T-Os-q4i" firstAttribute="top" secondItem="BUS-Ul-v8V" secondAttribute="bottom" id="WjY-nb-RJI"/>
                 <constraint firstAttribute="trailing" secondItem="dzv-F7-B6g" secondAttribute="trailing" constant="8" id="b8z-yq-UUZ"/>
                 <constraint firstItem="BUS-Ul-v8V" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" id="bgI-yo-fKC"/>
                 <constraint firstItem="8hV-cG-FuN" firstAttribute="top" secondItem="yFU-CJ-3nV" secondAttribute="bottom" constant="13" id="c6a-Ox-lOz"/>
-                <constraint firstAttribute="trailing" secondItem="aWk-Ai-C59" secondAttribute="trailing" id="d1d-bG-NmM"/>
                 <constraint firstItem="8hV-cG-FuN" firstAttribute="top" secondItem="jcM-ik-yDs" secondAttribute="bottom" constant="13" id="fJR-IJ-Uh9"/>
+                <constraint firstItem="ou2-SI-hJr" firstAttribute="trailing" secondItem="p2T-Os-q4i" secondAttribute="trailing" id="luQ-Gt-gVJ"/>
                 <constraint firstItem="aE2-yR-IFt" firstAttribute="centerX" secondItem="6KW-3u-Vbw" secondAttribute="centerX" id="mUG-l7-NTG"/>
                 <constraint firstItem="2Cc-Mm-Ekn" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" id="o3z-Kt-5Nz"/>
-                <constraint firstItem="aWk-Ai-C59" firstAttribute="leading" secondItem="62C-Bd-rqf" secondAttribute="trailing" id="p8G-5F-qPE"/>
                 <constraint firstItem="2Cc-Mm-Ekn" firstAttribute="top" secondItem="6KW-3u-Vbw" secondAttribute="top" id="pa1-np-muk"/>
-                <constraint firstAttribute="bottom" secondItem="xIB-IN-g42" secondAttribute="bottom" id="qyE-H3-Xsl"/>
-                <constraint firstAttribute="bottom" secondItem="483-o2-4ux" secondAttribute="bottom" id="txo-zp-iIA"/>
-                <constraint firstItem="xIB-IN-g42" firstAttribute="leading" secondItem="6KW-3u-Vbw" secondAttribute="leading" id="vJG-ST-3LV"/>
+                <constraint firstAttribute="bottom" secondItem="p2T-Os-q4i" secondAttribute="bottom" id="r5a-D9-iW9"/>
                 <constraint firstAttribute="trailing" secondItem="8hV-cG-FuN" secondAttribute="trailing" id="vgH-zR-XeY"/>
                 <constraint firstItem="8hV-cG-FuN" firstAttribute="top" secondItem="dzv-F7-B6g" secondAttribute="bottom" constant="13" id="whc-kS-rZr"/>
-                <constraint firstAttribute="bottom" secondItem="aWk-Ai-C59" secondAttribute="bottom" id="yEw-Eo-uaQ"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="ou2-SI-hJr"/>
@@ -184,12 +174,13 @@
                 </userDefinedRuntimeAttribute>
                 <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
             </userDefinedRuntimeAttributes>
-            <point key="canvasLocation" x="1060" y="-525"/>
+            <point key="canvasLocation" x="1058.6956521739132" y="-525"/>
         </view>
     </objects>
     <resources>
         <image name="Jump" width="28" height="28"/>
         <image name="Skip" width="20" height="32"/>
+        <image name="SmallPlay" width="13" height="15"/>
         <image name="Step" width="26" height="30"/>
     </resources>
 </document>
