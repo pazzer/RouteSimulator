@@ -24,7 +24,7 @@ class UIBotSequence {
      */
     private var operations: [Any]
     private var position: Int = 0
-    var section = "START"
+    var section: String?
     
     init(from rawSequence: NSDictionary) {
         self.name = rawSequence["name"] as! String

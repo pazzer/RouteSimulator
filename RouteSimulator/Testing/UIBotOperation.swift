@@ -14,10 +14,10 @@ struct UIBotOperation {
     let name: String
     let data: Any
     
-    let section: String
+    let section: String?
     let index: Int
     
-    init(from rawOperation: NSDictionary, index: Int, section: String) {
+    init(from rawOperation: NSDictionary, index: Int, section: String?) {
         self.name = rawOperation["name"] as! String
         self.data = rawOperation["data"] as Any
         self.section = section

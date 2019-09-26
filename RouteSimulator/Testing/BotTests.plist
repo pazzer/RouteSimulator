@@ -55,16 +55,22 @@
 				<key>name</key>
 				<string>SET_CROSSHAIRS_ON_WAYPOINT</string>
 			</dict>
+			<dict>
+				<key>data</key>
+				<string>B</string>
+				<key>name</key>
+				<string>TAP_REMOVE</string>
+			</dict>
 			<string>Counting Tests</string>
 			<dict>
 				<key>data</key>
-				<integer>4</integer>
+				<integer>3</integer>
 				<key>name</key>
 				<string>COUNT_WAYPOINTS</string>
 			</dict>
 			<dict>
 				<key>data</key>
-				<integer>3</integer>
+				<integer>1</integer>
 				<key>name</key>
 				<string>COUNT_ARROWS</string>
 			</dict>

@@ -44,17 +44,17 @@ class BotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         return (true, "")
     }
 
-    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String, operationIndex: Int, isTest: Bool) {
+    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool) {
         lastLoadedOperation = named
         guard let block = loadedOpBlock else {
             return
         }
         
         block()
-        
     }
     
-    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?) {
+    
+    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool) {
         guard let block = sequenceCompleteBlock else {
             return
         }
@@ -71,43 +71,43 @@ class BotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         // Test 1
         var bot = UIBot(sequences: [SequenceB()], delegate: self, dataSource: self)
         self.result = 0
-        
+
         try! bot.step() // executed 1.0, now at 2.0
         try! bot.step() // executed 2.0, now at 3.0
-        
+
         var resultExpectation = XCTestExpectation(description: "Result == 125")
-        
+
         sequenceCompleteBlock = {
             if self.result == 125 {
                 resultExpectation.fulfill()
             }
         }
-        
-        
+
+
         try! bot.step(to: .end) // executed 3.0, .1, .2 and 4.0, now at end
         wait(for: [resultExpectation], timeout: 10)
-        
+
         sequenceCompleteBlock = nil
         
         // Test 2
         bot = UIBot(sequences: [SequenceB()], delegate: self, dataSource: self)
         self.result = 0
-        
+
         try! bot.step() // executed 1.0, now at 2.0
-        
+        XCTAssertEqual(result, 1)
+
         resultExpectation = XCTestExpectation(description: "Result == 5")
-        
+
         loadedOpBlock = {
             if self.result == 5 {
                 resultExpectation.fulfill()
             }
         }
-        
+
         try! bot.step(to: .nextSection) // executed 2.0, now at 3.0
         wait(for: [resultExpectation], timeout: 10)
         XCTAssertEqual(lastLoadedOperation!, "3.0")
         loadedOpBlock = nil
-        
     }
     
     func testSequenceLoading() {
@@ -279,5 +279,27 @@ class BotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
             thrownError = error as? UIBotError
         }
         XCTAssertEqual(thrownError!, UIBotError.noSequencesRemaining)
+    }
+    
+    
+    
+    func testSequenceCompleteDelegate() {
+        // Tests whether bot.allSequncesComplete returns the correct value in the delegate method <didCompleteSequence>
+        let seqs = [SequenceA(),SequenceB(),SequenceC()]
+        let bot = UIBot(sequences: seqs, delegate: self, dataSource: self)
+        try! bot.loadNextSequence()
+        try! bot.loadNextSequence()
+        
+        let allCompleteExpectation = XCTestExpectation(description: "All Complete")
+        sequenceCompleteBlock = {
+            if bot.allSequencesComplete == true {
+                allCompleteExpectation.fulfill()
+            }
+        }
+        try! bot.step(to: .end)
+        wait(for: [allCompleteExpectation], timeout: 10)
+        
+        
+        
     }
 }

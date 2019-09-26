@@ -413,7 +413,6 @@ class RouteViewController: UIViewController {
     
     
     func extend(from existingNode: Node, to location: CGPoint, withName name: String) {
-        print("extend")
         let newNode = self.newNode(at: location, name: name)
         let currentNext = route.nameOfWaypointFollowing(waypointNamed: existingNode.name)
         let existingName = existingNode.name

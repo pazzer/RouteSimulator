@@ -23,18 +23,16 @@ protocol UIBotDataSource {
 
 protocol UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named name: String?)
-    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String, operationIndex: Int, isTest: Bool)
-    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?)
-    func uiBotCompletedAllSequences(_ uiBot: UIBot)
+    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool)
+    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool)
     func uiBot(_ uiBot: UIBot, isSkippingSequence index: Int, named name: String?)
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?)
 }
 
 extension UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named name: String?) { }
-    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String, operationIndex: Int, isTest: Bool) { }
-    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?) { }
-    func uiBotCompletedAllSequences(_ uiBot: UIBot) { }
+    func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool) { }
+    func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool) { }
     func uiBot(_ uiBot: UIBot, isSkippingSequence index: Int, named name: String?) { }
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?) { }
 }
@@ -93,7 +91,8 @@ class UIBot {
             guard let pending = self.pending else {
                 return
             }
-            delegate.uiBot(self, loadedOperation: pending.name, fromSection: pending.section, operationIndex: pending.index, isTest: false)
+            let isTest = dataSource.uiBot(self, operationIsTest: pending.name)
+            delegate.uiBot(self, loadedOperation: pending.name, fromSection: pending.section, operationIndex: pending.index, isTest: isTest)
         }
     }
     
@@ -137,7 +136,7 @@ class UIBot {
     private func blocksDidExecute() {
         if sequence.isComplete {
             self.pending = nil
-            delegate.uiBot(self, didCompleteSequence: sequenceIndex, named: sequence.name)
+            delegate.uiBot(self, didCompleteSequence: sequenceIndex, named: sequence.name, isLast: allSequencesComplete)
         } else {
             self.pending = try! sequence.step()
         }
@@ -183,8 +182,9 @@ class UIBot {
         }
         
         if sequence.isComplete {
+            self.pending = nil
             blocks.append {
-                self.delegate.uiBot(self, didCompleteSequence: self.sequenceIndex, named: self.sequence.name)
+                self.delegate.uiBot(self, didCompleteSequence: self.sequenceIndex, named: self.sequence.name, isLast: self.allSequencesComplete)
             }
         } else {
             blocks.append { self.pending = try! self.sequence.step() }
