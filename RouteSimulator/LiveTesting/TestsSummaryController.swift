@@ -12,12 +12,14 @@ class TestsSummaryController: NSObject, UIBotDelegate {
     
     @IBOutlet var view: UIView!
     
-    @IBOutlet weak var sectionName: UILabel!
+    
     @IBOutlet weak var testNumber: UILabel!
     @IBOutlet weak var currentTest: UILabel!
+    
     @IBOutlet weak var mainSummary: UILabel!
     @IBOutlet weak var currentFails: UILabel!
     @IBOutlet weak var currentPasses: UILabel!
+    @IBOutlet weak var sectionName: UILabel!
     @IBOutlet weak var leftOperation: UILabel!
     @IBOutlet weak var middleOperation: UILabel!
     @IBOutlet weak var rightOperation: UILabel!
@@ -75,8 +77,6 @@ class TestsSummaryController: NSObject, UIBotDelegate {
             self.totalPasses = 0
             self.totalFails = 0
             completed = 0
-            
-            
         } catch {
             print("Unexpected Error")
         }
@@ -88,6 +88,7 @@ class TestsSummaryController: NSObject, UIBotDelegate {
         if index == 0 {
             setUp()
         }
+        
         leftOperation.text = nil
         middleOperation.text = nil
         rightOperation.text = nil
@@ -95,7 +96,7 @@ class TestsSummaryController: NSObject, UIBotDelegate {
         sequenceFails = 0
         sequencePasses = 0
         
-        routeViewController.clearRoute()
+        routeViewController.clearRoute(self)
         routeViewController.unicodePoint = UNICODE_CAP_A
         
         currentTest.text = named
@@ -220,8 +221,6 @@ class TestsSummaryController: NSObject, UIBotDelegate {
             view.addSubview(dlv)
         }
     }
-    
-    
-    
-    
 }
+
+

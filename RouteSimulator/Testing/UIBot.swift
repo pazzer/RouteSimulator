@@ -25,7 +25,6 @@ protocol UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named name: String?)
     func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool)
     func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool)
-    func uiBot(_ uiBot: UIBot, isSkippingSequence index: Int, named name: String?)
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?)
 }
 
@@ -33,7 +32,6 @@ extension UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named name: String?) { }
     func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool) { }
     func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool) { }
-    func uiBot(_ uiBot: UIBot, isSkippingSequence index: Int, named name: String?) { }
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?) { }
 }
 
@@ -98,9 +96,9 @@ class UIBot {
     
     private func executeOnConsecutiveRunLoopIterations(blocks: [() -> Void]) {
         var counter = 0
+        
         let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.beforeWaiting.rawValue, true, 0) { (observer, activity) in
             if activity.contains(.beforeWaiting) && counter < blocks.count {
-                
                 let block = blocks[counter]
                 RunLoop.main.perform {
                     block()
@@ -112,6 +110,7 @@ class UIBot {
         }
         
         CFRunLoopAddObserver(CFRunLoopGetMain(), observer, CFRunLoopMode.commonModes)
+        CFRunLoopWakeUp(CFRunLoopGetMain())
     }
     
     var delegate: UIBotDelegate!
@@ -240,13 +239,4 @@ class UIBot {
 }
 
 
-func ConvertSeparatedStringToArray(_ separatedString: String, separator: String = ",") -> [String] {
-    var array: [String]
-    if separatedString.contains(separator) {
-        array = separatedString.components(separatedBy: separator)
-        array = array.map({$0.trimmingCharacters(in: .whitespaces)})
-    } else {
-        array = [separatedString.trimmingCharacters(in: .whitespaces)]
-    }
-    return array
-}
+

@@ -14,42 +14,99 @@ let UNICODE_CAP_A = 65
 let grid: (rows: Int, columns: Int) = (15, 8)
 
 
+enum RouteUpdate {
+    case create(name: String, location: CGPoint)
+    case remove(name: String, location: CGPoint)
+    case select(name: String)
+    case deselect(name: String)
+    case move(name: String, from: CGPoint, to: CGPoint, byPan: Bool)
+    case setNext(name: String, new: String?)
+    
+    func undone() -> RouteUpdate {
+        switch self {
+        case .create(let name, let location):
+            return .remove(name: name, location: location)
+        case .remove(let name, let location):
+            return .create(name: name, location: location)
+        case .select(let name):
+            return .deselect(name: name)
+        case .deselect(let name):
+            return .select(name: name)
+        case .move(let name, let from, let to, _):
+            return .move(name: name, from: to, to: from, byPan: false)
+        default:
+            fatalError()
+        }
+    }
+}
+
 class RouteViewController: UIViewController {
 
-    @IBOutlet weak var undoButton: UIBarButtonItem!
-    @IBOutlet weak var redoButton: UIBarButtonItem!
+
     
-    var unicodePoint = UNICODE_CAP_A
+    // MARK:- ViewController Lifecycle
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        _undoManager = UndoManager()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.maxX), size: CGSize(width: 120, height: 120))
+        graphicsView.add(crosshairs)
+        prepareForTesting()
+        updateButtons()
+    }
+    
+    // MARK:- Variables (stored and computed)
+    
+    var route = Route()
+    
+    var crosshairs: Crosshairs!
+    
+    weak var selection: Node? {
+        didSet {
+            if let old = oldValue {
+                graphicsView.setNeedsDisplay(old.frame)
+            }
+            if let new = selection {
+                graphicsView.setNeedsDisplay(new.frame)
+            }
+        }
+    }
+    
+    var graphicsView: GraphicsView {
+        return view as! GraphicsView
+    }
+    
+    let nodeRadius = CGFloat(22.0)
+    
+    let arrowInset: CGFloat = 5
+    
     private var _undoManager: UndoManager!
+    
     override var undoManager: UndoManager? {
         return _undoManager
     }
     
-    let nodeRadius = CGFloat(22.0)
-    let arrowInset: CGFloat = 5
-    var canvas: Canvas {
-        return view as! Canvas
-    }
+
+    // MARK:- Outlets
+    @IBOutlet weak var undoButton: UIBarButtonItem!
     
-    var panningGraphic: Graphic?
+    @IBOutlet weak var redoButton: UIBarButtonItem!
     
-    var nodeLocationBeforePan: CGPoint?
+    // MARK:- Actions/Handling Actions
     
-    func autoName() -> String {
-        let name = String(Unicode.Scalar(unicodePoint)!)
-        unicodePoint += 1
-        return name
-    }
-    
-    @IBAction func userPannedOnCanvas(_ pan: UIPanGestureRecognizer) {
+    @IBAction func userPannedOnGraphicsView(_ pan: UIPanGestureRecognizer) {
         
         switch pan.state {
             
         case .began:
-            let pt = pan.location(in: canvas)
+            let pt = pan.location(in: graphicsView)
             if crosshairs.contains(pt) {
                 panningGraphic = crosshairs
-            } else if let node = canvas.graphics.first(where: { (graphic) -> Bool in
+            } else if let node = graphicsView.graphics.first(where: { (graphic) -> Bool in
                 graphic is Node && graphic.contains(pt)
             }) as? Node {
                 panningGraphic = node
@@ -59,22 +116,16 @@ class RouteViewController: UIViewController {
         case .changed:
             
             if let node = panningGraphic as? Node {
-                relocateNode(node, translation: pan.translation(in: canvas))
+                relocateNode(node, translation: pan.translation(in: graphicsView))
             } else if let crosshairs = panningGraphic as? Crosshairs {
-                relocateGraphic(crosshairs, translation: pan.translation(in: canvas))
+                relocateGraphic(crosshairs, translation: pan.translation(in: graphicsView))
             }
             
-            pan.setTranslation(CGPoint.zero, in: canvas)
+            pan.setTranslation(CGPoint.zero, in: graphicsView)
             
         case .ended:
-            if let node = panningGraphic as? Node {
-                route.updateLocation(ofWaypointNamed: node.name, to: node.center)
-                if let locationBeforePan = nodeLocationBeforePan {
-                    undoManager?.setActionName("undo <pan>")
-                    undoManager?.registerUndo(withTarget: self, handler: { (_) in
-                        self.move(waypointNamed: node.name, to: locationBeforePan)
-                    })
-                }
+            if let node = panningGraphic as? Node, let initialLocation = nodeLocationBeforePan {
+                runUpdates([.move(name: node.name, from: initialLocation, to: node.center, byPan: true)])
             }
             nodeLocationBeforePan = nil
             panningGraphic = nil
@@ -84,22 +135,440 @@ class RouteViewController: UIViewController {
         }
     }
     
-    func relocateGraphic(_ graphic: Graphic, translation: CGPoint) {
-        let oldFrame = graphic.frame
-        let newCenter = CGPoint(x: graphic.center.x + translation.x, y: graphic.center.y + translation.y)
-        graphic.center = newCenter
-        canvas.setNeedsDisplay(oldFrame.union(graphic.frame))
+    @IBAction func userTapped(_ tap: UITapGestureRecognizer) {
+        handleTap(at: tap.location(in: graphicsView))
     }
+    
+    func handleTap(at point: CGPoint) {
+        let graphicsUnderPoint = graphicsView.graphics.filter({ $0.frame.contains(point) })
+        
+        guard graphicsUnderPoint.count > 0 else {
+            /* Tapping empty space clears any existing selection */
+            if let _ = selection {
+                instigateSelectionUpdate(newSelection: nil)
+            }
+            return
+        }
+        
+        guard !graphicsUnderPoint.contains(where: {$0 is Crosshairs}) else {
+            /* Tap on crosshairs always sets selection to nil */
+            instigateSelectionUpdate(newSelection: nil)
+            return
+        }
+        
+        guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
+            /* Tap on selected node deselects it */
+            instigateSelectionUpdate(newSelection: nil)
+            return
+        }
+        
+        instigateSelectionUpdate(newSelection: node.name)
+    }
+    
+    @IBAction func undo(_ sender: Any) {
+        undoManager?.undo()
+    }
+    @IBAction func redo(_ sender: Any) {
+        undoManager?.redo()
+    }
+    
+    @IBAction func userTappedAdd(_ sender: Any) {
+        switch (nodeUnderCursor, selection) {
+        case (nil, nil):
+            if let arrow = arrowUnderCursor {
+                instigateInsertion(on: arrow)
+            } else {
+                instigateCreationOfNewWaypoint()
+            }
+        case let (nil, selection?):
+            instigateExtension(from: selection.name)
+        case let (nodeUnderCursor?, selection?):
+            instigateRerouting(set: nodeUnderCursor.name, toFollow: selection.name)
+        default:
+            break
+        }
+    }
+    
+    @IBAction func userTappedRemove(_ sender: Any) {
+        if let waypoint = nodeUnderCursor?.name {
+            instigateRemoval(of: waypoint)
+        } else if let arrow = arrowUnderCursor {
+            guard let (waypoint, _) = arrows.first(where: {$1 === arrow}) else {
+                fatalError("can't find arrow in <arrows>")
+            }
+            
+            runUpdates([.setNext(name: waypoint, new: nil)])
+        }
+    }
+    
+    @IBAction func clearRoute(_ sender: Any) {
+        route.clear()
+        graphicsView.graphics.forEach { (graphic) in
+            if !(graphic is Crosshairs) {
+                self.graphicsView.remove(graphic)
+            }
+        }
+    }
+    
+    // MARK:- Instigating route updates
+    func instigateSelectionUpdate(newSelection waypointName: String?) {
+        
+        var updates = [RouteUpdate]()
+        
+        if let oldSelection = selection {
+            updates.append(.deselect(name: oldSelection.name))
+        }
+        
+        if let name = waypointName {
+            updates.append(.select(name: name))
+        }
+        
+        runUpdates(updates)
+    }
+
+    func instigateRerouting(set waypoint¹: String, toFollow waypoint⁰: String) {
+        var updates = [RouteUpdate]()
+        if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint¹) {
+            updates.append(.setNext(name: previous, new: nil))
+        }
+
+        updates.append(.setNext(name: waypoint⁰, new: waypoint¹))
+        if let selection = selection?.name {
+            updates.append(.deselect(name: selection))
+        }
+        updates.append(.select(name: waypoint¹))
+        runUpdates(updates)
+    }
+    
+    func instigateInsertion(on arrow: Arrow) {
+        
+        guard let waypoint = self.waypoint(for: arrow) else {
+            fatalError("failed to find arrow in <arrows>")
+        }
+        guard let next = route.nameOfWaypointFollowing(waypointNamed: waypoint) else {
+            fatalError("found arrow for \(waypoint), but model reports no next")
+        }
+        
+        var updates = [RouteUpdate]()
+        if let selection = selection?.name {
+            updates.append(.deselect(name: selection))
+        }
+        updates.append(.setNext(name: waypoint, new: nil))
+        let pt⁰ = route.location(ofWaypointNamed: waypoint)
+        let pt¹ = route.location(ofWaypointNamed: next)
+        let midpoint = pt⁰.midpoint(pt¹)
+        let newName = autoName()
+        updates.append(.create(name: newName, location: midpoint))
+        updates.append(.setNext(name: waypoint, new: newName))
+        updates.append(.setNext(name: newName, new: next))
+        updates.append(.select(name: newName))
+        runUpdates(updates)
+    }
+    
+    func instigateRemoval(of waypoint: String) {
+        var updates = [RouteUpdate]()
+        if let selection = self.selection, selection.name == waypoint {
+            updates.append(.deselect(name: waypoint))
+        }
+        if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint) {
+            updates.append(.setNext(name: previous, new: nil))
+        }
+        if let _ = route.nameOfWaypointFollowing(waypointNamed: waypoint) {
+            updates.append(.setNext(name: waypoint, new: nil))
+        }
+        updates.append(.remove(name: waypoint, location: route.location(ofWaypointNamed: waypoint)))
+        runUpdates(updates)
+    }
+    
+    func instigateExtension(from waypoint: String) {
+        var updates = [RouteUpdate]()
+        if let _ = route.nameOfWaypointFollowing(waypointNamed: waypoint) {
+            updates.append(.setNext(name: waypoint, new: nil))
+        }
+        let newName = autoName()
+        updates.append(.create(name: newName, location: crosshairs.center))
+        updates.append(.setNext(name: waypoint, new: newName))
+        updates.append(.deselect(name: waypoint))
+        updates.append(.select(name: newName))
+        runUpdates(updates)
+    }
+    
+    func instigateCreationOfNewWaypoint() {
+        let name = autoName()
+        var updates = [RouteUpdate.create(name: name, location: crosshairs.center)]
+        updates.append(RouteUpdate.select(name: name))
+        runUpdates(updates)
+    }
+    
+    // MARK:- Executing routes updates
+    
+    func executeCreation(of waypoint: String, at location: CGPoint) {
+        route.add(waypointNamed: waypoint, at: location)
+        let node = newNode(at: location, name: waypoint)
+        graphicsView.add(node)
+        nodes[waypoint] = node
+    }
+    
+    func executeRemove(of waypoint: String) {
+        assert(selection?.name != waypoint, "must deselect node before removing")
+        guard let node = nodes.removeValue(forKey: waypoint) else {
+            fatalError("no node named \(waypoint) in <nodes>")
+        }
+        
+        graphicsView.remove(node)
+        if let _ = route.nameOfWaypointFollowing(waypointNamed: waypoint) {
+            guard let arrow = arrows.removeValue(forKey: waypoint) else {
+                fatalError("expected key '\(waypoint)' in <arrows>")
+            }
+            graphicsView.remove(arrow)
+        }
+        
+        route.remove(waypointNamed: waypoint)
+    }
+    
+    func executeSelection(of waypoint: String) {
+        guard let node = nodes[waypoint] else {
+            fatalError("no node with name \(waypoint) found in <nodes>")
+        }
+        
+        if !node.selected {
+            node.selected = true
+            self.selection = node
+        }
+    }
+    
+    func executeDeselection(of waypoint: String) {
+        guard let node = nodes[waypoint] else {
+            fatalError("no node with name \(waypoint) found in <nodes>")
+        }
+        
+        if node.selected {
+            node.selected = false
+            self.selection = nil
+        }
+        
+    }
+    
+    func executeRelocation(ofWaypoint waypoint: String, from: CGPoint, to: CGPoint, followingPan: Bool) {
+        route.updateLocation(ofWaypointNamed: waypoint, to: to)
+        
+        if !followingPan {
+            guard let node = nodes[waypoint] else {
+                fatalError("key '\(waypoint)' does not appear in <nodes>")
+            }
+            relocateNode(node, translation: CGPoint(x: to.x - from.x, y: to.y - from.y))
+        }
+    }
+    
+    func executeSetNext(of waypoint⁰: String, to waypoint¹: String?) {
+
+        let oldNext = route.nameOfWaypointFollowing(waypointNamed: waypoint⁰)
+        if let _ = oldNext {
+            guard let arrow = arrows.removeValue(forKey: waypoint⁰) else {
+                fatalError("expected to find key '\(waypoint⁰)' in <arrows>")
+            }
+            graphicsView.remove(arrow)
+        }
+        
+        
+        if let newNext = waypoint¹ {
+            guard let node⁰ = nodes[waypoint⁰] else {
+                fatalError("expected to find key '\(waypoint⁰)' in <nodes>")
+            }
+            guard let node¹ = nodes[newNext] else {
+                fatalError("expected to find key '\(newNext)' in <nodes>")
+            }
+            
+            if let previous = route.nameOfWaypointPreceeding(waypointNamed: newNext) {
+                guard let arrow = arrows.removeValue(forKey: previous) else {
+                    fatalError("expected for find key '\(previous)' in <arrows>")
+                }
+                graphicsView.remove(arrow)
+            }
+            
+            let arrow = newArrow(from: node⁰, to: node¹)
+            arrows[waypoint⁰] = arrow
+            graphicsView.add(arrow)
+            route.setNext(ofWaypointNamed: waypoint⁰, toWaypointNamed: newNext)
+        } else {
+            route.unsetNext(ofWaypointNamed: waypoint⁰)
+        }
+    }
+    
+    
+    // MARK:- Running Updates
+    
+    func runUpdates(_ updates: [RouteUpdate]) {
+        var undos = [RouteUpdate]()
+        
+        for update in updates {
+            switch update {
+            
+            case .create(let name, let location):
+                executeCreation(of: name, at: location)
+                undos.append(update.undone())
+                
+            case .select(let name):
+                executeSelection(of: name)
+                undos.append(update.undone())
+                
+            case .deselect(let name):
+                executeDeselection(of: name)
+                undos.append(update.undone())
+                
+            case .remove(let name, _):
+                executeRemove(of: name)
+                undos.append(update.undone())
+                
+            case .move(let name, let from, let to, let byPan):
+                executeRelocation(ofWaypoint: name, from: from, to: to, followingPan: byPan)
+                undos.append(update.undone())
+                
+            case .setNext(let name, let new):
+                let oldNext = route.nameOfWaypointFollowing(waypointNamed: name)
+                executeSetNext(of: name, to: new)
+                undos.append(.setNext(name: name, new: oldNext))
+            }
+        }
+        
+        DispatchQueue.main.async {
+            self.updateButtons()
+        }
+        
+        undoManager?.registerUndo(withTarget: self, handler: { (_) in
+            self.runUpdates(undos.reversed())
+        })
+    }
+    
+
+
+    
+    
+    // MARK:- Book-keeping
+    
+    var unicodePoint = UNICODE_CAP_A
+    
+    var panningGraphic: Graphic?
+    
+    var nodeLocationBeforePan: CGPoint?
+    
+    var nodes = [String:Node]()
+    
+    var arrows = [String: Arrow]()
+    
+    func updateButtons() {
+        guard let undoManager = undoManager else {
+            undoButton.isEnabled = false
+            redoButton.isEnabled = false
+            return
+        }
+        
+        if undoManager.canUndo != undoButton.isEnabled {
+            undoButton.isEnabled = !undoButton.isEnabled
+        }
+        if undoManager.canRedo != redoButton.isEnabled {
+            redoButton.isEnabled = !redoButton.isEnabled
+        }
+    }
+    
+    // MARK:- Convenience
+    
+    var arrowUnderCursor: Arrow? {
+        return graphicsView.graphics.first(where: { (graphic) -> Bool in
+            return (graphic is Arrow) && graphic.contains(crosshairs.center)
+        }) as? Arrow
+    }
+    
+    var nodeUnderCursor: Node? {
+        return graphicsView.graphics.first { (graphic) -> Bool in
+            return graphic is Node && graphic.contains(crosshairs.center)
+        } as? Node
+    }
+    
+    func waypoint(for arrow: Arrow) -> String? {
+        return arrows.first(where: {$1 === arrow})?.key
+    }
+    
+    // MARK:- Execution Helpers
     
     func relocateNode(_ node: Node, translation: CGPoint) {
         relocateGraphic(node, translation: translation)
         
-        if let next = route.nameOfWaypointFollowing(waypointNamed: node.name), let arrow = arrows[node.name] {
-            setArrow(arrow, toPointFrom: node, to: self.node(named: next))
+        if let next = route.nameOfWaypointFollowing(waypointNamed: node.name) {
+            guard let arrow = arrows[node.name] else {
+                fatalError("expected key '\(node.name)' in <arrows>")
+            }
+            guard let nextNode = nodes[next] else {
+                fatalError("expected key '\(next)' in <nodes>")
+            }
+            setArrow(arrow, toPointFrom: node, to: nextNode)
         }
-        if let previous = route.nameOfWaypointPreceeding(waypointNamed: node.name), let arrow = arrows[previous] {
-            setArrow(arrow, toPointFrom: self.node(named: previous), to: node)
+        
+        if let previous = route.nameOfWaypointPreceeding(waypointNamed: node.name) {
+            guard let arrow = arrows[previous] else {
+                fatalError("expected key '\(previous)' in <arrows>")
+            }
+            guard let previousNode = nodes[previous] else {
+                fatalError("expected key '\(previous)' in <nodes>")
+            }
+            setArrow(arrow, toPointFrom: previousNode, to: node)
         }
+    }
+    
+    func relocateGraphic(_ graphic: Graphic, translation: CGPoint) {
+        let oldFrame = graphic.frame
+        let newCenter = CGPoint(x: graphic.center.x + translation.x, y: graphic.center.y + translation.y)
+        graphic.center = newCenter
+        graphicsView.setNeedsDisplay(oldFrame.union(graphic.frame))
+    }
+    
+    func calculateCoordinates(ofArrowFrom from: Node, to: Node) -> (start: CGPoint, end: CGPoint) {
+        guard from.center.distance(to: to.center) > nodeRadius * 2 + arrowInset * 2 else {
+            return (.zero, .zero)
+        }
+        
+        let line = LineSector(start: from.center, end: to.center)
+        let d1 = nodeRadius + arrowInset
+        let d2 = from.center.distance(to: to.center) - (nodeRadius + arrowInset)
+        
+        var start = line.point(distanceFromOrigin: d1)
+        var end = line.point(distanceFromOrigin: d2)
+        
+        
+        if route.circularRelationshipExistsBetween(waypointNamed: from.name, and: to.name) {
+            let insetLine = LineSector(start: start, end: end)
+            let offsetLines = insetLine.parallelLineSectors(offset: 15)
+            start = offsetLines.0.start
+            end = offsetLines.0.end
+        }
+        
+        return (start, end)
+    }
+    
+    func setArrow(_ arrow: Arrow, toPointFrom from: Node, to: Node) {
+        assert(graphicsView.graphics.contains(where: { $0 === arrow }))
+        let oldFrame = arrow.frame
+        let pts = calculateCoordinates(ofArrowFrom: from, to: to)
+        arrow.update(start: pts.start, end: pts.end)
+        graphicsView.setNeedsDisplay(oldFrame.union(arrow.frame))
+    }
+    
+    func move(_ graphic: Graphic, to point: CGPoint) {
+        if graphic is Crosshairs {
+            graphicsView.setNeedsDisplay(graphic.frame)
+            graphic.center = point
+            graphicsView.setNeedsDisplay(graphic.frame)
+        }
+    }
+    
+
+    
+    // MARK:- Creating nodes, arrows, names etc
+    
+    func autoName() -> String {
+        let name = String(Unicode.Scalar(unicodePoint)!)
+        unicodePoint += 1
+        return name
     }
     
     func newNode(at centerpoint: CGPoint, name: String) -> Node {
@@ -108,10 +577,23 @@ class RouteViewController: UIViewController {
         return node
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        _undoManager = UndoManager()
+    func newArrow(from: Node, to: Node) -> Arrow {
+        let pts = calculateCoordinates(ofArrowFrom: from, to: to)
+        return Arrow(start: pts.start, end: pts.end)
     }
+    
+
+    // MARK:- Debugging
+    
+    func describeGraphicsView() {
+        for (index, graphic) in graphicsView.graphics.enumerated() {
+            if let node = graphic as? Node {
+                print("\(index): \(node.name)(\(self.zone(containing: node.center)))")
+            }
+        }
+    }
+    
+    // MARK:- Testing Machinery
     
     lazy var testsSummaryController: TestsSummaryController = {
         let testsSummaryController = TestsSummaryController()
@@ -122,8 +604,6 @@ class RouteViewController: UIViewController {
     func prepareForTesting() {
         installTestSummaryView()
         testsSummaryController.uiBot = uiBot
-        
-        
     }
     
     func installTestSummaryView() {
@@ -147,534 +627,21 @@ class RouteViewController: UIViewController {
         
         // Position the container
         let size = testsSummaryView.bounds.size
-        let maxY = canvas.convert(canvas.bounds, from: view).maxY
+        let maxY = graphicsView.convert(graphicsView.bounds, from: view).maxY
         let origin = CGPoint(x: view.frame.midX - size.width * 0.5, y: maxY - 16 - size.height)
         container.frame = CGRect(origin: origin, size: size)
     }
     
-    
-    var crosshairs: Crosshairs!
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        crosshairs = Crosshairs(center: CGPoint(x: canvas.bounds.midX, y: canvas.bounds.maxX), size: CGSize(width: 120, height: 120))
-        canvas.add(crosshairs)
-        prepareForTesting()
-        updateButtons()
-    }
-    
-
-    func randomLocation(in zone: Int) -> CGPoint {
-        
-        let nRows = CGFloat(grid.rows)
-        let nCols = CGFloat(grid.columns)
-        
-        let zoneWidth = view.bounds.width / nCols
-        let zoneHeight = view.bounds.height / nRows
-        
-        let (row, _) = modf(CGFloat(zone) / nCols)
-        let col = CGFloat(zone) - (row * nCols)
-        
-        let minX = col * zoneWidth
-        let minY = row * zoneHeight
-        let x = CGFloat(arc4random_uniform(UInt32(zoneWidth)) + UInt32(minX))
-        let y = CGFloat(arc4random_uniform(UInt32(zoneHeight)) + UInt32(minY))
-        return CGPoint(x: x, y: y)
-    }
-    
-    func zone(containing point: CGPoint) -> Int {
-        let nRows = CGFloat(grid.rows)
-        let nCols = CGFloat(grid.columns)
-        
-        let zoneWidth = canvas.bounds.width / nCols
-        let zoneHeight = canvas.bounds.height / nRows
-        
-        let row = floor(point.y / zoneHeight)
-        let col = floor(point.x / zoneWidth)
-        
-        return Int(row * nCols + col)
-    }
-    
-    var undos = [String]() {
-        didSet {
-//            print("undo stack: \(undos)")
-        }
-    }
-    
-
-    func updateButtons() {
-        guard let undoManager = undoManager else {
-            undoButton.isEnabled = false
-            redoButton.isEnabled = false
-            return
-        }
-        
-//        if undoManager.canUndo != undoButton.isEnabled {
-//            undoButton.isEnabled = !undoButton.isEnabled
-//        }
-//        if undoManager.canRedo != redoButton.isEnabled {
-//            redoButton.isEnabled = !redoButton.isEnabled
-//        }
-    }
-    
-    
-    weak var selection: Node?
-    
-    func updateSelection(to waypointName: String?, isUndoable: Bool) {
-        
-        var newSelection: Node?
-        if let name = waypointName {
-            newSelection = canvas.node(named: name)
-        }
-        
-        let undoName = selection?.name
-        
-        if let oldSelection = selection {
-            oldSelection.selected = false
-            canvas.setNeedsDisplay(oldSelection.frame)
-        }
-        
-        if let newSelection = newSelection {
-            newSelection.selected = true
-            canvas.setNeedsDisplay(newSelection.frame)
-        }
-        
-        selection = newSelection
-        
-        guard isUndoable else {
-            return
-        }
-        
-        undoManager?.setActionName("undo updateSelection")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            self.updateSelection(to: undoName, isUndoable: true)
-        })
-        
-    }
-    
-    @IBAction func userTapped(_ tap: UITapGestureRecognizer) {
-        handleTap(at: tap.location(in: canvas))
-    }
-    
-    func handleTap(at point: CGPoint) {
-        let graphicsUnderPoint = canvas.graphics.filter({ $0.frame.contains(point) })
-        
-        guard !graphicsUnderPoint.contains(where: {$0 is Crosshairs}) else {
-            updateSelection(to: nil, isUndoable: true)
-            print("tap in crosshairs")
-            return
-        }
-        
-        guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
-            
-            updateSelection(to: nil, isUndoable: true)
-            return
-        }
-        
-        updateSelection(to: node.name, isUndoable: true)
-    }
-    
-    @IBAction func undo(_ sender: Any) {
-        print(undoManager?.undoActionName ?? "-")
-        undoManager?.undo()
-    }
-    @IBAction func redo(_ sender: Any) {
-        print("redoing: \(undoManager?.redoActionName ?? "-")")
-        undoManager?.redo()
-    }
-    
-    @IBAction func userTappedAdd(_ sender: Any) {
-        switch (nodeUnderCursor, selection) {
-        case (nil, nil):
-            if let arrow = arrowUnderCursor {
-                insertCirle(on: arrow)
-            } else {
-                
-                addStandaloneNode(at: crosshairs.center, named: autoName())
-            }
-        case let (nil, selection?):
-            
-            extend(from: selection, to: crosshairs.center, withName: autoName())
-        case let (nodeUnderCursor?, selection?):
-            updateNext(of: selection, to: nodeUnderCursor)
-        default:
-            break
-        }
-    }
-    
-    func insertCirle(on arrow: Arrow) {
-        guard let name = arrows.first(where: {$1 === arrow})?.key else {
-            return
-        }
-        guard let next = route.nameOfWaypointFollowing(waypointNamed: name) else {
-            return
-        }
-        
-        
-        let newNode = self.newNode(at: crosshairs.center, name: autoName())
-        
-        route.add(waypointNamed: newNode.name, at: crosshairs.center)
-        route.setNext(ofWaypointNamed: name, toWaypointNamed: newNode.name)
-        route.setNext(ofWaypointNamed: newNode.name, toWaypointNamed: self.node(named: next).name)
-        
-        canvas.add(newNode)
-        setArrow(arrow, toPointFrom: self.node(named: name), to: newNode)
-        
-        let newArrow = makeArrow(from: newNode, to: self.node(named: next))
-        canvas.add(newArrow)
-        arrows[newNode.name] = newArrow
-        
-        // Maybe a problem with this line when undoing insert??
-        updateSelection(to: newNode.name, isUndoable: true)
-        
-        
-    }
-    
-    func updateNext(of subject: Node, to target: Node) {
-        var spareArrows = [Arrow]()
-        
-        
-        if let previous = route.nameOfWaypointPreceeding(waypointNamed: target.name), let existingArrow = arrows.removeValue(forKey: previous) {
-            spareArrows.append(existingArrow)
-        }
-        
-        if let _ = route.nameOfWaypointFollowing(waypointNamed: subject.name), let existingArrow = arrows.removeValue(forKey: subject.name) {
-            spareArrows.append(existingArrow)
-        }
-        
-        // update model
-        route.setNext(ofWaypointNamed: subject.name, toWaypointNamed: target.name)
-
-        // Update view
-        let dirty = spareArrows.reduce(CGRect.null) { $0.union($1.frame) }
-        let arrow: Arrow
-        if let existingArrow = spareArrows.popLast() {
-            arrow = existingArrow
-            spareArrows.forEach { canvas.remove($0)}
-            setArrow(arrow, toPointFrom: subject, to: target)
-            canvas.setNeedsDisplay(dirty.union(arrow.frame))
-        } else {
-            arrow = makeArrow(from: subject, to: target)
-            canvas.insert(arrow, below: crosshairs)
-        }
-        updateSelection(to: target.name, isUndoable: true)
-        arrows[subject.name] = arrow
-    }
-    
-    var arrows = [String: Arrow]()
-    
-    func node(named name: String) -> Node {
-        return canvas.graphics.first { (graphic) -> Bool in
-            if let node = graphic as? Node, node.name == name {
-                return true
-            } else {
-                return false
-            }
-        } as! Node
-    }
-    
-    func addStandaloneNode(at location: CGPoint, named name: String) {
-        assert(selection == nil)
-        let node = newNode(at: location, name: name)
-        
-        // update the model
-        route.add(waypointNamed: node.name, at: location)
-        
-        // update the view
-        canvas.insert(node, below: crosshairs)
-        updateSelection(to: node.name, isUndoable: false)
-        
-        undoManager?.setActionName("undo <addStandaloneNode>")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            self.removeStandaloneNode(named: name)
-        })
-    }
-    
-    func removeStandaloneNode(named nodeName: String) {
-        let node = canvas.node(named: nodeName)
-        let location = route.location(ofWaypointNamed: nodeName)
-        
-        route.remove(waypointNamed: nodeName)
-        canvas.remove(node)
-        
-        deletedWaypoints.append((name: node.name, location: location))
-        if selection === node {
-            updateSelection(to: nil, isUndoable: false)
-        }
-        
-        undoManager?.setActionName("undo <removeStandaloneNode>")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            guard let rawWaypoint = self.deletedWaypoints.popLast() else {
-                fatalError("requested undo, but <deletedWaypoints> is empty")
-            }
-            self.addStandaloneNode(at: rawWaypoint.location, named: rawWaypoint.name)
-        })
-    }
-    
-    
-    func extend(from existingNode: Node, to location: CGPoint, withName name: String) {
-        let newNode = self.newNode(at: location, name: name)
-        let currentNext = route.nameOfWaypointFollowing(waypointNamed: existingNode.name)
-        let existingName = existingNode.name
-        
-        route.add(waypointNamed: newNode.name, at: location)
-        route.setNext(ofWaypointNamed: existingNode.name, toWaypointNamed: newNode.name)
-        
-        var arrow: Arrow!
-        if let _ = currentNext, let existingArrow = arrows.removeValue(forKey: existingNode.name) {
-            canvas.setNeedsDisplay(existingArrow.frame)
-            setArrow(existingArrow, toPointFrom: existingNode, to: newNode)
-            arrow = existingArrow
-            canvas.setNeedsDisplay(arrow.frame)
-        } else {
-            arrow = makeArrow(from: existingNode, to: newNode)
-            canvas.insert(arrow, below: crosshairs)
-        }
-        
-        arrows[existingNode.name] = arrow
-        
-        canvas.insert(newNode, below: crosshairs)
-        updateSelection(to: newNode.name, isUndoable: false)
-        
-        undoManager?.setActionName("undo <extend>")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            self.removeExtension(toNodeNamed: name, fromNodeNamed: existingName)
-        })
-    }
-    
-    func removeExtension(toNodeNamed name¹: String, fromNodeNamed name⁰: String) {
-        guard route.nameOfWaypointFollowing(waypointNamed: name¹) == nil else {
-            fatalError("<removeExtension> assumes node being removed has no next")
-        }
-        guard let arrow = arrows.removeValue(forKey: name⁰) else {
-            fatalError("\(name⁰) is assumed to have a next, but can't find the associated arrow")
-        }
-        
-        let location¹ = route.location(ofWaypointNamed: name¹)
-        deletedWaypoints.append((name: name¹, location: location¹))
-        
-        let node¹ = canvas.node(named: name¹)
-        canvas.remove(node¹)
-        canvas.remove(arrow)
-        
-        route.remove(waypointNamed: name¹)
-        
-        updateSelection(to: name⁰, isUndoable: false)
-        
-        undoManager?.setActionName("undo <removeExtension>")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            guard let rawWaypoint = self.deletedWaypoints.popLast() else {
-                fatalError("requested undo, but <deletedWaypoints> is empty")
-            }
-            
-            guard let selection = self.selection, selection.name == name⁰ else {
-                fatalError("need selection for extend operation")
-            }
-            guard selection.name == name⁰ else {
-                fatalError("undoing <removeExtension>; expected selection name of \(name⁰)")
-            }
-            
-            self.extend(from: selection, to: rawWaypoint.location, withName: rawWaypoint.name)
-        })
-    }
-    
-
-    func remove(_ node: Node) {
-        
-        // Update view
-        if let _ = route.nameOfWaypointFollowing(waypointNamed: node.name) {
-            if let arrow = arrows[node.name] {
-                canvas.remove(arrow)
-                arrows.removeValue(forKey: node.name)
-            }
-        }
-        
-        if let previous = route.nameOfWaypointPreceeding(waypointNamed: node.name) {
-            if let arrow = arrows[previous] {
-                canvas.remove(arrow)
-                arrows.removeValue(forKey: previous)
-            }
-        }
-        
-        if let selection = self.selection, node === selection {
-            updateSelection(to: nil, isUndoable: true)
-        }
-        canvas.remove(node)
-        
-        // update model
-        deletedWaypoints.append((name: node.name, location: node.center))
-        route.remove(waypointNamed: node.name)
-    }
-    
-    
-    var deletedWaypoints = [(name: String, location: CGPoint)]()
-    
-    @IBAction func userTappedRemove(_ sender: Any) {
-        
-        if let node = nodeUnderCursor {
-            remove(node)
-        } else if let arrow = arrowUnderCursor {
-            remove(arrow)
-        }
-    }
-
-    var arrowUnderCursor: Arrow? {
-        return canvas.graphics.first(where: { (graphic) -> Bool in
-            return (graphic is Arrow) && graphic.contains(crosshairs.center)
-        }) as? Arrow
-    }
-    
-    var counter = 0
-
-    func describeCanvas() {
-        for (index, graphic) in canvas.graphics.enumerated() {
-            if let node = graphic as? Node {
-                print("\(index): \(node.name)(\(self.zone(containing: node.center)))")
-            }
-        }
-    }
-    
-    func remove(_ arrow: Arrow) {
-        
-        canvas.remove(arrow)
-        if let (name, _) = arrows.first(where: {$1 === arrow}) {
-            arrows.removeValue(forKey: name)
-            route.unsetNext(ofWaypointNamed: name)
-        } else {
-            fatalError("Internal inconsistency - asked to remove arrow that is not represented in arrows map.")
-        }
-    }
-    
-    var nodeUnderCursor: Node? {
-        return canvas.graphics.first { (graphic) -> Bool in
-            return graphic is Node && graphic.contains(crosshairs.center)
-        } as? Node
-    }
-    
-    var nodes: [Node] {
-//        return view.subviews.filter { $0 is Node } as! [Node]
-        return []
-    }
-    
-    
-    // Handling Arrows
-    
-    func makeArrow(from: Node, to: Node) -> Arrow {
-        let pts = calculateCoordinates(ofArrowFrom: from, to: to)
-        return Arrow(start: pts.start, end: pts.end)
-    }
-    
-    
-    func setArrow(_ arrow: Arrow, toPointFrom from: Node, to: Node) {
-        assert(canvas.graphics.contains(where: { $0 === arrow }))
-        let oldFrame = arrow.frame
-        let pts = calculateCoordinates(ofArrowFrom: from, to: to)
-        arrow.update(start: pts.start, end: pts.end)
-        canvas.setNeedsDisplay(oldFrame.union(arrow.frame))
-    }
-    
-    var route = Route()
-    
-    func calculateCoordinates(ofArrowFrom from: Node, to: Node) -> (start: CGPoint, end: CGPoint) {
-        guard from.center.distance(to: to.center) > nodeRadius * 2 + arrowInset * 2 else {
-            return (.zero, .zero)
-        }
-        
-        let line = LineSector(start: from.center, end: to.center)
-        let d1 = nodeRadius + arrowInset
-        let d2 = from.center.distance(to: to.center) - (nodeRadius + arrowInset)
-        
-        var start = line.point(distanceFromOrigin: d1)
-        var end = line.point(distanceFromOrigin: d2)
-        
-        if node(from, inCircularRelationshipWith: to) {
-            let insetLine = LineSector(start: start, end: end)
-            let offsetLines = insetLine.parallelLineSectors(offset: 15)
-            start = offsetLines.0.start
-            end = offsetLines.0.end
-        }
-        
-        return (start, end)
-    }
-    
-    @IBAction func clearRoute() {
-        route.clear()
-        canvas.graphics.forEach { (graphic) in
-            if !(graphic is Crosshairs) {
-                self.canvas.remove(graphic)
-            }
-        }
-    }
-    
-    // MARK: Querying the model
-    
-    func node(_ node: Node, inCircularRelationshipWith other: Node) -> Bool {
-        return route.circularRelationshipExistsBetween(waypointNamed: node.name, and: other.name)
-    }
-    
-    @IBAction func userTappedTest(_ sender: Any) {
-    }
-    
-    var tests = Bundle.main.url(forResource: "BotTests", withExtension: "plist")
+    var tests = Bundle.main.url(forResource: "TestSix", withExtension: "plist")
     
     lazy var uiBot: UIBot = {
         let uiBot = UIBot(url: self.tests!, delegate: self.testsSummaryController, dataSource: self)
         return uiBot
     }()
-    
-    
-    func move(waypointNamed waypointName: String, to point: CGPoint) {
-        let node = canvas.node(named: waypointName)
-        
-        let originalLocation = node.center
-        canvas.setNeedsDisplay(node.frame)
-        
-        route.updateLocation(ofWaypointNamed: waypointName, to: point)
-        node.center = point
-        
-        canvas.setNeedsDisplay(node.frame)
-        
-        if let nextName = route.nameOfWaypointFollowing(waypointNamed: waypointName), let arrow = arrows[waypointName] {
-            // arrow pointing from moved waypoint
-            canvas.setNeedsDisplay(arrow.frame)
-            
-            let nextNode = self.node(named: nextName)
-            let (start, end) = calculateCoordinates(ofArrowFrom: node, to: nextNode)
-            arrow.update(start: start, end: end)
-            
-            canvas.setNeedsDisplay(arrow.frame)
-        }
-        
-        if let previousName = route.nameOfWaypointPreceeding(waypointNamed: waypointName), let arrow = arrows[previousName] {
-            // arrow pointing to moved waypoint
-            canvas.setNeedsDisplay(arrow.frame)
-            
-            let previousNode = self.node(named: previousName)
-            let (start, end) = calculateCoordinates(ofArrowFrom: previousNode, to: node)
-            arrow.update(start: start, end: end)
-            
-            canvas.setNeedsDisplay(arrow.frame)
-        }
-        
-        undoManager?.setActionName("undo <move>")
-        undoManager?.registerUndo(withTarget: self, handler: { (_) in
-            self.move(waypointNamed: waypointName, to: originalLocation)
-            
-        })
-    }
-    
-    func move(_ graphic: Graphic, to point: CGPoint) {
-        
-        if graphic is Crosshairs {
-            canvas.setNeedsDisplay(graphic.frame)
-            graphic.center = point
-            canvas.setNeedsDisplay(graphic.frame)
-        }
-    }
 }
 
 
-// Testing extension
+// MARK:- Testing extension
 
 extension RouteViewController: UIBotDataSource {
     
@@ -684,14 +651,28 @@ extension RouteViewController: UIBotDataSource {
             return countWaypoints(expectedWaypoints: data as! Int)
         case "COUNT_ARROWS":
             return countArrows(expected: data as! Int)
+        case "VALIDATE_ROUTE_NEXT":
+            return validateRouteNext(diagram: data as! String)
+        case "VALIDATE_ROUTE_PREVIOUS":
+            return validateRoutePrevious(diagram: data as! String)
+        case "VALIDATE_SELECTION":
+            return validateSelection(expectedSelectionName: data as! String)
+        case "VALIDATE_WAYPOINT_LOCATION":
+            return validateWaypointLocation(data as! String)
+        case "VALIDATE_ARROW_PRESENCE":
+            return validateArrowPresence(waypointName: data as! String)
+        case "VALIDATE_ARROW_ABSENCE":
+            return validateArrowAbsence(waypointName: data as! String)
+        case "VALIDATE_ARROW_LOCATION":
+            return validateArrowPosition(waypointName: data as! String)
         default:
-            fatalError()
+            fatalError("\(testName) not recognised")
         }
     }
     
     
     func uiBot(_ uiBot: UIBot, operationIsTest operationName: String) -> Bool {
-        return ["COUNT_WAYPOINTS", "COUNT_ARROWS", "VALIDATE_ARROW_PRESENCE"].contains(operationName)
+        return ["COUNT_WAYPOINTS", "COUNT_ARROWS", "DELETED_WAYPOINTS", "VALIDATE_ROUTE_NEXT", "VALIDATE_ROUTE_PREVIOUS", "VALIDATE_SELECTION", "VALIDATE_WAYPOINT_LOCATION", "VALIDATE_ARROW_PRESENCE","VALIDATE_ARROW_ABSENCE", "VALIDATE_ARROW_LOCATION"].contains(operationName)
     }
 
     func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void) {
@@ -702,6 +683,12 @@ extension RouteViewController: UIBotDataSource {
             return tapAdd()
         case "TAP_REMOVE":
             return tapRemove()
+        case "TAP_UNDO":
+            return tapUndo()
+        case "TAP_REDO":
+            return tapRedo()
+        case "TAP_EMPTY_ZONE":
+            return self.tapEmptyZone()
         case "TAP_WAYPOINT":
             return tapWaypoint(named: operationData as! String)
         case "MOVE_CROSSHAIRS_TO_ZONE":
@@ -712,6 +699,8 @@ extension RouteViewController: UIBotDataSource {
             return setCrosshairsOnWaypoint(named: operationData as! String)
         case "SET_CROSSHAIRS_ON_ARROW":
             return setCrosshairsOnArrow(originatingAt: operationData as! String)
+
+            
         default:
             fatalError("\(operationName) not recognised")
         }
@@ -719,7 +708,7 @@ extension RouteViewController: UIBotDataSource {
     
     func setCrosshairsOnWaypoint(named name: String) -> () -> Void {
         return {
-            let node = self.canvas.node(named: name)
+            let node = self.graphicsView.node(named: name)
             self.move(self.crosshairs, to: node.center)
         }
     }
@@ -736,6 +725,18 @@ extension RouteViewController: UIBotDataSource {
         }
     }
     
+    func tapRedo() -> () -> Void {
+        return {
+            self.redo(self)
+        }
+    }
+    
+    func tapUndo() -> () -> Void {
+        return {
+            self.undo(self)
+        }
+    }
+    
     func moveCrosshairsToZone(_ zone: Int) -> () -> Void {
         return {
             let pt = self.center(of: zone)
@@ -745,7 +746,7 @@ extension RouteViewController: UIBotDataSource {
     
     func tapWaypoint(named name: String) -> () -> Void {
         return {
-            let node = self.canvas.node(named: name)
+            let node = self.graphicsView.node(named: name)
             self.handleTap(at: node.center)
         }
     }
@@ -764,24 +765,30 @@ extension RouteViewController: UIBotDataSource {
         return {
             let waypointName = rawData["waypoint"] as! String
             let zone = rawData["zone"] as! Int
-            self.move(waypointNamed: waypointName, to: self.center(of: zone))
+            //self.move(waypointNamed: waypointName, to: self.center(of: zone))
         }
     }
     
-    // TESTS
+    func tapEmptyZone() -> () -> Void {
+        return {
+            self.handleTap(at: self.center(of: NODE_FREE_ZONE))
+        }
+    }
+    
+    // MARK: Tests
     
     func countWaypoints(expectedWaypoints: Int) -> (Bool, String) {
         let pass: Bool
         let msg: String
         let actualWaypoints = route.numbeOfWaypoints
-        let actualCircles = canvas.graphics.filter { $0 is Node }.count
+        let actualCircles = graphicsView.graphics.filter { $0 is Node }.count
         if actualWaypoints == expectedWaypoints {
             if actualCircles == actualWaypoints {
                 pass = true
                 msg = "Number of waypoints is \(expectedWaypoints)"
             } else {
                 pass = false
-                msg = "Number of waypoints is as expected \(expectedWaypoints), but number of circles on the canvas is not \(actualCircles)"
+                msg = "Number of waypoints is as expected \(expectedWaypoints), but number of circles on the graphicsView is not \(actualCircles)"
             }
         } else {
             pass = false
@@ -791,7 +798,7 @@ extension RouteViewController: UIBotDataSource {
     }
     
     func countArrows(expected: Int) -> (Bool, String) {
-        let graphicsCount = canvas.graphics.filter { $0 is Arrow}.count
+        let graphicsCount = graphicsView.graphics.filter { $0 is Arrow}.count
         let mapCount = arrows.count
         let pass: Bool
         let msg: String
@@ -801,7 +808,7 @@ extension RouteViewController: UIBotDataSource {
                 msg = "number of arrows is \(expected)"
             } else {
                 pass = false
-                msg = "arrow-map contains expected number of arrows \(expected), but number graphics on canvas is reported as \(graphicsCount)"
+                msg = "arrow-map contains expected number of arrows \(expected), but number graphics on graphicsView is reported as \(graphicsCount)"
             }
         } else {
             pass = false
@@ -811,14 +818,7 @@ extension RouteViewController: UIBotDataSource {
         return (pass, msg)
     }
     
-    func deletedWaypoints(names: String) -> (Bool, String) {
-        let expected = ConvertSeparatedStringToArray(names).sorted()
-        let actual = deletedWaypoints.map({$0.name}).sorted()
-        let pass = expected == actual
-        let msg = pass ? "deleted waypoints array does consist of \(expected)" : "deleted waypoints array consists of \(actual), not \(expected)"
-        return (pass, msg)
-    }
-    
+
     func validateRouteNext(diagram: String) -> (Bool, String) {
         let comps = diagram.components(separatedBy: "→")
         let name = comps.first!
@@ -845,14 +845,148 @@ extension RouteViewController: UIBotDataSource {
     }
     
     
-    // Working with zones
+    func validateRoutePrevious(diagram: String) -> (Bool, String) {
+        var pass: Bool
+        var msg: String
+        let comps = diagram.components(separatedBy: "→")
+        let expectedPrevious = comps.first!
+        let name = comps.last!
+        if expectedPrevious == "*" {
+            if let actualPrevious = self.route.nameOfWaypointPreceeding(waypointNamed: name) {
+                pass = false
+                msg = "previous of \(name) is \(actualPrevious), not nil"
+            } else {
+                pass = true
+                msg = "previous of \(name) is nil"
+            }
+        } else if let actualPrevious = self.route.nameOfWaypointPreceeding(waypointNamed: name) {
+            pass = actualPrevious == expectedPrevious
+            msg = pass ? "previous of \(name) is \(expectedPrevious)" : "previous of \(name) is \(actualPrevious), not \(expectedPrevious)"
+        } else {
+            pass = false
+            msg = "previous of \(name) is nil, not \(expectedPrevious)"
+        }
+        return (pass, msg)
+    }
+    
+    func validateSelection(expectedSelectionName: String) -> (Bool, String) {
+
+        let pass: Bool
+        let msg: String
+
+        if expectedSelectionName == "*" {
+            if let actualSelectionName = self.selection?.name {
+                pass = false
+                msg = "selection is \(actualSelectionName), not nil"
+            } else {
+                pass = true
+                msg = "selection is nil"
+            }
+        } else if let selectionName = self.selection?.name {
+            pass = selectionName == expectedSelectionName
+            msg = pass ? "selection is \(expectedSelectionName)" : "selection is \(selectionName) not \(expectedSelectionName)"
+        } else {
+            pass = false
+            msg = "selection is nil, not \(expectedSelectionName)"
+        }
+        return (pass, msg)
+    }
+    
+    func validateWaypointLocation(_ waypointName: String) -> (Bool, String) {
+        let routePoint = self.route.location(ofWaypointNamed: waypointName)
+        let nodePoint = self.nodes[waypointName]!.center
+        let pass: Bool
+        let msg: String
+        if nodePoint == routePoint {
+            pass = true
+            msg = "waypoint and corresponding node report same location (\(routePoint))"
+        } else {
+            pass = false
+            msg = "waypoint location \(routePoint) (zone \(self.zone(containing: routePoint)) differs from node location \(nodePoint) (zone \(self.zone(containing: nodePoint))"
+        }
+        return (pass, msg)
+    }
+    
+    
+    func validateArrowPresence(waypointName: String) -> (Bool, String) {
+        var pass: Bool
+        var msg: String
+        if let arrow = self.arrows[waypointName] {
+            if let _ = self.graphicsView.graphics.first(where: {$0 === arrow}) {
+                pass = true
+                msg = "found valid arrow for \(waypointName)"
+            } else {
+                pass = false
+                msg = "found arrow in arrow-map for \(waypointName), but arrow not present on graphicsView"
+            }
+        } else {
+            pass = false
+            msg = "no key '\(waypointName)' in arrow-map"
+        }
+
+        return (pass, msg)
+    }
+    
+   func validateArrowAbsence(waypointName: String) -> (Bool, String) {
+        let pass: Bool
+        let msg: String
+        if let arrow = self.arrows[waypointName] {
+            pass = false
+            if let _ = self.graphicsView.graphics.first(where: {$0 === arrow}) {
+                msg = "\(waypointName) does have arrow in arrow-map, and this arrow is on the graphicsView"
+            } else {
+                msg = "\(waypointName) does have arrow in arrow-map, but this arrow is not present on the graphicsView"
+            }
+        } else {
+            pass = true
+            msg = "\(waypointName) does not appear as a key in arrow-map"
+        }
+        return (pass, msg)
+    }
+    
+    func validateArrowPosition(waypointName: String) -> (Bool, String) {
+        let pass: Bool
+        let msg: String
+
+        let arrow = self.arrows[waypointName]!
+
+        let location⁰ = self.route.location(ofWaypointNamed: waypointName)
+        let nextName = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+        let location¹ = self.route.location(ofWaypointNamed: nextName)
+        let midpoint = location⁰.midpoint(location¹)
+
+        let arrowGradient = LineSector(start: arrow.start, end: arrow.end).gradient
+        let pointsGradient = LineSector(start: location⁰, end: location¹).gradient
+
+        let gradsOk: Bool
+        switch (arrowGradient, pointsGradient) {
+        case let (arrowGradient?, pointsGradient?):
+            gradsOk = abs(arrowGradient - pointsGradient) < 0.0001
+        case (_?, nil), (nil, _?):
+            gradsOk = false
+        case (nil, nil):
+            gradsOk = true
+        }
+
+        assert(self.graphicsView.graphics.first(where: {$0 === arrow}) != nil)
+        if arrow.contains(midpoint) && gradsOk {
+            msg = "arrow emanating from \(waypointName) is correctly positioned"
+            pass = true
+        } else {
+            msg = "arrow emanating from \(waypointName) is not correctly positioned"
+            pass = false
+        }
+        return (pass, msg)
+    }
+    
+    // MARK:- Working with zones
     
     private var zoneSize: CGSize {
         let nRows = CGFloat(grid.rows)
         let nCols = CGFloat(grid.columns)
         
-        let zoneWidth = canvas.bounds.width / nCols
-        let zoneHeight = canvas.bounds.height / nRows
+        let zoneWidth = graphicsView.bounds.width / nCols
+        let zoneHeight = graphicsView.bounds.height / nRows
         
         return CGSize(width: zoneWidth, height: zoneHeight)
     }
@@ -873,5 +1007,18 @@ extension RouteViewController: UIBotDataSource {
     private func center(of zone: Int) -> CGPoint {
         let origin = self.origin(of: zone)
         return CGPoint(x: origin.x + zoneSize.width * 0.5, y: origin.y + zoneSize.height * 0.5)
+    }
+    
+    private func zone(containing point: CGPoint) -> Int {
+        let nRows = CGFloat(grid.rows)
+        let nCols = CGFloat(grid.columns)
+        
+        let zoneWidth = graphicsView.bounds.width / nCols
+        let zoneHeight = graphicsView.bounds.height / nRows
+        
+        let row = floor(point.y / zoneHeight)
+        let col = floor(point.x / zoneWidth)
+        
+        return Int(row * nCols + col)
     }
 }

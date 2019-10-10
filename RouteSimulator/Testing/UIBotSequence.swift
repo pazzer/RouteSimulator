@@ -100,6 +100,4 @@ class UIBotSequence {
     var isComplete: Bool {
         return position > operations.count - 1
     }
-    
-
 }

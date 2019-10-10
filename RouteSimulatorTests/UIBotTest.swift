@@ -8,7 +8,7 @@
 
 import XCTest
 
-class BotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
+class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     
     var result = Double(0)
     

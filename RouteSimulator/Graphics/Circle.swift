@@ -48,7 +48,6 @@ public class Node: Graphic {
         }
     }
     
-    var isLocked = false
     var selected = false
     var frame: CGRect = .zero {
         didSet {
@@ -92,9 +91,5 @@ public class Node: Graphic {
         
         let labelRect = CGRect(x: center.x - labelSize.width / 2, y: center.y - labelSize.height / 2, width: labelSize.width, height: labelSize.height)
         NSString(string: name).draw(in: labelRect, withAttributes: nameAttributes)
-    }
-    
-    deinit {
-        print("circle named \(name) gone!")
     }
 }

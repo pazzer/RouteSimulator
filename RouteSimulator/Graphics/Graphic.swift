@@ -13,7 +13,6 @@ protocol Graphic: class {
     var frame: CGRect { get set }
     var center: CGPoint { get set }
     var selected: Bool { get set }
-    var isLocked: Bool { get set }
     func draw(in context: CGContext, rect: CGRect)
     func contains(_ point: CGPoint) -> Bool
 }

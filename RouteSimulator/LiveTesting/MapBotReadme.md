@@ -1,81 +1,209 @@
-#  <#Title#>
+#  Operations for UIBot Sequences
 
-### Adding Waypoints
+## Primitive Operations
+
+### Tapping 
+
+    <dict>
+        <key>name</key>
+        <string>TAP_ADD</string>
+    </dict>
+    
+    <dict>
+        <key>name</key>
+        <string>TAP_REMOVE</string>
+    </dict>
+    
+    <dict>
+        <key>name</key>
+        <string>TAP_UNDO</string>
+    </dict>
+    
+    <dict>
+        <key>name</key>
+        <string>TAP_REDO</string>
+    </dict>
     
     <dict>
         <key>data</key>
-        <dict>
-            <key>zones</key>
-            <string>49,18,22,47</string>
-            <key>connected</key>
-            <true/>
-        </dict>
-        <key>operation</key>
-        <string>ADD_WAYPOINTS_TO_ZONES</string>
-    </dict>
-
-### Deleting Waypoints
-
+        <string>A</string>
+        <key>name</key>
+        <string>TAP_WAYPOINT</string>
+    </dict>   
+    
     <dict>
-        <key>data</key>
-        <string>B</string>
-        <key>operation</key>
-        <string>DELETE_WAYPOINT</string>
+        <key>name</key>
+        <string>TAP_EMPTY_ZONE</string>
     </dict>
     
-### Deleting Arrows
+### Positioning the Crosshairs
+    
+    <dict>
+        <key>data</key>
+        <string>E</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_ARROW</string>
+    </dict>
+    
+    <dict>
+        <key>data</key>
+        <string>E</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+    </dict>
 
     <dict>
         <key>data</key>
-        <string>F</string>
-        <key>operation</key>
-        <string>DELETE_ARROW</string>
+        <integer>74</integer>
+        <key>name</key>
+        <string>MOVE_CROSSHAIRS_TO_ZONE</string>
+    </dict>
+    
+
+## Combining *Primitive* Operations
+    
+### Adding a Standalone Waypoint
+
+    <string>Adding A</string>
+    <dict>
+        <key>name</key>
+        <string>TAP_EMPTY_ZONE</string>
+    </dict>
+    <dict>
+        <key>data</key>
+        <integer>49</integer>
+        <key>name</key>
+        <string>MOVE_CROSSHAIRS_TO_ZONE</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_ADD</string>
+    </dict>
+    
+### Extending
+
+    <string>Extending from A to New</string>
+    <dict>
+        <key>data</key>
+        <string>A</string>
+        <key>name</key>
+        <string>TAP_WAYPOINT</string>
+    </dict>
+    <dict>
+        <key>data</key>
+        <integer>49</integer>
+        <key>name</key>
+        <string>MOVE_CROSSHAIRS_TO_ZONE</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_ADD</string>
+    </dict>
+    
+
+### Removing a Waypoint
+
+    <string>Removing A</string>
+    <dict>
+        <key>data</key>
+        <string>A</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_REMOVE</string>
     </dict>
     
 ### Setting Next
 
+    <string>Setting A → B</string>
     <dict>
         <key>data</key>
-        <string>A→F</string>
-        <key>operation</key>
-        <string>SET_NEXT</string>
+        <string>A</string>
+        <key>name</key>
+        <string>TAP_WAYPOINT</string>
+    </dict>
+    <dict>
+        <key>data</key>
+        <string>B</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_ADD</string>
     </dict>
     
-### Selecting Waypoints
+### Inserting
 
+    <string>Inserting C on arrow A → B</string>
+    <dict>
+        <key>name</key>
+        <string>TAP_EMPTY_ZONE</string>
+    </dict>
+    <dict>
+        <key>data</key>
+        <string>A</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_ARROW</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_ADD</string>
+    </dict>
+
+### Removing a Connection
+
+    <string>Delete Arrow From A</string>
+    <dict>
+        <key>data</key>
+        <string>A</string>
+        <key>name</key>
+        <string>SET_CROSSHAIRS_ON_ARROW</string>
+    </dict>
+    <dict>
+        <key>name</key>
+        <string>TAP_REMOVE</string>
+    </dict>
+
+# Tests
+
+    <dict>
+        <key>data</key>
+        <integer>2</integer>
+        <key>name</key>
+        <string>COUNT_WAYPOINTS</string>
+    </dict>
+    
+    <dict>
+        <key>data</key>
+        <integer>2</integer>
+        <key>name</key>
+        <string>COUNT_ARROWS</string>
+    </dict>
+    
     <dict>
         <key>data</key>
         <string>*</string>
-        <key>operation</key>
-        <string>SELECT_WAYPOINT</string>
+        <key>name</key>
+        <string>VALIDATE_SELECTION</string>
     </dict>
-
-### Validate Next
-
+    
     <dict>
         <key>data</key>
-        <string>D→*</string>
-        <key>operation</key>
+        <string>E→F</string>
+        <key>name</key>
         <string>VALIDATE_ROUTE_NEXT</string>
     </dict>
 
-### Validate Arrow Position
+# New Sequence
 
     <dict>
-        <key>data</key>
-        <string>F</string>
-        <key>operation</key>
-        <string>VALIDATE_ARROW_POSITION</string>
+        <key>name</key>
+        <string>?????????</string>
+        <key>operations</key>
+        <array>
+            <!-- OPERATIONS HERE -->
+        </array>
     </dict>
-    
-    
-### Deleted Waypoints
-
-    <dict>
-        <key></key>
-        <string></string>
-        <key>operation</key>
-        <string>DELETED_WAYPOINTS</string>
-    </dict>
-    
-

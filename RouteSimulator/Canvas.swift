@@ -1,5 +1,5 @@
 //
-//  Canvas.swift
+//  GraphicsView.swift
 //  RouteSimulator
 //
 //  Created by Paul Patterson on 10/09/2019.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Canvas: UIView {
+class GraphicsView: UIView {
     
     private(set) var graphics = [Graphic]()
     
@@ -57,7 +57,7 @@ class Canvas: UIView {
     }
 }
 
-extension Canvas {
+extension GraphicsView {
     func node(named name: String) -> Node {
         return graphics.first { (graphic) -> Bool in
             if let node = graphic as? Node {

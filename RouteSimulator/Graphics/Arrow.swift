@@ -146,8 +146,6 @@ public class Arrow: Graphic {
     
     var selected = false
     
-    var isLocked = false
-    
     func draw(in context: CGContext, rect: CGRect) {
         UIColor.gray.setFill()
         path.fill()

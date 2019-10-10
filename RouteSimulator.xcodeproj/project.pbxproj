@@ -32,7 +32,7 @@
 		CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B82328DDAE001582C7 /* LineSector.swift */; };
 		CF8A75BB2328E158001582C7 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BA2328E158001582C7 /* Direction.swift */; };
 		CF8A75BD2328E5A2001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
-		CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */; };
+		CF8A75D823291013001582C7 /* RouteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75D723291013001582C7 /* RouteTests.swift */; };
 		CF8A75DF232924B7001582C7 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CF8A75E6232A69BF001582C7 /* UIBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75E5232A69BF001582C7 /* UIBot.swift */; };
 		CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75E7232A7A7C001582C7 /* BotTests.plist */; };
@@ -40,16 +40,22 @@
 		CF8A75EC232AE02C001582C7 /* TestsSummaryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75EB232AE02C001582C7 /* TestsSummaryController.swift */; };
 		CF8A75EE232AE134001582C7 /* DashedLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75ED232AE134001582C7 /* DashedLineView.swift */; };
 		CF8A75F7232C3AF0001582C7 /* NSLayoutConstraint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75F6232C3AF0001582C7 /* NSLayoutConstraint+.swift */; };
+		CF8D0616234F86AD000C3882 /* TestOne.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D0615234F86AD000C3882 /* TestOne.plist */; };
+		CF8D0618234F872C000C3882 /* TestTwo.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D0617234F872C000C3882 /* TestTwo.plist */; };
+		CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D0619234F87B0000C3882 /* TestThree.plist */; };
+		CF8D061C234F8846000C3882 /* TestFour.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061B234F8846000C3882 /* TestFour.plist */; };
+		CF8D061E234F8F4B000C3882 /* TestFive.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061D234F8F4B000C3882 /* TestFive.plist */; };
+		CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061F234FB9A3000C3882 /* TestSix.plist */; };
 		CF981009233AA3780090AEDE /* UIBotSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981008233AA3780090AEDE /* UIBotSequence.swift */; };
 		CF98100B233AA3AD0090AEDE /* UIBotOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */; };
-		CF98100D233B63AE0090AEDE /* SequenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100C233B63AE0090AEDE /* SequenceTest.swift */; };
+		CF98100D233B63AE0090AEDE /* UISequenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100C233B63AE0090AEDE /* UISequenceTest.swift */; };
 		CF98100E233B65210090AEDE /* UIBotSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981008233AA3780090AEDE /* UIBotSequence.swift */; };
 		CF98100F233B65270090AEDE /* UIBotOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */; };
-		CF981011233B7D990090AEDE /* BotTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981010233B7D990090AEDE /* BotTest.swift */; };
+		CF981011233B7D990090AEDE /* UIBotTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981010233B7D990090AEDE /* UIBotTest.swift */; };
 		CF981013233B7E7D0090AEDE /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981012233B7E7D0090AEDE /* Sequences.swift */; };
-		CF981017233B834D0090AEDE /* PlistLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981016233B834D0090AEDE /* PlistLoader.swift */; };
 		CF981018233B861D0090AEDE /* UIBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75E5232A69BF001582C7 /* UIBot.swift */; };
-		CF981019233B86A00090AEDE /* PlistLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981016233B834D0090AEDE /* PlistLoader.swift */; };
+		CF98101B233D41480090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
+		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +69,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CF25E592234E7064004083F3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		CF8A75872322544F001582C7 /* RouteSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF8A758A2322544F001582C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CF8A758C2322544F001582C7 /* RouteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteViewController.swift; sourceTree = "<group>"; };
@@ -82,7 +89,7 @@
 		CF8A75BA2328E158001582C7 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
 		CF8A75BC2328E5A2001582C7 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		CF8A75D523291013001582C7 /* RouteSimulatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteSimulatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSimulatorTests.swift; sourceTree = "<group>"; };
+		CF8A75D723291013001582C7 /* RouteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTests.swift; sourceTree = "<group>"; };
 		CF8A75D923291013001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF8A75E5232A69BF001582C7 /* UIBot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBot.swift; sourceTree = "<group>"; };
 		CF8A75E7232A7A7C001582C7 /* BotTests.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BotTests.plist; sourceTree = "<group>"; };
@@ -92,12 +99,18 @@
 		CF8A75F0232AEC24001582C7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		CF8A75F6232C3AF0001582C7 /* NSLayoutConstraint+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSLayoutConstraint+.swift"; sourceTree = "<group>"; };
 		CF8A75F82331507D001582C7 /* MapBotReadme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = MapBotReadme.md; sourceTree = "<group>"; };
+		CF8D0615234F86AD000C3882 /* TestOne.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestOne.plist; sourceTree = "<group>"; };
+		CF8D0617234F872C000C3882 /* TestTwo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestTwo.plist; sourceTree = "<group>"; };
+		CF8D0619234F87B0000C3882 /* TestThree.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestThree.plist; sourceTree = "<group>"; };
+		CF8D061B234F8846000C3882 /* TestFour.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestFour.plist; sourceTree = "<group>"; };
+		CF8D061D234F8F4B000C3882 /* TestFive.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestFive.plist; sourceTree = "<group>"; };
+		CF8D061F234FB9A3000C3882 /* TestSix.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestSix.plist; sourceTree = "<group>"; };
 		CF981008233AA3780090AEDE /* UIBotSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotSequence.swift; sourceTree = "<group>"; };
 		CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotOperation.swift; sourceTree = "<group>"; };
-		CF98100C233B63AE0090AEDE /* SequenceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequenceTest.swift; sourceTree = "<group>"; };
-		CF981010233B7D990090AEDE /* BotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotTest.swift; sourceTree = "<group>"; };
+		CF98100C233B63AE0090AEDE /* UISequenceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISequenceTest.swift; sourceTree = "<group>"; };
+		CF981010233B7D990090AEDE /* UIBotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotTest.swift; sourceTree = "<group>"; };
 		CF981012233B7E7D0090AEDE /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
-		CF981016233B834D0090AEDE /* PlistLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlistLoader.swift; sourceTree = "<group>"; };
+		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +134,8 @@
 		CF8A757E2322544F001582C7 = {
 			isa = PBXGroup;
 			children = (
+				CF8D0614234F8687000C3882 /* BotTests */,
+				CF25E592234E7064004083F3 /* README.md */,
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
 				CF8A75882322544F001582C7 /* Products */,
@@ -140,9 +155,9 @@
 		CF8A75892322544F001582C7 /* RouteSimulator */ = {
 			isa = PBXGroup;
 			children = (
+				CF98101A233D41480090AEDE /* Globals.swift */,
 				CF981007233AA3650090AEDE /* Testing */,
 				CF8A75E2232A5AB7001582C7 /* LiveTesting */,
-				CF8A75E1232A5A8C001582C7 /* Extensions */,
 				CF8A758A2322544F001582C7 /* AppDelegate.swift */,
 				CF8A758C2322544F001582C7 /* RouteViewController.swift */,
 				CF8A75BA2328E158001582C7 /* Direction.swift */,
@@ -155,8 +170,8 @@
 				CF8A759623225450001582C7 /* LaunchScreen.storyboard */,
 				CF8A759923225450001582C7 /* Info.plist */,
 				CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */,
+				CF8A75E1232A5A8C001582C7 /* Extensions */,
 				CF8A75B5232840A7001582C7 /* Graphics */,
-				CF981016233B834D0090AEDE /* PlistLoader.swift */,
 			);
 			path = RouteSimulator;
 			sourceTree = "<group>";
@@ -175,10 +190,10 @@
 		CF8A75D623291013001582C7 /* RouteSimulatorTests */ = {
 			isa = PBXGroup;
 			children = (
-				CF8A75D723291013001582C7 /* RouteSimulatorTests.swift */,
+				CF8A75D723291013001582C7 /* RouteTests.swift */,
+				CF98100C233B63AE0090AEDE /* UISequenceTest.swift */,
+				CF981010233B7D990090AEDE /* UIBotTest.swift */,
 				CF8A75D923291013001582C7 /* Info.plist */,
-				CF98100C233B63AE0090AEDE /* SequenceTest.swift */,
-				CF981010233B7D990090AEDE /* BotTest.swift */,
 				CF981012233B7E7D0090AEDE /* Sequences.swift */,
 			);
 			path = RouteSimulatorTests;
@@ -218,6 +233,19 @@
 				CF8A75F0232AEC24001582C7 /* QuartzCore.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CF8D0614234F8687000C3882 /* BotTests */ = {
+			isa = PBXGroup;
+			children = (
+				CF8D0615234F86AD000C3882 /* TestOne.plist */,
+				CF8D0617234F872C000C3882 /* TestTwo.plist */,
+				CF8D0619234F87B0000C3882 /* TestThree.plist */,
+				CF8D061B234F8846000C3882 /* TestFour.plist */,
+				CF8D061D234F8F4B000C3882 /* TestFive.plist */,
+				CF8D061F234FB9A3000C3882 /* TestSix.plist */,
+			);
+			path = BotTests;
 			sourceTree = "<group>";
 		};
 		CF981007233AA3650090AEDE /* Testing */ = {
@@ -312,8 +340,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF8D061E234F8F4B000C3882 /* TestFive.plist in Resources */,
 				CF8A75EA232AD502001582C7 /* TestsSummaryView.xib in Resources */,
+				CF8D0618234F872C000C3882 /* TestTwo.plist in Resources */,
+				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
+				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
+				CF8D061C234F8846000C3882 /* TestFour.plist in Resources */,
+				CF8D0616234F86AD000C3882 /* TestOne.plist in Resources */,
 				CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */,
 				CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */,
 				CF8A759523225450001582C7 /* Assets.xcassets in Resources */,
@@ -340,6 +374,7 @@
 				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
 				CF8A758D2322544F001582C7 /* RouteViewController.swift in Sources */,
 				CF8A75EE232AE134001582C7 /* DashedLineView.swift in Sources */,
+				CF98101B233D41480090AEDE /* Globals.swift in Sources */,
 				CF8A75E6232A69BF001582C7 /* UIBot.swift in Sources */,
 				CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */,
 				CF8A75B72328413A001582C7 /* CGPoint+.swift in Sources */,
@@ -352,7 +387,6 @@
 				CF8A75AC23283F08001582C7 /* Circle.swift in Sources */,
 				CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */,
 				CF8A75EC232AE02C001582C7 /* TestsSummaryController.swift in Sources */,
-				CF981017233B834D0090AEDE /* PlistLoader.swift in Sources */,
 				CF8A75BB2328E158001582C7 /* Direction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -369,12 +403,12 @@
 				CF2B4A87233A1B83008DFAD4 /* Canvas.swift in Sources */,
 				CF98100F233B65270090AEDE /* UIBotOperation.swift in Sources */,
 				CF981013233B7E7D0090AEDE /* Sequences.swift in Sources */,
+				CF98101C233D41910090AEDE /* Globals.swift in Sources */,
 				CF2B4A82233A1A2A008DFAD4 /* Arrow.swift in Sources */,
-				CF981011233B7D990090AEDE /* BotTest.swift in Sources */,
-				CF98100D233B63AE0090AEDE /* SequenceTest.swift in Sources */,
-				CF8A75D823291013001582C7 /* RouteSimulatorTests.swift in Sources */,
+				CF981011233B7D990090AEDE /* UIBotTest.swift in Sources */,
+				CF98100D233B63AE0090AEDE /* UISequenceTest.swift in Sources */,
+				CF8A75D823291013001582C7 /* RouteTests.swift in Sources */,
 				CF98100E233B65210090AEDE /* UIBotSequence.swift in Sources */,
-				CF981019233B86A00090AEDE /* PlistLoader.swift in Sources */,
 				CF2B4A88233A1B95008DFAD4 /* Crosshairs.swift in Sources */,
 				CF2B4A8C233A1C3D008DFAD4 /* NSLayoutConstraint+.swift in Sources */,
 				CF8A75DF232924B7001582C7 /* Route.swift in Sources */,

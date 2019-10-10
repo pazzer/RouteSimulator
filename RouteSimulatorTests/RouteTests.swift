@@ -9,9 +9,7 @@
 import XCTest
 
 
-class RouteSimulatorTests: XCTestCase {
-
-    
+class RouteTests: XCTestCase {
 
     var routeA: Route {
         let route = Route()

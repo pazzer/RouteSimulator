@@ -1,12 +1,24 @@
 //
-//  PlistLoader.swift
+//  File.swift
 //  RouteSimulator
 //
-//  Created by Paul Patterson on 25/09/2019.
+//  Created by Paul Patterson on 26/09/2019.
 //  Copyright © 2019 Paul Patterson. All rights reserved.
 //
 
 import Foundation
+import UIKit
+
+func ConvertSeparatedStringToArray(_ separatedString: String, separator: String = ",") -> [String] {
+    var array: [String]
+    if separatedString.contains(separator) {
+        array = separatedString.components(separatedBy: separator)
+        array = array.map({$0.trimmingCharacters(in: .whitespaces)})
+    } else {
+        array = [separatedString.trimmingCharacters(in: .whitespaces)]
+    }
+    return array
+}
 
 func LoadPlist(at url: URL) -> Any {
     guard

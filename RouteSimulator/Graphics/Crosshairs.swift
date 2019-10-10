@@ -16,7 +16,6 @@ public class Crosshairs: Graphic {
         }
     }
     
-    var isLocked = false
     var selected: Bool = false
     
     init(center: CGPoint, size: CGSize) {

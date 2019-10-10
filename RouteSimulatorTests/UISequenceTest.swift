@@ -8,7 +8,7 @@
 
 import XCTest
 
-class SequenceTest: XCTestCase {
+class UISequenceTest: XCTestCase {
 
     func testSequenceARandom() {
         var op: UIBotOperation
@@ -58,7 +58,7 @@ class SequenceTest: XCTestCase {
         var op: UIBotOperation
         var ops: [UIBotOperation]
         
-        var sequence = SequenceA()
+        let sequence = SequenceA()
         let _ = try! sequence.step()
         ops = try! sequence.step(to: .end)
         XCTAssertEqual(ops.count, 8)
@@ -73,7 +73,7 @@ class SequenceTest: XCTestCase {
     
     func testSequenceASections() {
         var ops: [UIBotOperation]
-        var sequence = SequenceA()
+        let sequence = SequenceA()
         
         // at start of section 1
         ops = try! sequence.step(to: .nextSection)
@@ -102,7 +102,7 @@ class SequenceTest: XCTestCase {
     
     func testSequenceAStepping() {
         var op: UIBotOperation
-        var sequence = SequenceA()
+        let sequence = SequenceA()
         
         let _ = try! sequence.step()
         let _ = try! sequence.step()
