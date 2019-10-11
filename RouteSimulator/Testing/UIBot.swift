@@ -37,27 +37,33 @@ extension UIBotDelegate {
 
 class UIBot {
     
-    init(url: URL, delegate: UIBotDelegate, dataSource: UIBotDataSource) {
-        self.delegate = delegate
-        self.dataSource = dataSource
-        
-        let rawSequences = LoadPlist(at: url) as! [NSDictionary]
-        self.sequences = rawSequences.map { UIBotSequence(from: $0) }
-        
-        commonInit()
-    }
+//    init(url: URL, delegate: UIBotDelegate, dataSource: UIBotDataSource) {
+//        self.delegate = delegate
+//        self.dataSource = dataSource
+//
+//        let rawSequences = LoadPlist(at: url) as! [NSDictionary]
+//        self.sequences = rawSequences.map { UIBotSequence(from: $0) }
+//
+//        commonInit()
+//    }
     
-    init(sequences: [UIBotSequence], delegate: UIBotDelegate, dataSource: UIBotDataSource) {
-        self.delegate = delegate
-        self.dataSource = dataSource
+//    init(sequences: [UIBotSequence], delegate: UIBotDelegate, dataSource: UIBotDataSource) {
+//        self.delegate = delegate
+//        self.dataSource = dataSource
+//        self.sequences = sequences
+//
+//        commonInit()
+//    }
+    
+    init(sequences: [UIBotSequence]) {
         self.sequences = sequences
-        
-        commonInit()
     }
     
-    func commonInit() {
-        self.sequenceIndex = 0
-    }
+    
+//
+//    func commonInit() {
+//        self.sequenceIndex = 0
+//    }
     
     var allSequencesComplete: Bool {
         return sequenceIndex == sequences.count - 1 && allStepsComplete
@@ -115,7 +121,11 @@ class UIBot {
     
     var delegate: UIBotDelegate!
     
-    var dataSource: UIBotDataSource!
+    var dataSource: UIBotDataSource! {
+        didSet {
+            sequenceIndex = 0
+        }
+    }
     
     private func executeTest(named name: String, data: Any) -> () -> Void {
         return {

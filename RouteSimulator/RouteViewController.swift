@@ -55,8 +55,14 @@ class RouteViewController: UIViewController {
         super.viewWillAppear(animated)
         crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.maxX), size: CGSize(width: 120, height: 120))
         graphicsView.add(crosshairs)
-        prepareForTesting()
         updateButtons()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let uiBot = testsSummaryViewController.uiBot
+        uiBot?.delegate = testsSummaryViewController
+        uiBot?.dataSource = self
     }
     
     // MARK:- Variables (stored and computed)
@@ -74,10 +80,6 @@ class RouteViewController: UIViewController {
                 graphicsView.setNeedsDisplay(new.frame)
             }
         }
-    }
-    
-    var graphicsView: GraphicsView {
-        return view as! GraphicsView
     }
     
     let nodeRadius = CGFloat(22.0)
@@ -590,6 +592,24 @@ class RouteViewController: UIViewController {
     }
     
 
+    // MARK:- Seguing
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let testsSummaryViewController = segue.destination as? TestsSummaryViewController else {
+            return
+        }
+        self.testsSummaryViewController = testsSummaryViewController
+        
+        
+    }
+    
+    var testsSummaryViewController: TestsSummaryViewController! {
+        didSet {
+            testsSummaryViewController.routeViewController = self
+            testsSummaryViewController.uiBot = UIBot(sequences: testSequences)
+        }
+    }
+    
     // MARK:- Debugging
     
     func describeGraphicsView() {
@@ -602,57 +622,20 @@ class RouteViewController: UIViewController {
     
     // MARK:- Testing Machinery
     
-    lazy var testsSummaryController: TestsSummaryController = {
-        let testsSummaryController = TestsSummaryController()
-        testsSummaryController.routeViewController = self
-        return testsSummaryController
-    }()
+
     
-    func prepareForTesting() {
-        installTestSummaryView()
-        testsSummaryController.uiBot = uiBot
-    }
-    
-    func installTestSummaryView() {
-        let nib = UINib(nibName: "TestsSummaryView", bundle: nil)
-        let _ = nib.instantiate(withOwner: testsSummaryController, options: nil)
-        let testsSummaryView = testsSummaryController.view!
-        let container = UIView()
-        container.addSubview(testsSummaryView)
-        view.addSubview(container)
-        NSLayoutConstraint.fitSubviewIntoSuperview(subview: testsSummaryView)
-        
-        // Shadow the container
-        let shadowLayer = CAShapeLayer()
-        shadowLayer.shadowColor = UIColor.darkGray.cgColor
-        shadowLayer.shadowOffset = .zero
-        shadowLayer.shadowOpacity = 0.4
-        shadowLayer.shadowRadius = 6
-        shadowLayer.shadowPath = UIBezierPath(roundedRect: testsSummaryView.bounds.insetBy(dx: -3, dy: -3)
-            , cornerRadius: 6).cgPath
-        container.layer.insertSublayer(shadowLayer, at: 0)
-        
-        // Position the container
-        let size = testsSummaryView.bounds.size
-        let maxY = graphicsView.convert(graphicsView.bounds, from: view).maxY
-        let origin = CGPoint(x: view.frame.midX - size.width * 0.5, y: maxY - 16 - size.height)
-        container.frame = CGRect(origin: origin, size: size)
-    }
+
+    @IBOutlet weak var graphicsView: GraphicsView!
     
     lazy var testSequences: [UIBotSequence] = {
         var sequences = [UIBotSequence]()
-        //["One", "Two", "Three", "Four", "Five", "Six"]
-        ["Seven"].forEach { (number) in
+        
+        ["One", "Two", "Three", "Four", "Five", "Six", "Seven"].forEach { (number) in
             if let url = Bundle.main.url(forResource: "Test\(number)", withExtension: "plist") {
                 sequences.append(UIBotSequence(from: url))
             }
         }
         return sequences
-    }()
-        
-    lazy var uiBot: UIBot = {
-        let uiBot = UIBot(sequences: self.testSequences, delegate: self.testsSummaryController, dataSource: self)
-        return uiBot
     }()
 }
 

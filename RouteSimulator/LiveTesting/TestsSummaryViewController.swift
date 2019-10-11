@@ -8,10 +8,7 @@
 
 import UIKit
 
-class TestsSummaryController: NSObject, UIBotDelegate {
-    
-    @IBOutlet var view: UIView!
-    
+class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     @IBOutlet weak var testNumber: UILabel!
     @IBOutlet weak var currentTest: UILabel!
@@ -39,15 +36,9 @@ class TestsSummaryController: NSObject, UIBotDelegate {
     @IBOutlet weak var buttonStack: UIStackView!
     
     weak var routeViewController: RouteViewController!
-    var uiBot: UIBot! {
-        didSet {
-            completed = 0
-        }
-    }
+    var uiBot: UIBot!
     
-    func setUp() {
-        divideButtons()
-    }
+
     
     
     @IBAction func step(_ sender: Any) {
@@ -83,11 +74,7 @@ class TestsSummaryController: NSObject, UIBotDelegate {
     
     // MARK: UIBotDelegate
     
-    func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named: String?) {
-        if index == 0 {
-            setUp()
-        }
-        
+    func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named: String?) {        
         leftOperation.text = nil
         middleOperation.text = nil
         rightOperation.text = nil
@@ -205,11 +192,14 @@ class TestsSummaryController: NSObject, UIBotDelegate {
     
     var skipped: Int = 0
     
-    func divideButtons() {
-        guard let view = buttonStack.superview else {
-            return
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        divideButtons()
+        completed = 0
+        
+    }
     
+    func divideButtons() {
         [step, sectionStep, sequenceStep].forEach { (btn) in
             let rect = btn!.convert(btn!.bounds, to: view)
             let dlvFrame = CGRect(x: rect.maxX - 1, y: buttonStack.frame.minY, width: 3, height: buttonStack.frame.height)
@@ -217,7 +207,10 @@ class TestsSummaryController: NSObject, UIBotDelegate {
             dlv.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(dlv)
         }
+        
     }
+    
+
 }
 
 

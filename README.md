@@ -7,6 +7,8 @@ make waypointNamed methods more concise
 Handle reciprocal relationships
 Make test view contained controller to stop inadvertent tapping
 
+should testsSummaryViewController  have reference to routeviewcontroller?
+
 // Tests
 
 2. Something - undo - something - redo ?
