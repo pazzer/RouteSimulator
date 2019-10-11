@@ -8,7 +8,6 @@
    Copyright (c) 2019 Paul Patterson. All rights reserved.
 -->
 <plist version="1.0">
-<array>
     <dict>		
         <key>name</key>
         <string>All Standard Ops (No Undo)</string>
@@ -625,5 +624,4 @@
             </dict>
         </array>
     </dict>
-</array>
 </plist>

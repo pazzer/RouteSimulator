@@ -46,6 +46,7 @@
 		CF8D061C234F8846000C3882 /* TestFour.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061B234F8846000C3882 /* TestFour.plist */; };
 		CF8D061E234F8F4B000C3882 /* TestFive.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061D234F8F4B000C3882 /* TestFive.plist */; };
 		CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D061F234FB9A3000C3882 /* TestSix.plist */; };
+		CF8D062223507754000C3882 /* TestSeven.plist in Resources */ = {isa = PBXBuildFile; fileRef = CF8D062123507754000C3882 /* TestSeven.plist */; };
 		CF981009233AA3780090AEDE /* UIBotSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981008233AA3780090AEDE /* UIBotSequence.swift */; };
 		CF98100B233AA3AD0090AEDE /* UIBotOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */; };
 		CF98100D233B63AE0090AEDE /* UISequenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100C233B63AE0090AEDE /* UISequenceTest.swift */; };
@@ -105,6 +106,7 @@
 		CF8D061B234F8846000C3882 /* TestFour.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestFour.plist; sourceTree = "<group>"; };
 		CF8D061D234F8F4B000C3882 /* TestFive.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestFive.plist; sourceTree = "<group>"; };
 		CF8D061F234FB9A3000C3882 /* TestSix.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestSix.plist; sourceTree = "<group>"; };
+		CF8D062123507754000C3882 /* TestSeven.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestSeven.plist; sourceTree = "<group>"; };
 		CF981008233AA3780090AEDE /* UIBotSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotSequence.swift; sourceTree = "<group>"; };
 		CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotOperation.swift; sourceTree = "<group>"; };
 		CF98100C233B63AE0090AEDE /* UISequenceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISequenceTest.swift; sourceTree = "<group>"; };
@@ -134,7 +136,6 @@
 		CF8A757E2322544F001582C7 = {
 			isa = PBXGroup;
 			children = (
-				CF8D0614234F8687000C3882 /* BotTests */,
 				CF25E592234E7064004083F3 /* README.md */,
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
@@ -244,6 +245,7 @@
 				CF8D061B234F8846000C3882 /* TestFour.plist */,
 				CF8D061D234F8F4B000C3882 /* TestFive.plist */,
 				CF8D061F234FB9A3000C3882 /* TestSix.plist */,
+				CF8D062123507754000C3882 /* TestSeven.plist */,
 			);
 			path = BotTests;
 			sourceTree = "<group>";
@@ -251,6 +253,7 @@
 		CF981007233AA3650090AEDE /* Testing */ = {
 			isa = PBXGroup;
 			children = (
+				CF8D0614234F8687000C3882 /* BotTests */,
 				CF981008233AA3780090AEDE /* UIBotSequence.swift */,
 				CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */,
 				CF8A75E5232A69BF001582C7 /* UIBot.swift */,
@@ -345,6 +348,7 @@
 				CF8D0618234F872C000C3882 /* TestTwo.plist in Resources */,
 				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
+				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,
 				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
 				CF8D061C234F8846000C3882 /* TestFour.plist in Resources */,
 				CF8D0616234F86AD000C3882 /* TestOne.plist in Resources */,

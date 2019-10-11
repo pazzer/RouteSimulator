@@ -202,7 +202,14 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func clearRoute(_ sender: Any) {
+        // Clearing model
         route.clear()
+        
+        // Clearing view/controller
+        selection = nil
+        arrows.removeAll()
+        nodes.removeAll()
+        undoManager?.removeAllActions()
         graphicsView.graphics.forEach { (graphic) in
             if !(graphic is Crosshairs) {
                 self.graphicsView.remove(graphic)
@@ -632,10 +639,19 @@ class RouteViewController: UIViewController {
         container.frame = CGRect(origin: origin, size: size)
     }
     
-    var tests = Bundle.main.url(forResource: "TestSix", withExtension: "plist")
-    
+    lazy var testSequences: [UIBotSequence] = {
+        var sequences = [UIBotSequence]()
+        //["One", "Two", "Three", "Four", "Five", "Six"]
+        ["Seven"].forEach { (number) in
+            if let url = Bundle.main.url(forResource: "Test\(number)", withExtension: "plist") {
+                sequences.append(UIBotSequence(from: url))
+            }
+        }
+        return sequences
+    }()
+        
     lazy var uiBot: UIBot = {
-        let uiBot = UIBot(url: self.tests!, delegate: self.testsSummaryController, dataSource: self)
+        let uiBot = UIBot(sequences: self.testSequences, delegate: self.testsSummaryController, dataSource: self)
         return uiBot
     }()
 }
@@ -693,8 +709,6 @@ extension RouteViewController: UIBotDataSource {
             return tapWaypoint(named: operationData as! String)
         case "MOVE_CROSSHAIRS_TO_ZONE":
             return moveCrosshairsToZone(operationData as! Int)
-        case "MOVE_WAYPOINT_TO_ZONE":
-            return moveWaypointToZone(rawData: operationData as! NSDictionary)
         case "SET_CROSSHAIRS_ON_WAYPOINT":
             return setCrosshairsOnWaypoint(named: operationData as! String)
         case "SET_CROSSHAIRS_ON_ARROW":
@@ -758,14 +772,6 @@ extension RouteViewController: UIBotDataSource {
             let pt¹ = self.route.location(ofWaypointNamed: next)
             let midPoint = pt⁰.midpoint(pt¹)
             self.move(self.crosshairs, to: midPoint)
-        }
-    }
-    
-    func moveWaypointToZone(rawData: NSDictionary) -> () -> Void {
-        return {
-            let waypointName = rawData["waypoint"] as! String
-            let zone = rawData["zone"] as! Int
-            //self.move(waypointNamed: waypointName, to: self.center(of: zone))
         }
     }
     

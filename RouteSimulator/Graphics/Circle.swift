@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-public class Node: Graphic {
+public class Node: Graphic, CustomStringConvertible {
     
     init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, name: String) {
         self.frame = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
@@ -91,5 +91,9 @@ public class Node: Graphic {
         
         let labelRect = CGRect(x: center.x - labelSize.width / 2, y: center.y - labelSize.height / 2, width: labelSize.width, height: labelSize.height)
         NSString(string: name).draw(in: labelRect, withAttributes: nameAttributes)
+    }
+    
+    public var description: String {
+        return "\(Unmanaged.passUnretained(self).toOpaque()); center: \(center), radius: \(radius), name: \(name)"
     }
 }

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<array>
 	<dict>
 		<key>name</key>
-		<string>Connecting Two Standalones, then Undoing</string>
+		<string>Inserting three standalone</string>
 		<key>operations</key>
 		<array>
-			<string>Inserting two standalone, then extending</string>
 			<dict>
 				<key>data</key>
 				<integer>17</integer>
@@ -33,8 +31,12 @@
 				<string>TAP_ADD</string>
 			</dict>
 			<dict>
+				<key>name</key>
+				<string>TAP_EMPTY_ZONE</string>
+			</dict>
+			<dict>
 				<key>data</key>
-				<integer>75</integer>
+				<integer>59</integer>
 				<key>name</key>
 				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
 			</dict>
@@ -42,88 +44,121 @@
 				<key>name</key>
 				<string>TAP_ADD</string>
 			</dict>
-			<string>Messing about with selection</string>
+			<string>Setting C to A</string>
 			<dict>
 				<key>data</key>
 				<string>A</string>
 				<key>name</key>
-				<string>TAP_WAYPOINT</string>
+				<string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Setting A to B</string>
+			<dict>
+				<key>data</key>
+				<string>B</string>
+				<key>name</key>
+				<string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Setting B to C</string>
+			<dict>
+				<key>data</key>
+				<string>C</string>
+				<key>name</key>
+				<string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Insert on B</string>
+			<dict>
+				<key>name</key>
+				<string>TAP_EMPTY_ZONE</string>
 			</dict>
 			<dict>
 				<key>data</key>
 				<string>B</string>
 				<key>name</key>
-				<string>TAP_WAYPOINT</string>
+				<string>SET_CROSSHAIRS_ON_ARROW</string>
 			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Insert on C</string>
 			<dict>
 				<key>name</key>
 				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>data</key>
-				<integer>3</integer>
-				<key>name</key>
-				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
 			</dict>
 			<dict>
 				<key>data</key>
 				<string>C</string>
 				<key>name</key>
-				<string>TAP_WAYPOINT</string>
+				<string>SET_CROSSHAIRS_ON_ARROW</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
 			</dict>
 			<string>Undo Once</string>
 			<dict>
 				<key>name</key>
 				<string>TAP_UNDO</string>
 			</dict>
-			<string>Test</string>
+			<string>Tests</string>
+			<dict>
+				<key>data</key>
+				<string>B→D</string>
+				<key>name</key>
+				<string>VALIDATE_ROUTE_NEXT</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<string>D→C</string>
+				<key>name</key>
+				<string>VALIDATE_ROUTE_NEXT</string>
+			</dict>
 			<dict>
 				<key>data</key>
 				<string>*</string>
 				<key>name</key>
 				<string>VALIDATE_SELECTION</string>
 			</dict>
+			<dict>
+				<key>data</key>
+				<integer>4</integer>
+				<key>name</key>
+				<string>COUNT_WAYPOINTS</string>
+			</dict>
 			<string>Undo Again</string>
 			<dict>
 				<key>name</key>
 				<string>TAP_UNDO</string>
 			</dict>
-			<string>Test</string>
-			<dict>
-				<key>data</key>
-				<string>B</string>
-				<key>name</key>
-				<string>VALIDATE_SELECTION</string>
-			</dict>
-			<string>Final Undo</string>
 			<dict>
 				<key>name</key>
 				<string>TAP_UNDO</string>
 			</dict>
-			<string>Test</string>
+			<string>Tests</string>
 			<dict>
 				<key>data</key>
-				<string>A</string>
+				<integer>3</integer>
 				<key>name</key>
-				<string>VALIDATE_SELECTION</string>
+				<string>COUNT_WAYPOINTS</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>3</integer>
+				<key>name</key>
+				<string>COUNT_ARROWS</string>
 			</dict>
 		</array>
 	</dict>
-</array>
 </plist>

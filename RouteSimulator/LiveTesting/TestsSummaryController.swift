@@ -36,7 +36,6 @@ class TestsSummaryController: NSObject, UIBotDelegate {
     // Jumps to the start of the next sequence, ignoring any outstanding steps in the current one
     @IBOutlet weak var sequenceSkip: UIButton!
     
-
     @IBOutlet weak var buttonStack: UIStackView!
     
     weak var routeViewController: RouteViewController!
@@ -131,8 +130,6 @@ class TestsSummaryController: NSObject, UIBotDelegate {
         leftOperation.text = operationName
         leftOperation.textColor = isTest ? testTextColor : .black
     }
-    
-    
     
     var completed: Int! {
         didSet {

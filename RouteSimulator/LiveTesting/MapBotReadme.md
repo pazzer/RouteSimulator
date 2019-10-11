@@ -196,6 +196,13 @@
         <key>name</key>
         <string>VALIDATE_ROUTE_NEXT</string>
     </dict>
+    
+    <dict>
+        <key>data</key>
+        <string>C</string>
+        <key>name</key>
+        <string>VALIDATE_ARROW_LOCATION</string>
+    </dict>
 
 # New Sequence
 

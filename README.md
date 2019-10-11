@@ -1,14 +1,11 @@
-# 
-1. Debug description for arrows (CustomRepresentable), then replace as appropriate in fatalError calls
+
 
 Refactor
-Lot's of tests
-nicest way to get undo operations (use 'undo' idea?)
-
-Rework tests so test are provided in a datasource fashion - allowing me to put one test in one file.
 
 Rename Node 'Circle'
 make waypointNamed methods more concise
+Handle reciprocal relationships
+Make test view contained controller to stop inadvertent tapping
 
 // Tests
 

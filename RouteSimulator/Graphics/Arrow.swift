@@ -16,7 +16,7 @@ struct ArrowMetrics {
 }
 
 
-public class Arrow: Graphic {
+public class Arrow: Graphic, CustomStringConvertible {
     
     static var defaultMetrics = ArrowMetrics(tipHeight: 20, tipWidth: 20, shaftWidth: 5)
     
@@ -151,6 +151,9 @@ public class Arrow: Graphic {
         path.fill()
     }
     
+    public var description: String {
+        return "\(Unmanaged.passUnretained(self).toOpaque()): \(start) → \(end)"
+    }
 
 }
 
