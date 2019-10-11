@@ -37,10 +37,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     weak var routeViewController: RouteViewController!
     var uiBot: UIBot!
-    
 
-    
-    
     @IBAction func step(_ sender: Any) {
         try! uiBot.step()
     }

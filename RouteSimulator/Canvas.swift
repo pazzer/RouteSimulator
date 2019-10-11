@@ -58,12 +58,12 @@ class GraphicsView: UIView {
 }
 
 extension GraphicsView {
-    func node(named name: String) -> Node {
+    func circle(labeled label: String) -> Circle {
         return graphics.first { (graphic) -> Bool in
-            if let node = graphic as? Node {
-                return node.name == name
+            if let circle = graphic as? Circle {
+                return circle.label == label
             }
             return false
-        } as! Node
+        } as! Circle
     }
 }

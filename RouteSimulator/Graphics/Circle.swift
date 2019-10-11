@@ -1,5 +1,5 @@
 //
-//  Node.swift
+//  Circle.swift
 //  RouteSimulator
 //
 //  Created by Paul Patterson on 10/09/2019.
@@ -9,13 +9,13 @@
 import Foundation
 import UIKit
 
-public class Node: Graphic, CustomStringConvertible {
+public class Circle: Graphic, CustomStringConvertible {
     
-    init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, name: String) {
+    init(center: CGPoint, radius: CGFloat, fill: UIColor, stroke: UIColor, label: String) {
         self.frame = CGRect(x: center.x - radius, y: center.y - radius, width: radius * 2, height: radius * 2)
         self.fill = fill
         self.stroke = stroke
-        self.name = name
+        self.label = label
         updatePaths()
         updateLabelSize()
     }
@@ -32,17 +32,16 @@ public class Node: Graphic, CustomStringConvertible {
     
     private var labelSize = CGSize.zero
     
-    var name: String = "" {
+    var label: String = "" {
         didSet {
             updateLabelSize()
         }
     }
     
     private func updateLabelSize() {
-        let name = self.name.trimmingCharacters(in: .whitespaces)
-        if name.count > 0 {
-            let label = NSString(string: name)
-            labelSize = label.size(withAttributes: nameAttributes)
+        let label = self.label.trimmingCharacters(in: .whitespaces)
+        if label.count > 0 {
+            labelSize = NSString(string: label).size(withAttributes: labelAttributes)
         } else {
             labelSize = .zero
         }
@@ -57,7 +56,7 @@ public class Node: Graphic, CustomStringConvertible {
     
     let font = UIFont.systemFont(ofSize: 15.0, weight: .bold)
     
-    lazy var nameAttributes: [NSAttributedString.Key : Any] = {
+    lazy var labelAttributes: [NSAttributedString.Key : Any] = {
         return [NSAttributedString.Key.font: self.font, NSAttributedString.Key.foregroundColor: UIColor.white]
     }()
     
@@ -84,16 +83,16 @@ public class Node: Graphic, CustomStringConvertible {
         }
         
         // Draw the label
-        let trimmedName = name.trimmingCharacters(in: .whitespaces)
-        guard trimmedName.count > 0 && labelSize != .zero else {
+        let trimmedLabel = label.trimmingCharacters(in: .whitespaces)
+        guard trimmedLabel.count > 0 && labelSize != .zero else {
             return
         }
         
         let labelRect = CGRect(x: center.x - labelSize.width / 2, y: center.y - labelSize.height / 2, width: labelSize.width, height: labelSize.height)
-        NSString(string: name).draw(in: labelRect, withAttributes: nameAttributes)
+        NSString(string: label).draw(in: labelRect, withAttributes: labelAttributes)
     }
     
     public var description: String {
-        return "\(Unmanaged.passUnretained(self).toOpaque()); center: \(center), radius: \(radius), name: \(name)"
+        return "\(Unmanaged.passUnretained(self).toOpaque()); center: \(center), radius: \(radius), name: \(label)"
     }
 }

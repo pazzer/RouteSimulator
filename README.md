@@ -2,16 +2,15 @@
 
 Refactor
 
-Rename Node 'Circle'
-make waypointNamed methods more concise
-Handle reciprocal relationships
-Make test view contained controller to stop inadvertent tapping
 
+Handle reciprocal relationships
+Handle showing/hiding of container
 should testsSummaryViewController  have reference to routeviewcontroller?
 
-// Tests
 
+Make sure can't make same relationship twice
+
+// One more test
 2. Something - undo - something - redo ?
-3. Removing arrows/unset next
 
 

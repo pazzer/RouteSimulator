@@ -29,6 +29,9 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-IG-xv4" customClass="GraphicsView" customModule="RouteSimulator" customModuleProvider="target">
                                 <rect key="frame" x="8" y="8" width="359" height="415"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="tCr-K4-J8c"/>
+                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.77480706865923388" green="0.77480706865923388" blue="0.77480706865923388" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -43,7 +46,6 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <connections>
-                            <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="A5M-dx-MKq"/>
                             <outletCollection property="gestureRecognizers" destination="H1x-00-GJu" appends="YES" id="anT-K5-skS"/>
                         </connections>
                     </view>
@@ -87,7 +89,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="hD9-VH-AYF">
                     <connections>
-                        <action selector="userTapped:" destination="BYZ-38-t0r" id="bHa-I2-hjs"/>
+                        <action selector="userTapped:" destination="BYZ-38-t0r" id="wsh-sy-rzf"/>
                     </connections>
                 </tapGestureRecognizer>
                 <panGestureRecognizer minimumNumberOfTouches="1" id="H1x-00-GJu">
@@ -283,6 +285,7 @@
                             </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Pnw-Ui-7cv"/>
                     </view>
                     <connections>
                         <outlet property="buttonStack" destination="kDb-Ta-Wg1" id="wI2-CX-cQn"/>

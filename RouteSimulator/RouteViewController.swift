@@ -8,7 +8,7 @@
 
 import UIKit
 
-let NODE_FREE_ZONE = 0
+let CIRCLE_FREE_ZONE = 0
 let UNICODE_CAP_A = 65
 
 let grid: (rows: Int, columns: Int) = (15, 8)
@@ -71,7 +71,7 @@ class RouteViewController: UIViewController {
     
     var crosshairs: Crosshairs!
     
-    weak var selection: Node? {
+    weak var selection: Circle? {
         didSet {
             if let old = oldValue {
                 graphicsView.setNeedsDisplay(old.frame)
@@ -82,9 +82,10 @@ class RouteViewController: UIViewController {
         }
     }
     
-    let nodeRadius = CGFloat(22.0)
+    let circleRadius = CGFloat(22.0)
     
     let arrowInset: CGFloat = 5
+    let parallelArrowsOffset: CGFloat = 10
     
     private var _undoManager: UndoManager!
     
@@ -108,17 +109,17 @@ class RouteViewController: UIViewController {
             let pt = pan.location(in: graphicsView)
             if crosshairs.contains(pt) {
                 panningGraphic = crosshairs
-            } else if let node = graphicsView.graphics.first(where: { (graphic) -> Bool in
-                graphic is Node && graphic.contains(pt)
-            }) as? Node {
-                panningGraphic = node
-                nodeLocationBeforePan = node.center
+            } else if let circle = graphicsView.graphics.first(where: { (graphic) -> Bool in
+                graphic is Circle && graphic.contains(pt)
+            }) as? Circle {
+                panningGraphic = circle
+                circleLocationBeforePan = circle.center
             }
             
         case .changed:
             
-            if let node = panningGraphic as? Node {
-                relocateNode(node, translation: pan.translation(in: graphicsView))
+            if let circle = panningGraphic as? Circle {
+                relocateCircle(circle, translation: pan.translation(in: graphicsView))
             } else if let crosshairs = panningGraphic as? Crosshairs {
                 relocateGraphic(crosshairs, translation: pan.translation(in: graphicsView))
             }
@@ -126,10 +127,10 @@ class RouteViewController: UIViewController {
             pan.setTranslation(CGPoint.zero, in: graphicsView)
             
         case .ended:
-            if let node = panningGraphic as? Node, let initialLocation = nodeLocationBeforePan {
-                runUpdates([.move(name: node.name, from: initialLocation, to: node.center, byPan: true)])
+            if let circle = panningGraphic as? Circle, let initialLocation = circleLocationBeforePan {
+                runUpdates([.move(name: circle.label, from: initialLocation, to: circle.center, byPan: true)])
             }
-            nodeLocationBeforePan = nil
+            circleLocationBeforePan = nil
             panningGraphic = nil
 
         default:
@@ -158,13 +159,13 @@ class RouteViewController: UIViewController {
             return
         }
         
-        guard let node = graphicsUnderPoint.first(where: { $0 is Node }) as? Node, !node.selected else {
-            /* Tap on selected node deselects it */
+        guard let circle = graphicsUnderPoint.first(where: { $0 is Circle }) as? Circle, !circle.selected else {
+            /* Tap on selected circle deselects it */
             instigateSelectionUpdate(newSelection: nil)
             return
         }
         
-        instigateSelectionUpdate(newSelection: node.name)
+        instigateSelectionUpdate(newSelection: circle.label)
     }
     
     @IBAction func undo(_ sender: Any) {
@@ -175,7 +176,7 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func userTappedAdd(_ sender: Any) {
-        switch (nodeUnderCursor, selection) {
+        switch (circleUnderCursor, selection) {
         case (nil, nil):
             if let arrow = arrowUnderCursor {
                 instigateInsertion(on: arrow)
@@ -183,16 +184,16 @@ class RouteViewController: UIViewController {
                 instigateCreationOfNewWaypoint()
             }
         case let (nil, selection?):
-            instigateExtension(from: selection.name)
-        case let (nodeUnderCursor?, selection?):
-            instigateRerouting(set: nodeUnderCursor.name, toFollow: selection.name)
+            instigateExtension(from: selection.label)
+        case let (circleUnderCursor?, selection?):
+            instigateRerouting(set: circleUnderCursor.label, toFollow: selection.label)
         default:
             break
         }
     }
     
     @IBAction func userTappedRemove(_ sender: Any) {
-        if let waypoint = nodeUnderCursor?.name {
+        if let waypoint = circleUnderCursor?.label {
             instigateRemoval(of: waypoint)
         } else if let arrow = arrowUnderCursor {
             guard let (waypoint, _) = arrows.first(where: {$1 === arrow}) else {
@@ -210,7 +211,7 @@ class RouteViewController: UIViewController {
         // Clearing view/controller
         selection = nil
         arrows.removeAll()
-        nodes.removeAll()
+        circles.removeAll()
         undoManager?.removeAllActions()
         graphicsView.graphics.forEach { (graphic) in
             if !(graphic is Crosshairs) {
@@ -225,7 +226,7 @@ class RouteViewController: UIViewController {
         var updates = [RouteUpdate]()
         
         if let oldSelection = selection {
-            updates.append(.deselect(name: oldSelection.name))
+            updates.append(.deselect(name: oldSelection.label))
         }
         
         if let name = waypointName {
@@ -234,15 +235,18 @@ class RouteViewController: UIViewController {
         
         runUpdates(updates)
     }
-
+    
+    
+    
     func instigateRerouting(set waypoint¹: String, toFollow waypoint⁰: String) {
+        
         var updates = [RouteUpdate]()
         if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint¹) {
             updates.append(.setNext(name: previous, new: nil))
         }
 
         updates.append(.setNext(name: waypoint⁰, new: waypoint¹))
-        if let selection = selection?.name {
+        if let selection = selection?.label {
             updates.append(.deselect(name: selection))
         }
         updates.append(.select(name: waypoint¹))
@@ -259,7 +263,7 @@ class RouteViewController: UIViewController {
         }
         
         var updates = [RouteUpdate]()
-        if let selection = selection?.name {
+        if let selection = selection?.label {
             updates.append(.deselect(name: selection))
         }
         updates.append(.setNext(name: waypoint, new: nil))
@@ -276,7 +280,7 @@ class RouteViewController: UIViewController {
     
     func instigateRemoval(of waypoint: String) {
         var updates = [RouteUpdate]()
-        if let selection = self.selection, selection.name == waypoint {
+        if let selection = self.selection, selection.label == waypoint {
             updates.append(.deselect(name: waypoint))
         }
         if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint) {
@@ -313,18 +317,18 @@ class RouteViewController: UIViewController {
     
     func executeCreation(of waypoint: String, at location: CGPoint) {
         route.add(waypointNamed: waypoint, at: location)
-        let node = newNode(at: location, name: waypoint)
-        graphicsView.add(node)
-        nodes[waypoint] = node
+        let circle = newCircle(at: location, label: waypoint)
+        graphicsView.add(circle)
+        circles[waypoint] = circle
     }
     
     func executeRemove(of waypoint: String) {
-        assert(selection?.name != waypoint, "must deselect node before removing")
-        guard let node = nodes.removeValue(forKey: waypoint) else {
-            fatalError("no node named \(waypoint) in <nodes>")
+        assert(selection?.label != waypoint, "must deselect circle before removing")
+        guard let circle = circles.removeValue(forKey: waypoint) else {
+            fatalError("no circle named \(waypoint) in <circles>")
         }
         
-        graphicsView.remove(node)
+        graphicsView.remove(circle)
         if let _ = route.nameOfWaypointFollowing(waypointNamed: waypoint) {
             guard let arrow = arrows.removeValue(forKey: waypoint) else {
                 fatalError("expected key '\(waypoint)' in <arrows>")
@@ -336,23 +340,23 @@ class RouteViewController: UIViewController {
     }
     
     func executeSelection(of waypoint: String) {
-        guard let node = nodes[waypoint] else {
-            fatalError("no node with name \(waypoint) found in <nodes>")
+        guard let circle = circles[waypoint] else {
+            fatalError("no circle with label \(waypoint) found in <circles>")
         }
         
-        if !node.selected {
-            node.selected = true
-            self.selection = node
+        if !circle.selected {
+            circle.selected = true
+            self.selection = circle
         }
     }
     
     func executeDeselection(of waypoint: String) {
-        guard let node = nodes[waypoint] else {
-            fatalError("no node with name \(waypoint) found in <nodes>")
+        guard let circle = circles[waypoint] else {
+            fatalError("no circle with name \(waypoint) found in <circles>")
         }
         
-        if node.selected {
-            node.selected = false
+        if circle.selected {
+            circle.selected = false
             self.selection = nil
         }
         
@@ -362,48 +366,104 @@ class RouteViewController: UIViewController {
         route.updateLocation(ofWaypointNamed: waypoint, to: to)
         
         if !followingPan {
-            guard let node = nodes[waypoint] else {
-                fatalError("key '\(waypoint)' does not appear in <nodes>")
+            guard let circle = circles[waypoint] else {
+                fatalError("key '\(waypoint)' does not appear in <circles>")
             }
-            relocateNode(node, translation: CGPoint(x: to.x - from.x, y: to.y - from.y))
+            relocateCircle(circle, translation: CGPoint(x: to.x - from.x, y: to.y - from.y))
+        }
+    }
+    
+    
+    func endRelationship(from waypoint⁰: String, to waypoint¹: String) {
+        guard let arrow = arrows.removeValue(forKey: waypoint⁰) else {
+            fatalError("expected to find key '\(waypoint⁰)' in <arrows>")
+        }
+        graphicsView.remove(arrow)
+        if route.circularRelationshipExistsBetween(waypointNamed: waypoint⁰, and: waypoint¹) {
+            guard let arrow = arrows[waypoint¹] else {
+                fatalError("expected to find key '\(waypoint⁰)' in <arrows>")
+            }
+            guard let circle⁰ = circles[waypoint⁰], let circle¹ = circles[waypoint¹] else {
+                fatalError("failed to find \(waypoint⁰) and/or \(waypoint¹) in <circles>")
+            }
+            let oldFrame = arrow.frame
+            let pts = calculateCoordinates(ofArrowFrom: circle¹, to: circle⁰)
+            arrow.update(start: pts.start, end: pts.end)
+            graphicsView.setNeedsDisplay(oldFrame.union(arrow.frame))
+        }
+        route.unsetNext(ofWaypointNamed: waypoint⁰)
+    }
+    
+    func createRelationship(from waypoint⁰: String, to waypoint¹: String) {
+        guard let circle⁰ = circles[waypoint⁰] else {
+            fatalError("expected to find key '\(waypoint⁰)' in <circles>")
+        }
+        guard let circle¹ = circles[waypoint¹] else {
+            fatalError("expected to find key '\(waypoint¹)' in <circles>")
+        }
+        if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint¹) {
+            endRelationship(from: previous, to: waypoint¹)
+        }
+        
+        route.setNext(ofWaypointNamed: waypoint⁰, toWaypointNamed: waypoint¹)
+        if route.circularRelationshipExistsBetween(waypointNamed: waypoint⁰, and: waypoint¹) {
+            representCircularRelationshipBetween(waypoint⁰, and: waypoint¹)
+        } else {
+            let arrow = newArrow(from: circle⁰, to: circle¹)
+            arrows[waypoint⁰] = arrow
+            graphicsView.add(arrow)
         }
     }
     
     func executeSetNext(of waypoint⁰: String, to waypoint¹: String?) {
-
+        
         let oldNext = route.nameOfWaypointFollowing(waypointNamed: waypoint⁰)
-        if let _ = oldNext {
-            guard let arrow = arrows.removeValue(forKey: waypoint⁰) else {
-                fatalError("expected to find key '\(waypoint⁰)' in <arrows>")
-            }
-            graphicsView.remove(arrow)
+        guard oldNext != waypoint¹ else {
+            // relationship already exists
+            return
         }
         
+        if let _ = oldNext {
+            endRelationship(from: waypoint⁰, to: oldNext!)
+        }
         
         if let newNext = waypoint¹ {
-            guard let node⁰ = nodes[waypoint⁰] else {
-                fatalError("expected to find key '\(waypoint⁰)' in <nodes>")
-            }
-            guard let node¹ = nodes[newNext] else {
-                fatalError("expected to find key '\(newNext)' in <nodes>")
-            }
-            
-            if let previous = route.nameOfWaypointPreceeding(waypointNamed: newNext) {
-                guard let arrow = arrows.removeValue(forKey: previous) else {
-                    fatalError("expected for find key '\(previous)' in <arrows>")
-                }
-                graphicsView.remove(arrow)
-            }
-            
-            let arrow = newArrow(from: node⁰, to: node¹)
-            arrows[waypoint⁰] = arrow
-            graphicsView.add(arrow)
-            route.setNext(ofWaypointNamed: waypoint⁰, toWaypointNamed: newNext)
-        } else {
-            route.unsetNext(ofWaypointNamed: waypoint⁰)
+            createRelationship(from: waypoint⁰, to: newNext)
         }
     }
     
+    
+    
+    func representCircularRelationshipBetween(_ waypoint⁰: String, and waypoint¹: String) {
+        
+        var ⁰To¹: Arrow
+        var ¹To⁰: Arrow
+        
+        if let arrow = arrows[waypoint⁰] {
+            ⁰To¹ = arrow
+            graphicsView.setNeedsDisplay(arrow.frame)
+        } else {
+            ⁰To¹ = newArrow(from: circles[waypoint⁰]!, to: circles[waypoint¹]!)
+            arrows[waypoint⁰] = ⁰To¹
+            graphicsView.add(⁰To¹)
+        }
+        
+        if let arrow = arrows[waypoint¹] {
+            ¹To⁰ = arrow
+            graphicsView.setNeedsDisplay(arrow.frame)
+        } else {
+            ¹To⁰ = newArrow(from: circles[waypoint¹]!, to: circles[waypoint⁰]!)
+            arrows[waypoint¹] = ¹To⁰
+            graphicsView.add(¹To⁰)
+        }
+        
+        let standardArrowLine = LineSector(start: ⁰To¹.start, end: ⁰To¹.end)
+        let offsetLines = standardArrowLine.parallelLineSectors(offset: parallelArrowsOffset)
+        
+        ⁰To¹.update(start: offsetLines.0.start, end: offsetLines.0.end)
+        ¹To⁰.update(start: offsetLines.1.end, end: offsetLines.1.start)
+        graphicsView.setNeedsDisplay(¹To⁰.frame.union(⁰To¹.frame))
+    }
     
     // MARK:- Running Updates
     
@@ -459,9 +519,9 @@ class RouteViewController: UIViewController {
     
     var panningGraphic: Graphic?
     
-    var nodeLocationBeforePan: CGPoint?
+    var circleLocationBeforePan: CGPoint?
     
-    var nodes = [String:Node]()
+    var circles = [String:Circle]()
     
     var arrows = [String: Arrow]()
     
@@ -488,10 +548,10 @@ class RouteViewController: UIViewController {
         }) as? Arrow
     }
     
-    var nodeUnderCursor: Node? {
+    var circleUnderCursor: Circle? {
         return graphicsView.graphics.first { (graphic) -> Bool in
-            return graphic is Node && graphic.contains(crosshairs.center)
-        } as? Node
+            return graphic is Circle && graphic.contains(crosshairs.center)
+        } as? Circle
     }
     
     func waypoint(for arrow: Arrow) -> String? {
@@ -500,27 +560,27 @@ class RouteViewController: UIViewController {
     
     // MARK:- Execution Helpers
     
-    func relocateNode(_ node: Node, translation: CGPoint) {
-        relocateGraphic(node, translation: translation)
+    func relocateCircle(_ circle: Circle, translation: CGPoint) {
+        relocateGraphic(circle, translation: translation)
         
-        if let next = route.nameOfWaypointFollowing(waypointNamed: node.name) {
-            guard let arrow = arrows[node.name] else {
-                fatalError("expected key '\(node.name)' in <arrows>")
+        if let next = route.nameOfWaypointFollowing(waypointNamed: circle.label) {
+            guard let arrow = arrows[circle.label] else {
+                fatalError("expected key '\(circle.label)' in <arrows>")
             }
-            guard let nextNode = nodes[next] else {
-                fatalError("expected key '\(next)' in <nodes>")
+            guard let nextCircle = circles[next] else {
+                fatalError("expected key '\(next)' in <circles>")
             }
-            setArrow(arrow, toPointFrom: node, to: nextNode)
+            setArrow(arrow, toPointFrom: circle, to: nextCircle)
         }
         
-        if let previous = route.nameOfWaypointPreceeding(waypointNamed: node.name) {
+        if let previous = route.nameOfWaypointPreceeding(waypointNamed: circle.label) {
             guard let arrow = arrows[previous] else {
                 fatalError("expected key '\(previous)' in <arrows>")
             }
-            guard let previousNode = nodes[previous] else {
-                fatalError("expected key '\(previous)' in <nodes>")
+            guard let previousCircle = circles[previous] else {
+                fatalError("expected key '\(previous)' in <circles>")
             }
-            setArrow(arrow, toPointFrom: previousNode, to: node)
+            setArrow(arrow, toPointFrom: previousCircle, to: circle)
         }
     }
     
@@ -531,34 +591,34 @@ class RouteViewController: UIViewController {
         graphicsView.setNeedsDisplay(oldFrame.union(graphic.frame))
     }
     
-    func calculateCoordinates(ofArrowFrom from: Node, to: Node) -> (start: CGPoint, end: CGPoint) {
-        guard from.center.distance(to: to.center) > nodeRadius * 2 + arrowInset * 2 else {
+    func calculateCoordinates(ofArrowFrom from: Circle, to: Circle) -> (start: CGPoint, end: CGPoint) {
+        guard from.center.distance(to: to.center) > circleRadius * 2 + arrowInset * 2 else {
             return (.zero, .zero)
         }
         
         let line = LineSector(start: from.center, end: to.center)
-        let d1 = nodeRadius + arrowInset
-        let d2 = from.center.distance(to: to.center) - (nodeRadius + arrowInset)
+        let d1 = circleRadius + arrowInset
+        let d2 = from.center.distance(to: to.center) - (circleRadius + arrowInset)
         
-        var start = line.point(distanceFromOrigin: d1)
-        var end = line.point(distanceFromOrigin: d2)
-        
-        
-        if route.circularRelationshipExistsBetween(waypointNamed: from.name, and: to.name) {
-            let insetLine = LineSector(start: start, end: end)
-            let offsetLines = insetLine.parallelLineSectors(offset: 15)
-            start = offsetLines.0.start
-            end = offsetLines.0.end
-        }
+        let start = line.point(distanceFromOrigin: d1)
+        let end = line.point(distanceFromOrigin: d2)
         
         return (start, end)
     }
     
-    func setArrow(_ arrow: Arrow, toPointFrom from: Node, to: Node) {
+    func setArrow(_ arrow: Arrow, toPointFrom from: Circle, to: Circle) {
         assert(graphicsView.graphics.contains(where: { $0 === arrow }))
         let oldFrame = arrow.frame
+        let waypoint⁰ = from.label
+        let waypoint¹ = to.label
         let pts = calculateCoordinates(ofArrowFrom: from, to: to)
-        arrow.update(start: pts.start, end: pts.end)
+        if route.circularRelationshipExistsBetween(waypointNamed: waypoint⁰, and: waypoint¹) {
+            let centralLine = LineSector(start: pts.start, end: pts.end)
+            let offsetLine = centralLine.parallelLineSectors(offset: parallelArrowsOffset).0
+            arrow.update(start: offsetLine.start, end: offsetLine.end)
+        } else {
+            arrow.update(start: pts.start, end: pts.end)
+        }
         graphicsView.setNeedsDisplay(oldFrame.union(arrow.frame))
     }
     
@@ -570,9 +630,8 @@ class RouteViewController: UIViewController {
         }
     }
     
-
     
-    // MARK:- Creating nodes, arrows, names etc
+    // MARK:- Creating circles, arrows, names etc
     
     func autoName() -> String {
         let name = String(Unicode.Scalar(unicodePoint)!)
@@ -580,13 +639,13 @@ class RouteViewController: UIViewController {
         return name
     }
     
-    func newNode(at centerpoint: CGPoint, name: String) -> Node {
-        let node = Node(center: centerpoint, radius: nodeRadius, fill: .red, stroke: .clear, name: name)
-        node.center = centerpoint
-        return node
+    func newCircle(at centerpoint: CGPoint, label: String) -> Circle {
+        let circle = Circle(center: centerpoint, radius: circleRadius, fill: .red, stroke: .clear, label: label)
+        circle.center = centerpoint
+        return circle
     }
     
-    func newArrow(from: Node, to: Node) -> Arrow {
+    func newArrow(from: Circle, to: Circle) -> Arrow {
         let pts = calculateCoordinates(ofArrowFrom: from, to: to)
         return Arrow(start: pts.start, end: pts.end)
     }
@@ -614,8 +673,8 @@ class RouteViewController: UIViewController {
     
     func describeGraphicsView() {
         for (index, graphic) in graphicsView.graphics.enumerated() {
-            if let node = graphic as? Node {
-                print("\(index): \(node.name)(\(self.zone(containing: node.center)))")
+            if let circle = graphic as? Circle {
+                print("\(index): \(circle.label)(\(self.zone(containing: circle.center)))")
             }
         }
     }
@@ -705,8 +764,8 @@ extension RouteViewController: UIBotDataSource {
     
     func setCrosshairsOnWaypoint(named name: String) -> () -> Void {
         return {
-            let node = self.graphicsView.node(named: name)
-            self.move(self.crosshairs, to: node.center)
+            let circle = self.graphicsView.circle(labeled: name)
+            self.move(self.crosshairs, to: circle.center)
         }
     }
     
@@ -743,8 +802,8 @@ extension RouteViewController: UIBotDataSource {
     
     func tapWaypoint(named name: String) -> () -> Void {
         return {
-            let node = self.graphicsView.node(named: name)
-            self.handleTap(at: node.center)
+            let circle = self.graphicsView.circle(labeled: name)
+            self.handleTap(at: circle.center)
         }
     }
     
@@ -760,7 +819,7 @@ extension RouteViewController: UIBotDataSource {
     
     func tapEmptyZone() -> () -> Void {
         return {
-            self.handleTap(at: self.center(of: NODE_FREE_ZONE))
+            self.handleTap(at: self.center(of: CIRCLE_FREE_ZONE))
         }
     }
     
@@ -770,7 +829,7 @@ extension RouteViewController: UIBotDataSource {
         let pass: Bool
         let msg: String
         let actualWaypoints = route.numbeOfWaypoints
-        let actualCircles = graphicsView.graphics.filter { $0 is Node }.count
+        let actualCircles = graphicsView.graphics.filter { $0 is Circle }.count
         if actualWaypoints == expectedWaypoints {
             if actualCircles == actualWaypoints {
                 pass = true
@@ -864,14 +923,14 @@ extension RouteViewController: UIBotDataSource {
         let msg: String
 
         if expectedSelectionName == "*" {
-            if let actualSelectionName = self.selection?.name {
+            if let actualSelectionName = self.selection?.label {
                 pass = false
                 msg = "selection is \(actualSelectionName), not nil"
             } else {
                 pass = true
                 msg = "selection is nil"
             }
-        } else if let selectionName = self.selection?.name {
+        } else if let selectionName = self.selection?.label {
             pass = selectionName == expectedSelectionName
             msg = pass ? "selection is \(expectedSelectionName)" : "selection is \(selectionName) not \(expectedSelectionName)"
         } else {
@@ -883,15 +942,15 @@ extension RouteViewController: UIBotDataSource {
     
     func validateWaypointLocation(_ waypointName: String) -> (Bool, String) {
         let routePoint = self.route.location(ofWaypointNamed: waypointName)
-        let nodePoint = self.nodes[waypointName]!.center
+        let circlePoint = self.circles[waypointName]!.center
         let pass: Bool
         let msg: String
-        if nodePoint == routePoint {
+        if circlePoint == routePoint {
             pass = true
-            msg = "waypoint and corresponding node report same location (\(routePoint))"
+            msg = "waypoint and corresponding circle report same location (\(routePoint))"
         } else {
             pass = false
-            msg = "waypoint location \(routePoint) (zone \(self.zone(containing: routePoint)) differs from node location \(nodePoint) (zone \(self.zone(containing: nodePoint))"
+            msg = "waypoint location \(routePoint) (zone \(self.zone(containing: routePoint)) differs from circle location \(circlePoint) (zone \(self.zone(containing: circlePoint))"
         }
         return (pass, msg)
     }

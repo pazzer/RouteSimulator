@@ -95,9 +95,6 @@ class Route: CustomStringConvertible {
             }
         }
         return string
-        
-        
-        
     }
     
     func circularRelationshipExistsBetween(waypointNamed name⁰: String, and name¹: String) -> Bool {
@@ -111,7 +108,6 @@ class Route: CustomStringConvertible {
         
         return next⁰ == name¹ && next¹ == name⁰
     }
-
     
     func clear() {
         waypoints.removeAll(keepingCapacity: true)
