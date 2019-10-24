@@ -56,6 +56,8 @@
 		CF981018233B861D0090AEDE /* UIBot.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75E5232A69BF001582C7 /* UIBot.swift */; };
 		CF98101B233D41480090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
+		CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C5235122B3001BC5AD /* TestEight.plist */; };
+		CFF4D8C8235127CD001BC5AD /* TestNine.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C7235127CD001BC5AD /* TestNine.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +113,8 @@
 		CF981010233B7D990090AEDE /* UIBotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotTest.swift; sourceTree = "<group>"; };
 		CF981012233B7E7D0090AEDE /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
 		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		CFF4D8C5235122B3001BC5AD /* TestEight.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestEight.plist; sourceTree = "<group>"; };
+		CFF4D8C7235127CD001BC5AD /* TestNine.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestNine.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +247,8 @@
 				CF8D061D234F8F4B000C3882 /* TestFive.plist */,
 				CF8D061F234FB9A3000C3882 /* TestSix.plist */,
 				CF8D062123507754000C3882 /* TestSeven.plist */,
+				CFF4D8C5235122B3001BC5AD /* TestEight.plist */,
+				CFF4D8C7235127CD001BC5AD /* TestNine.plist */,
 			);
 			path = BotTests;
 			sourceTree = "<group>";
@@ -343,12 +349,14 @@
 				CF8D061E234F8F4B000C3882 /* TestFive.plist in Resources */,
 				CF8D0618234F872C000C3882 /* TestTwo.plist in Resources */,
 				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
+				CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
 				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,
 				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
 				CF8D061C234F8846000C3882 /* TestFour.plist in Resources */,
 				CF8D0616234F86AD000C3882 /* TestOne.plist in Resources */,
 				CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */,
+				CFF4D8C8235127CD001BC5AD /* TestNine.plist in Resources */,
 				CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */,
 				CF8A759523225450001582C7 /* Assets.xcassets in Resources */,
 				CF8A75902322544F001582C7 /* Main.storyboard in Resources */,

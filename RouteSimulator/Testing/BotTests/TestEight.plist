@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+   TestEight.plist
+   RouteSimulator
+
+   Created by Paul Patterson on 11/10/2019.
+   Copyright (c) 2019 Paul Patterson. All rights reserved.
+-->
+<plist version="1.0">
+	<dict>
+		<key>name</key>
+		<string>Can't Duplicate Existing relationship</string>
+		<key>operations</key>
+		<array>
+			<string>Adding A</string>
+			<dict>
+				<key>data</key>
+				<integer>49</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Adding B</string>
+			<dict>
+				<key>name</key>
+				<string>TAP_EMPTY_ZONE</string>
+			</dict>
+			<dict>
+				<key>data</key>
+				<integer>21</integer>
+				<key>name</key>
+				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+		    <dict>
+		        <key>data</key>
+		        <string>A</string>
+		        <key>name</key>
+		        <string>SET_CROSSHAIRS_ON_WAYPOINT</string>
+		    </dict>
+			<string>Setting B -> A</string>
+			<dict>
+				<key>name</key>
+				<string>TAP_ADD</string>
+			</dict>
+			<string>Attempting to duplicate B -> A</string>
+		    <dict>
+		        <key>data</key>
+		        <string>B</string>
+		        <key>name</key>
+		        <string>TAP_WAYPOINT</string>
+		    </dict>
+		    <dict>
+		        <key>name</key>
+		        <string>TAP_ADD</string>
+		    </dict>
+			<string>Tests</string>
+		    <dict>
+		        <key>data</key>
+		        <integer>1</integer>
+		        <key>name</key>
+		        <string>COUNT_ARROWS</string>
+		    </dict>
+		    <dict>
+		        <key>data</key>
+		        <string>B</string>
+		        <key>name</key>
+		        <string>VALIDATE_SELECTION</string>
+		    </dict>
+		    <dict>
+		        <key>data</key>
+		        <string>B→A</string>
+		        <key>name</key>
+		        <string>VALIDATE_ROUTE_NEXT</string>
+		    </dict>
+		    <dict>
+		        <key>data</key>
+		        <string>A→*</string>
+		        <key>name</key>
+		        <string>VALIDATE_ROUTE_NEXT</string>
+		    </dict>
+		</array>
+	</dict>
+</plist>

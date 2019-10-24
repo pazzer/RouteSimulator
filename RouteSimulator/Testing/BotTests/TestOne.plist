@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-	<dict>
-		<key>name</key>
-		<string>Connecting Two Standalones, then Undoing</string>
-		<key>operations</key>
-		<array>
-			<string>Adding A</string>
-			<dict>
-				<key>data</key>
-				<integer>49</integer>
-				<key>name</key>
-				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_ADD</string>
-			</dict>
-			<string>Adding B</string>
-			<dict>
-				<key>name</key>
-				<string>TAP_EMPTY_ZONE</string>
-			</dict>
-			<dict>
-				<key>data</key>
-				<integer>21</integer>
-				<key>name</key>
-				<string>MOVE_CROSSHAIRS_TO_ZONE</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_ADD</string>
-			</dict>
-			<string>Undoing x2</string>
-			<dict>
-				<key>name</key>
-				<string>TAP_UNDO</string>
-			</dict>
-			<dict>
-				<key>name</key>
-				<string>TAP_UNDO</string>
-			</dict>
-			<string>Tests</string>
-			<dict>
-				<key>data</key>
-				<integer>1</integer>
-				<key>name</key>
-				<string>COUNT_WAYPOINTS</string>
-			</dict>
-			<dict>
-				<key>data</key>
-				<string>A</string>
-				<key>name</key>
-				<string>VALIDATE_SELECTION</string>
-			</dict>
-		</array>
-	</dict>
+<dict>
+	<key>name</key>
+	<string>Connecting Two Standalones, then Undoing A little Bit</string>
+	<key>operations</key>
+	<array>
+		<string>Adding A</string>
+		<dict>
+			<key>data</key>
+			<integer>49</integer>
+			<key>name</key>
+			<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_ADD</string>
+		</dict>
+		<string>Adding B</string>
+		<dict>
+			<key>name</key>
+			<string>TAP_EMPTY_ZONE</string>
+		</dict>
+		<dict>
+			<key>data</key>
+			<integer>21</integer>
+			<key>name</key>
+			<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_ADD</string>
+		</dict>
+		<string>Undoing x2</string>
+		<dict>
+			<key>name</key>
+			<string>TAP_UNDO</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_UNDO</string>
+		</dict>
+		<string>Tests</string>
+		<dict>
+			<key>data</key>
+			<integer>1</integer>
+			<key>name</key>
+			<string>COUNT_WAYPOINTS</string>
+		</dict>
+		<dict>
+			<key>data</key>
+			<string>A</string>
+			<key>name</key>
+			<string>VALIDATE_SELECTION</string>
+		</dict>
+	</array>
+</dict>
 </plist>

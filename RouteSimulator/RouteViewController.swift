@@ -239,6 +239,10 @@ class RouteViewController: UIViewController {
     
     
     func instigateRerouting(set waypoint¹: String, toFollow waypoint⁰: String) {
+        if let existingNext = route.nameOfWaypointFollowing(waypointNamed: waypoint⁰), existingNext == waypoint¹ {
+            // Duplicating
+            return
+        }
         
         var updates = [RouteUpdate]()
         if let previous = route.nameOfWaypointPreceeding(waypointNamed: waypoint¹) {
@@ -680,16 +684,12 @@ class RouteViewController: UIViewController {
     }
     
     // MARK:- Testing Machinery
-    
-
-    
 
     @IBOutlet weak var graphicsView: GraphicsView!
     
     lazy var testSequences: [UIBotSequence] = {
         var sequences = [UIBotSequence]()
-        
-        ["One", "Two", "Three", "Four", "Five", "Six", "Seven"].forEach { (number) in
+        ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"].forEach { (number) in
             if let url = Bundle.main.url(forResource: "Test\(number)", withExtension: "plist") {
                 sequences.append(UIBotSequence(from: url))
             }
@@ -991,6 +991,9 @@ extension RouteViewController: UIBotDataSource {
         }
         return (pass, msg)
     }
+    
+    
+    
     
     func validateArrowPosition(waypointName: String) -> (Bool, String) {
         let pass: Bool

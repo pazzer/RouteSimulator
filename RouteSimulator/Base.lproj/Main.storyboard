@@ -51,34 +51,32 @@
                     </view>
                     <navigationItem key="navigationItem" id="Ce5-z7-v4Q">
                         <leftBarButtonItems>
-                            <barButtonItem title="Undo" id="rkn-BR-dSo">
+                            <barButtonItem title="Item" image="Plus" id="F0f-Ed-AE8">
+                                <connections>
+                                    <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="aWy-sY-doL"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Item" image="Minus" id="h37-oH-lwE">
+                                <connections>
+                                    <action selector="userTappedRemove:" destination="BYZ-38-t0r" id="B3u-5N-f30"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="Undo" id="rkn-BR-dSo">
                                 <connections>
                                     <action selector="undo:" destination="BYZ-38-t0r" id="7Tt-cT-yC9"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Redo" id="YdR-KH-SHj">
+                            <barButtonItem title="Redo" image="Redo" id="YdR-KH-SHj">
                                 <connections>
                                     <action selector="redo:" destination="BYZ-38-t0r" id="sgG-gK-Ta8"/>
                                 </connections>
                             </barButtonItem>
                         </leftBarButtonItems>
-                        <rightBarButtonItems>
-                            <barButtonItem title="Remove" id="h37-oH-lwE">
-                                <connections>
-                                    <action selector="userTappedRemove:" destination="BYZ-38-t0r" id="B3u-5N-f30"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem title="Add" id="F0f-Ed-AE8">
-                                <connections>
-                                    <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="aWy-sY-doL"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem title="Test" id="wsW-fN-84w">
-                                <connections>
-                                    <action selector="userTappedTest:" destination="BYZ-38-t0r" id="B8h-oO-Hea"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
+                        <barButtonItem key="rightBarButtonItem" image="Clipboard" id="wsW-fN-84w">
+                            <connections>
+                                <action selector="userTappedTest:" destination="BYZ-38-t0r" id="B8h-oO-Hea"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="graphicsView" destination="UbC-IG-xv4" id="gyC-WP-G8X"/>
@@ -124,9 +122,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="359" height="184"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" id="4Pg-5T-V0e">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Pg-5T-V0e">
                                 <rect key="frame" x="0.0" y="0.0" width="359" height="184"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vAl-ds-gpQ">
                                         <rect key="frame" x="0.0" y="0.0" width="359" height="32"/>
@@ -242,7 +239,7 @@
                                             <constraint firstItem="5mc-Up-Ruc" firstAttribute="centerX" secondItem="cr4-Ne-dNa" secondAttribute="centerX" id="alP-3H-eV0"/>
                                         </constraints>
                                     </view>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MsW-yL-ULF">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="150" text="Label" textAlignment="center" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MsW-yL-ULF">
                                         <rect key="frame" x="162" y="44" width="35.5" height="16"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                                         <nil key="textColor"/>
@@ -285,6 +282,12 @@
                             </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="4Pg-5T-V0e" firstAttribute="bottom" secondItem="Pnw-Ui-7cv" secondAttribute="bottom" id="4NW-Hd-waQ"/>
+                            <constraint firstItem="4Pg-5T-V0e" firstAttribute="leading" secondItem="Pnw-Ui-7cv" secondAttribute="leading" id="L0K-Yl-Mfq"/>
+                            <constraint firstItem="4Pg-5T-V0e" firstAttribute="trailing" secondItem="Pnw-Ui-7cv" secondAttribute="trailing" id="ctA-ho-K89"/>
+                            <constraint firstItem="4Pg-5T-V0e" firstAttribute="top" secondItem="Pnw-Ui-7cv" secondAttribute="top" id="i5b-XA-pbL"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Pnw-Ui-7cv"/>
                     </view>
                     <connections>
@@ -310,9 +313,14 @@
         </scene>
     </scenes>
     <resources>
+        <image name="Clipboard" width="32" height="32"/>
         <image name="Jump" width="28" height="28"/>
+        <image name="Minus" width="32" height="2"/>
+        <image name="Plus" width="32" height="32"/>
+        <image name="Redo" width="32" height="32"/>
         <image name="Skip" width="20" height="32"/>
         <image name="SmallPlay" width="13" height="15"/>
         <image name="Step" width="26" height="30"/>
+        <image name="Undo" width="32" height="32"/>
     </resources>
 </document>
