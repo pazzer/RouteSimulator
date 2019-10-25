@@ -100,7 +100,7 @@
                                 </connections>
                             </barButtonItem>
                         </leftBarButtonItems>
-                        <barButtonItem key="rightBarButtonItem" image="Clipboard" id="wsW-fN-84w">
+                        <barButtonItem key="rightBarButtonItem" image="Female" id="wsW-fN-84w">
                             <connections>
                                 <action selector="userTappedTest:" destination="BYZ-38-t0r" id="8s3-FI-qt0"/>
                             </connections>
@@ -108,8 +108,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="graphicsView" destination="F8J-xA-1gy" id="g3i-el-hku"/>
-                        <outlet property="graphicsViewBtmToViewBtm" destination="cqP-hA-0Zo" id="0Od-mF-aP3"/>
                         <outlet property="graphicsViewContainer" destination="UbC-IG-xv4" id="jwV-Pg-lVS"/>
+                        <outlet property="graphicsViewContainerBtmToViewBtm" destination="cqP-hA-0Zo" id="0Od-mF-aP3"/>
                         <outlet property="lockView" destination="36q-CY-Z8c" id="OM5-o4-d0H"/>
                         <outlet property="redoButton" destination="YdR-KH-SHj" id="uQb-vG-MGZ"/>
                         <outlet property="testViewContainer" destination="nDI-rE-04V" id="Sie-T5-cNT"/>
@@ -347,7 +347,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Clipboard" width="32" height="32"/>
+        <image name="Female" width="32" height="32"/>
         <image name="Jump" width="28" height="28"/>
         <image name="Lock" width="32" height="32"/>
         <image name="Minus" width="32" height="2"/>

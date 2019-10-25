@@ -44,7 +44,6 @@ class RouteViewController: UIViewController {
 
     // MARK:- ViewController Lifecycle
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         _undoManager = UndoManager()
@@ -53,13 +52,11 @@ class RouteViewController: UIViewController {
     @IBOutlet weak var graphicsViewContainer: UIView!
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        navigationController?.navigationBar.tintColor = .lightGray
         crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.midY), size: CGSize(width: 120, height: 120))
         graphicsView.add(crosshairs)
         
        updateButtons()
-        
-        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -111,7 +108,7 @@ class RouteViewController: UIViewController {
     
     @IBOutlet weak var viewBtmToTestViewBtm: NSLayoutConstraint?
     
-    @IBOutlet weak var graphicsViewBtmToViewBtm: NSLayoutConstraint!
+    @IBOutlet weak var graphicsViewContainerBtmToViewBtm: NSLayoutConstraint!
     
     @IBOutlet var testViewContainer: UIView!
     
@@ -189,13 +186,19 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func undo(_ sender: Any) {
+        guard mode == .user else { return }
+        
         undoManager?.undo()
     }
     @IBAction func redo(_ sender: Any) {
+        guard mode == .user else { return }
+        
         undoManager?.redo()
     }
     
     @IBAction func userTappedAdd(_ sender: Any) {
+        guard mode == .user else { return }
+        
         switch (circleUnderCursor, selection) {
         case (nil, nil):
             if let arrow = arrowUnderCursor {
@@ -213,6 +216,8 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func userTappedRemove(_ sender: Any) {
+        guard mode == .user else { return }
+        
         if let waypoint = circleUnderCursor?.label {
             instigateRemoval(of: waypoint)
         } else if let arrow = arrowUnderCursor {
@@ -228,12 +233,17 @@ class RouteViewController: UIViewController {
         if children.count > 0 {
             enterUserMode()
         } else {
-            let alert = UIAlertController(title: "Re-entering Test Mode", message: "The current route will be destroyed; do you want to continue?", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { (_) in
-                self.enterTestMode()
-            }))
-            present(alert, animated: true, completion: nil)
+            if route.numbeOfWaypoints > 0 {
+                let alert = UIAlertController(title: "Re-entering Test Mode", message: "The current route will be destroyed; do you want to continue?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { (_) in
+                    self.enterTestMode()
+                }))
+                
+                present(alert, animated: true, completion: nil)
+            } else {
+                enterTestMode()
+            }
         }
     }
     
@@ -802,24 +812,6 @@ class RouteViewController: UIViewController {
             fatalError("constaint 'testViewBottom' not set")
         }
         
-        
-        // 1. create an image of the graphicsView's contents
-        guard let image = graphicsViewImageForTransitionToMode(.user) else {
-            // Plan B???
-            return
-        }
-        
-        // 2. Add this image to the graphic view
-        let imageView = UIImageView(image: image)
-        graphicsView.clipsToBounds = true
-        graphicsView.addSubview(imageView)
-        imageView.frame = CGRect(origin: .zero, size: image.size)
-        
-        
-        // 2. Hide existing graphics
-        graphicsView.graphics.forEach { $0.hidden = true }
-        graphicsView.setNeedsDisplay()
-         
         // 4. Slide out container
         testViewBottom.constant = -(testViewContainer.frame.height)
 
@@ -827,17 +819,12 @@ class RouteViewController: UIViewController {
             self.view.layoutIfNeeded()
             self.graphicsViewContainer.backgroundColor = .white
             self.lockView.alpha = 0.0
+            self.navigationController?.navigationBar.tintColor = .systemBlue
+            self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Clipboard")
         }) { (_) in
             
-            // 5. Unhide graphics
-            self.graphicsView.graphics.forEach { $0.hidden = false }
+            self.graphicsViewContainerBtmToViewBtm.isActive = true
 
-            // 6. remove snapshot
-            imageView.removeFromSuperview()
-            self.graphicsView.setNeedsDisplay()
-            self.graphicsViewBtmToViewBtm.isActive = true
-
-            // 7. Remove test view
             self.testsSummaryViewController.willMove(toParent: nil)
             self.testViewContainer.removeFromSuperview()
             self.testsSummaryViewController.removeFromParent()
@@ -879,39 +866,37 @@ class RouteViewController: UIViewController {
                 self.testViewContainer.topAnchor.constraint(equalTo: self.graphicsView.bottomAnchor, constant: 8)
             ])
 
-            self.graphicsViewBtmToViewBtm.isActive = false
+            self.graphicsViewContainerBtmToViewBtm.isActive = false
             let constraint = self.view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: self.testViewContainer.bottomAnchor, constant: -self.testViewContainer.frame.height)
             constraint.isActive = true
             self.viewBtmToTestViewBtm = constraint
             self.testsSummaryViewController.didMove(toParent: self)
-
+            self.testsSummaryViewController.uiBot.restart()
+            
             self.view.layoutIfNeeded()
             constraint.constant = 8
 
             UIView.animate(withDuration: 0.25, animations: {
                 self.view.layoutIfNeeded()
-                let x = self.graphicsView.bounds.midX
-                let y = self.graphicsView.bounds.midY
-                crosshairsImageView.center = CGPoint(x: x, y: y)
+                crosshairsImageView.center = self.graphicsView.bounds.center
                 self.lockView.alpha = 1.0
                 self.graphicsViewContainer.backgroundColor = UIColor(named: "disabledBackground")
+                self.navigationController?.navigationBar.tintColor = .lightGray
+                self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Female")
             }) { (_) in
                 self.clearRoute(self)
-                self.crosshairs.center = crosshairsImageView.center
                 
+                self.crosshairs.center = crosshairsImageView.center
                 self.crosshairs.hidden = false
                 self.graphicsView.setNeedsDisplay()
                 
                 crosshairsImageView.removeFromSuperview()
+                
                 self.mode = .test
             }
         }
     }
 }
-
-    
-
-
 
 
 // MARK:- Testing extension
@@ -1027,7 +1012,15 @@ extension RouteViewController: UIBotDataSource {
             let next = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
             let pt⁰ = self.route.location(ofWaypointNamed: waypointName)
             let pt¹ = self.route.location(ofWaypointNamed: next)
-            let midPoint = pt⁰.midpoint(pt¹)
+            let midPoint: CGPoint
+            if self.route.circularRelationshipExistsBetween(waypointNamed: waypointName, and: next) {
+                let line = LineSector(start: pt⁰, end: pt¹)
+                let arrowLine = line.parallelLineSectors(offset: self.parallelArrowsOffset).0
+                midPoint = arrowLine.start.midpoint(arrowLine.end)
+            } else {
+                midPoint = pt⁰.midpoint(pt¹)
+            }
+            
             self.move(self.crosshairs, to: midPoint)
         }
     }
@@ -1211,16 +1204,26 @@ extension RouteViewController: UIBotDataSource {
     
     
     func validateArrowPosition(waypointName: String) -> (Bool, String) {
+        
         let pass: Bool
         let msg: String
 
+        let midpoint: CGPoint
         let arrow = self.arrows[waypointName]!
-
-        let location⁰ = self.route.location(ofWaypointNamed: waypointName)
         let nextName = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
+        
+        let location⁰ = self.route.location(ofWaypointNamed: waypointName)
         let location¹ = self.route.location(ofWaypointNamed: nextName)
-        let midpoint = location⁰.midpoint(location¹)
-
+        
+        if route.circularRelationshipExistsBetween(waypointNamed: waypointName, and: nextName) {
+            let standardArrowLine = LineSector(start: location⁰, end: location¹)
+            let offsetLines = standardArrowLine.parallelLineSectors(offset: parallelArrowsOffset)
+            let arrowLine = offsetLines.0
+            midpoint = arrowLine.start.midpoint(arrowLine.end)
+        } else {
+            midpoint = location⁰.midpoint(location¹)
+        }
+        
         let arrowGradient = LineSector(start: arrow.start, end: arrow.end).gradient
         let pointsGradient = LineSector(start: location⁰, end: location¹).gradient
 

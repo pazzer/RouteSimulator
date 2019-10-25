@@ -60,7 +60,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         do {
             try uiBot.loadNextSequence()
         } catch UIBotError.noSequencesRemaining {
-            uiBot.reset()
+            uiBot.restart()
             self.totalPasses = 0
             self.totalFails = 0
             completed = 0
@@ -173,7 +173,12 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     func updateSummary() {        
         var summary: String!
-        let passesAndFails = "\(totalPasses) passes, \(totalFails) fails."
+        
+        let totalPasses = String(format: "%i %@", self.totalPasses, self.totalPasses == 1 ? "pass" : "passes")
+        let totalFails = String(format: "%i %@", self.totalFails, self.totalFails == 1 ? "fail" : "fails")
+        
+        let passesAndFails = String(format: "%@, %@", totalPasses, totalFails)
+        
         if uiBot.allSequencesComplete {
             summary = "All Complete (\(completed!)): " + passesAndFails
         } else if completed == 0 {
@@ -189,11 +194,33 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     var skipped: Int = 0
     
+    var setUpComplete = false
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        divideButtons()
+        if !setUpComplete {
+            divideButtons()
+            setUpComplete = true
+        }
+        reset()
+        
+    }
+    
+    func reset() {
+        skipped = 0
+        totalPasses = 0
+        totalFails = 0
+        sequencePasses = 0
+        sequenceFails = 0
         completed = 0
         
+        leftOperation.text = nil
+        middleOperation.text = nil
+        rightOperation.text = nil
+        
+        currentTest.text = nil
+        testNumber.text = nil
+        section = nil
     }
     
     func divideButtons() {

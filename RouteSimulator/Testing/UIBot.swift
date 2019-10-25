@@ -57,6 +57,12 @@ class UIBot {
         }
     }
     
+    func restart() {
+        assert(sequences.count > 0)
+        assert(dataSource != nil)
+        sequenceIndex = 0
+    }
+    
     private var sequences: [UIBotSequence]!
     
     private var sequenceIndex: Int! {
@@ -217,10 +223,6 @@ class UIBot {
         }
         
         sequenceIndex += 1
-    }
-    
-    func reset() {
-        sequenceIndex = 0
     }
 }
 

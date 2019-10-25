@@ -1,19 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   TestNine.plist
-   RouteSimulator
-
-   Created by Paul Patterson on 11/10/2019.
-   Copyright (c) 2019 Paul Patterson. All rights reserved.
--->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-	<dict>
-		<key>name</key>
-		<string>Drawing Circular Relationships</string>
-		<key>operations</key>
-		<array>
-			
-		</array>
-	</dict>
+<dict>
+	<key>name</key>
+	<string>Drawing Circular Relationships</string>
+	<key>operations</key>
+	<array>
+		<string>Adding A</string>
+		<dict>
+			<key>data</key>
+			<integer>49</integer>
+			<key>name</key>
+			<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_ADD</string>
+		</dict>
+		<dict>
+			<key>data</key>
+			<integer>21</integer>
+			<key>name</key>
+			<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_ADD</string>
+		</dict>
+		<dict>
+			<key>data</key>
+			<integer>49</integer>
+			<key>name</key>
+			<string>MOVE_CROSSHAIRS_TO_ZONE</string>
+		</dict>
+		<dict>
+			<key>name</key>
+			<string>TAP_ADD</string>
+		</dict>
+	    <dict>
+	        <key>data</key>
+	        <integer>2</integer>
+	        <key>name</key>
+	        <string>COUNT_ARROWS</string>
+	    </dict>
+	    <dict>
+	        <key>data</key>
+	        <string>A</string>
+	        <key>name</key>
+	        <string>VALIDATE_ARROW_LOCATION</string>
+	    </dict>
+	    <dict>
+	        <key>data</key>
+	        <string>B</string>
+	        <key>name</key>
+	        <string>VALIDATE_ARROW_LOCATION</string>
+	    </dict>
+	    <string>Delete Arrow From A</string>
+	    <dict>
+	        <key>data</key>
+	        <string>A</string>
+	        <key>name</key>
+	        <string>SET_CROSSHAIRS_ON_ARROW</string>
+	    </dict>
+	    <dict>
+	        <key>name</key>
+	        <string>TAP_REMOVE</string>
+	    </dict>
+	    <dict>
+	        <key>data</key>
+	        <integer>1</integer>
+	        <key>name</key>
+	        <string>COUNT_ARROWS</string>
+	    </dict>
+	    <dict>
+	        <key>data</key>
+	        <string>B</string>
+	        <key>name</key>
+	        <string>VALIDATE_ARROW_LOCATION</string>
+	    </dict>
+	</array>
+</dict>
 </plist>
