@@ -185,23 +185,23 @@ class RouteViewController: UIViewController {
         instigateSelectionUpdate(newSelection: circle.label)
     }
     
-    func tapCanBeProcessed(sender: Any) -> Bool {
+    func tapShouldBeProcessed(sender: Any) -> Bool {
         return !((sender is UIBarButtonItem) && (mode == .test))
     }
     
     @IBAction func undo(_ sender: Any) {
-        guard tapCanBeProcessed(sender: sender) else { return }
+        guard tapShouldBeProcessed(sender: sender) else { return }
         
         undoManager?.undo()
     }
     @IBAction func redo(_ sender: Any) {
-        guard tapCanBeProcessed(sender: sender) else { return }
+        guard tapShouldBeProcessed(sender: sender) else { return }
         
         undoManager?.redo()
     }
     
     @IBAction func userTappedAdd(_ sender: Any) {
-        guard tapCanBeProcessed(sender: sender) else { return }
+        guard tapShouldBeProcessed(sender: sender) else { return }
         
         switch (circleUnderCursor, selection) {
         case (nil, nil):
