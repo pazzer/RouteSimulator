@@ -81,7 +81,7 @@
                         <leftBarButtonItems>
                             <barButtonItem title="Item" image="Plus" id="F0f-Ed-AE8">
                                 <connections>
-                                    <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="aWy-sY-doL"/>
+                                    <action selector="userTappedAdd:" destination="BYZ-38-t0r" id="RJK-UX-SBa"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem title="Item" image="Minus" id="h37-oH-lwE">

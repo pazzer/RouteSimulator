@@ -185,19 +185,23 @@ class RouteViewController: UIViewController {
         instigateSelectionUpdate(newSelection: circle.label)
     }
     
+    func tapCanBeProcessed(sender: Any) -> Bool {
+        return !((sender is UIBarButtonItem) && (mode == .test))
+    }
+    
     @IBAction func undo(_ sender: Any) {
-        guard mode == .user else { return }
+        guard tapCanBeProcessed(sender: sender) else { return }
         
         undoManager?.undo()
     }
     @IBAction func redo(_ sender: Any) {
-        guard mode == .user else { return }
+        guard tapCanBeProcessed(sender: sender) else { return }
         
         undoManager?.redo()
     }
     
     @IBAction func userTappedAdd(_ sender: Any) {
-        guard mode == .user else { return }
+        guard tapCanBeProcessed(sender: sender) else { return }
         
         switch (circleUnderCursor, selection) {
         case (nil, nil):
@@ -216,7 +220,7 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func userTappedRemove(_ sender: Any) {
-        guard mode == .user else { return }
+        guard !((sender is UIBarButtonItem) && (mode == .test)) else { return }
         
         if let waypoint = circleUnderCursor?.label {
             instigateRemoval(of: waypoint)
