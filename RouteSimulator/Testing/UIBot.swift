@@ -37,33 +37,9 @@ extension UIBotDelegate {
 
 class UIBot {
     
-//    init(url: URL, delegate: UIBotDelegate, dataSource: UIBotDataSource) {
-//        self.delegate = delegate
-//        self.dataSource = dataSource
-//
-//        let rawSequences = LoadPlist(at: url) as! [NSDictionary]
-//        self.sequences = rawSequences.map { UIBotSequence(from: $0) }
-//
-//        commonInit()
-//    }
-    
-//    init(sequences: [UIBotSequence], delegate: UIBotDelegate, dataSource: UIBotDataSource) {
-//        self.delegate = delegate
-//        self.dataSource = dataSource
-//        self.sequences = sequences
-//
-//        commonInit()
-//    }
-    
     init(sequences: [UIBotSequence]) {
         self.sequences = sequences
     }
-    
-    
-//
-//    func commonInit() {
-//        self.sequenceIndex = 0
-//    }
     
     var allSequencesComplete: Bool {
         return sequenceIndex == sequences.count - 1 && allStepsComplete

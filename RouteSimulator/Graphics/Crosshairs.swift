@@ -18,6 +18,8 @@ public class Crosshairs: Graphic {
     
     var selected: Bool = false
     
+    var hidden = false
+    
     init(center: CGPoint, size: CGSize) {
         frame = CGRect(x: center.x - size.width * 0.5, y: center.y - size.height * 0.5, width: size.width, height: size.height)
         updatePaths()
@@ -54,6 +56,9 @@ public class Crosshairs: Graphic {
     var horizontalCrosshair: UIBezierPath!
     
     func draw(in context: CGContext, rect: CGRect) {
+        guard !hidden else {
+            return
+        }
         fill.setFill()
         grayCircle.fill()
         #colorLiteral(red: 0.501960814, green: 0.501960814, blue: 0.501960814, alpha: 1).setStroke()

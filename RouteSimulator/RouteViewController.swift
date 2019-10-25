@@ -42,24 +42,31 @@ enum RouteUpdate {
 
 class RouteViewController: UIViewController {
 
-
-    
     // MARK:- ViewController Lifecycle
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         _undoManager = UndoManager()
     }
     
+    @IBOutlet weak var graphicsViewContainer: UIView!
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.maxX), size: CGSize(width: 120, height: 120))
+        
+        crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.midY), size: CGSize(width: 120, height: 120))
         graphicsView.add(crosshairs)
-        updateButtons()
+        
+       updateButtons()
+        
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        guard let testsSummaryViewController = self.testsSummaryViewController else {
+            fatalError("testsSummaryViewController is nil")
+        }
         let uiBot = testsSummaryViewController.uiBot
         uiBot?.delegate = testsSummaryViewController
         uiBot?.dataSource = self
@@ -85,6 +92,7 @@ class RouteViewController: UIViewController {
     let circleRadius = CGFloat(22.0)
     
     let arrowInset: CGFloat = 5
+    
     let parallelArrowsOffset: CGFloat = 10
     
     private var _undoManager: UndoManager!
@@ -99,9 +107,20 @@ class RouteViewController: UIViewController {
     
     @IBOutlet weak var redoButton: UIBarButtonItem!
     
+    @IBOutlet weak var testViewTop: NSLayoutConstraint?
+    
+    @IBOutlet weak var viewBtmToTestViewBtm: NSLayoutConstraint?
+    
+    @IBOutlet weak var graphicsViewBtmToViewBtm: NSLayoutConstraint!
+    
+    @IBOutlet var testViewContainer: UIView!
+    
+    @IBOutlet weak var lockView: UIImageView!
+    
     // MARK:- Actions/Handling Actions
     
     @IBAction func userPannedOnGraphicsView(_ pan: UIPanGestureRecognizer) {
+        guard mode == .user else { return }
         
         switch pan.state {
             
@@ -139,6 +158,7 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func userTapped(_ tap: UITapGestureRecognizer) {
+        guard mode == .user else { return }
         handleTap(at: tap.location(in: graphicsView))
     }
     
@@ -203,6 +223,21 @@ class RouteViewController: UIViewController {
             runUpdates([.setNext(name: waypoint, new: nil)])
         }
     }
+    
+    @IBAction func userTappedTest(_ sender: Any) {
+        if children.count > 0 {
+            enterUserMode()
+        } else {
+            let alert = UIAlertController(title: "Re-entering Test Mode", message: "The current route will be destroyed; do you want to continue?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "Yes", style: .destructive, handler: { (_) in
+                self.enterTestMode()
+            }))
+            present(alert, animated: true, completion: nil)
+        }
+    }
+    
+
     
     @IBAction func clearRoute(_ sender: Any) {
         // Clearing model
@@ -689,14 +724,194 @@ class RouteViewController: UIViewController {
     
     lazy var testSequences: [UIBotSequence] = {
         var sequences = [UIBotSequence]()
-        ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"].forEach { (number) in
+        ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"].forEach { (number) in
             if let url = Bundle.main.url(forResource: "Test\(number)", withExtension: "plist") {
                 sequences.append(UIBotSequence(from: url))
             }
         }
         return sequences
     }()
+    
+    enum Mode {
+        case user
+        case test
+    }
+    
+    var mode = Mode.test
+    
+    // MARK:- Switching UI Modes
+    
+    func context(ofSize size: CGSize) -> CGContext? {
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard let context = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: Int(size.width) * 4, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue) else {
+            return nil
+        }
+        context.translateBy(x: 0, y: size.height)
+        context.scaleBy(x: 1, y: -1)
+        return context
+    }
+    
+    func crosshairsImage() -> UIImage? {
+        let x = self.crosshairs.frame.width * 0.5
+        let y = self.crosshairs.frame.height * 0.5
+        let crosshairs = Crosshairs(center: CGPoint(x: x, y: y), size: self.crosshairs.frame.size)
+        
+        guard let context = context(ofSize: crosshairs.frame.size) else {
+            return nil
+        }
+        
+        UIGraphicsPushContext(context)
+        crosshairs.draw(in: context, rect: crosshairs.frame)
+        if let cgImage = context.makeImage() {
+            return UIImage(cgImage: cgImage)
+        } else {
+            return nil
+        }
+    }
+    
+    func graphicsViewImageForTransitionToMode(_ mode: Mode) -> UIImage? {
+        let size: CGSize
+        switch mode {
+        case .user:
+            let width = graphicsView.frame.width
+            let height = testViewContainer.frame.maxY - graphicsView.frame.minY
+            size = CGSize(width: width, height: height)
+        case .test:
+            size = graphicsView.bounds.size
+        }
+        
+        guard let context = context(ofSize: size) else {
+            return nil
+        }
+        UIGraphicsPushContext(context)
+        graphicsView.graphics.forEach { (graphic) in
+            if (mode == .user) || (mode == .test && !(graphic is Crosshairs)) {
+                graphic.draw(in: context, rect: CGRect(origin: .zero, size: size))
+            }
+        }
+        
+        if let cgImage = context.makeImage() {
+            return UIImage(cgImage: cgImage)
+        } else {
+            return nil
+        }
+    }
+    
+    func enterUserMode() {
+        guard let testViewBottom = self.viewBtmToTestViewBtm else {
+            fatalError("constaint 'testViewBottom' not set")
+        }
+        
+        
+        // 1. create an image of the graphicsView's contents
+        guard let image = graphicsViewImageForTransitionToMode(.user) else {
+            // Plan B???
+            return
+        }
+        
+        // 2. Add this image to the graphic view
+        let imageView = UIImageView(image: image)
+        graphicsView.clipsToBounds = true
+        graphicsView.addSubview(imageView)
+        imageView.frame = CGRect(origin: .zero, size: image.size)
+        
+        
+        // 2. Hide existing graphics
+        graphicsView.graphics.forEach { $0.hidden = true }
+        graphicsView.setNeedsDisplay()
+         
+        // 4. Slide out container
+        testViewBottom.constant = -(testViewContainer.frame.height)
+
+        UIView.animate(withDuration: 0.25, animations: {
+            self.view.layoutIfNeeded()
+            self.graphicsViewContainer.backgroundColor = .white
+            self.lockView.alpha = 0.0
+        }) { (_) in
+            
+            // 5. Unhide graphics
+            self.graphicsView.graphics.forEach { $0.hidden = false }
+
+            // 6. remove snapshot
+            imageView.removeFromSuperview()
+            self.graphicsView.setNeedsDisplay()
+            self.graphicsViewBtmToViewBtm.isActive = true
+
+            // 7. Remove test view
+            self.testsSummaryViewController.willMove(toParent: nil)
+            self.testViewContainer.removeFromSuperview()
+            self.testsSummaryViewController.removeFromParent()
+            
+            self.lockView.isHidden = true
+            self.mode = .user
+            
+        }
+    }
+    
+    func enterTestMode() {
+        guard let graphicsViewImage = graphicsViewImageForTransitionToMode(.test), let crosshairsImage = crosshairsImage() else {
+            // Plan-B???
+            return
+        }
+        
+        let graphicsViewImageView = UIImageView(image: graphicsViewImage)
+        graphicsViewImageView.frame = graphicsView.bounds
+        graphicsView.addSubview(graphicsViewImageView)
+        
+        let crosshairsImageView = UIImageView(image: crosshairsImage)
+        crosshairsImageView.frame = self.crosshairs.frame
+        graphicsView.addSubview(crosshairsImageView)
+        
+        graphicsView.graphics.forEach { $0.hidden = true }
+        graphicsView.setNeedsDisplay()
+        
+        self.lockView.isHidden = false
+        
+        UIView.animate(withDuration: 0.25, animations: {
+            graphicsViewImageView.alpha = 0
+        }) { (_) in
+            self.addChild(self.testsSummaryViewController)
+            self.view.addSubview(self.testViewContainer)
+
+            NSLayoutConstraint.activate([
+                self.testViewContainer.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 8),
+                self.testViewContainer.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -8),
+                self.testViewContainer.topAnchor.constraint(equalTo: self.graphicsView.bottomAnchor, constant: 8)
+            ])
+
+            self.graphicsViewBtmToViewBtm.isActive = false
+            let constraint = self.view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: self.testViewContainer.bottomAnchor, constant: -self.testViewContainer.frame.height)
+            constraint.isActive = true
+            self.viewBtmToTestViewBtm = constraint
+            self.testsSummaryViewController.didMove(toParent: self)
+
+            self.view.layoutIfNeeded()
+            constraint.constant = 8
+
+            UIView.animate(withDuration: 0.25, animations: {
+                self.view.layoutIfNeeded()
+                let x = self.graphicsView.bounds.midX
+                let y = self.graphicsView.bounds.midY
+                crosshairsImageView.center = CGPoint(x: x, y: y)
+                self.lockView.alpha = 1.0
+                self.graphicsViewContainer.backgroundColor = UIColor(named: "disabledBackground")
+            }) { (_) in
+                self.clearRoute(self)
+                self.crosshairs.center = crosshairsImageView.center
+                
+                self.crosshairs.hidden = false
+                self.graphicsView.setNeedsDisplay()
+                
+                crosshairsImageView.removeFromSuperview()
+                self.mode = .test
+            }
+        }
+    }
 }
+
+    
+
+
 
 
 // MARK:- Testing extension

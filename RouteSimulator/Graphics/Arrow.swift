@@ -146,7 +146,12 @@ public class Arrow: Graphic, CustomStringConvertible {
     
     var selected = false
     
+    var hidden = false
+    
     func draw(in context: CGContext, rect: CGRect) {
+        guard !hidden else {
+            return
+        }
         UIColor.gray.setFill()
         path.fill()
     }

@@ -11,11 +11,12 @@
 		CF2B4A83233A1A34008DFAD4 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AB23283F08001582C7 /* Circle.swift */; };
 		CF2B4A84233A1A3D008DFAD4 /* Graphic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A723279D3F001582C7 /* Graphic.swift */; };
 		CF2B4A85233A1A54008DFAD4 /* LineSector.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B82328DDAE001582C7 /* LineSector.swift */; };
-		CF2B4A87233A1B83008DFAD4 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* Canvas.swift */; };
+		CF2B4A87233A1B83008DFAD4 /* GraphicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* GraphicsView.swift */; };
 		CF2B4A88233A1B95008DFAD4 /* Crosshairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AF23283F58001582C7 /* Crosshairs.swift */; };
 		CF2B4A89233A1BA5008DFAD4 /* CGPoint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B62328413A001582C7 /* CGPoint+.swift */; };
 		CF2B4A8A233A1BF6008DFAD4 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BA2328E158001582C7 /* Direction.swift */; };
 		CF2B4A8C233A1C3D008DFAD4 /* NSLayoutConstraint+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75F6232C3AF0001582C7 /* NSLayoutConstraint+.swift */; };
+		CF7656B52362E50000A7CD2E /* CGRect+.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF7656B42362E50000A7CD2E /* CGRect+.swift */; };
 		CF8A758B2322544F001582C7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A758A2322544F001582C7 /* AppDelegate.swift */; };
 		CF8A758D2322544F001582C7 /* RouteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A758C2322544F001582C7 /* RouteViewController.swift */; };
 		CF8A75902322544F001582C7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF8A758E2322544F001582C7 /* Main.storyboard */; };
@@ -24,7 +25,7 @@
 		CF8A759823225450001582C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF8A759623225450001582C7 /* LaunchScreen.storyboard */; };
 		CF8A75A223225659001582C7 /* MapViewZones.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = CF8A75A123225659001582C7 /* MapViewZones.jpeg */; };
 		CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A723279D3F001582C7 /* Graphic.swift */; };
-		CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* Canvas.swift */; };
+		CF8A75AA23279E26001582C7 /* GraphicsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A923279E26001582C7 /* GraphicsView.swift */; };
 		CF8A75AC23283F08001582C7 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AB23283F08001582C7 /* Circle.swift */; };
 		CF8A75B023283F58001582C7 /* Crosshairs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AF23283F58001582C7 /* Crosshairs.swift */; };
 		CF8A75B423283F8B001582C7 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B323283F8B001582C7 /* Arrow.swift */; };
@@ -72,6 +73,7 @@
 
 /* Begin PBXFileReference section */
 		CF25E592234E7064004083F3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CF7656B42362E50000A7CD2E /* CGRect+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+.swift"; sourceTree = "<group>"; };
 		CF8A75872322544F001582C7 /* RouteSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF8A758A2322544F001582C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CF8A758C2322544F001582C7 /* RouteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteViewController.swift; sourceTree = "<group>"; };
@@ -82,7 +84,7 @@
 		CF8A759923225450001582C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF8A75A123225659001582C7 /* MapViewZones.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = MapViewZones.jpeg; sourceTree = "<group>"; };
 		CF8A75A723279D3F001582C7 /* Graphic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graphic.swift; sourceTree = "<group>"; };
-		CF8A75A923279E26001582C7 /* Canvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Canvas.swift; sourceTree = "<group>"; };
+		CF8A75A923279E26001582C7 /* GraphicsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicsView.swift; sourceTree = "<group>"; };
 		CF8A75AB23283F08001582C7 /* Circle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Circle.swift; sourceTree = "<group>"; };
 		CF8A75AF23283F58001582C7 /* Crosshairs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crosshairs.swift; sourceTree = "<group>"; };
 		CF8A75B323283F8B001582C7 /* Arrow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Arrow.swift; sourceTree = "<group>"; };
@@ -165,7 +167,7 @@
 				CF8A758C2322544F001582C7 /* RouteViewController.swift */,
 				CF8A75BA2328E158001582C7 /* Direction.swift */,
 				CF8A75B82328DDAE001582C7 /* LineSector.swift */,
-				CF8A75A923279E26001582C7 /* Canvas.swift */,
+				CF8A75A923279E26001582C7 /* GraphicsView.swift */,
 				CF8A75ED232AE134001582C7 /* DashedLineView.swift */,
 				CF8A75E0232A5A77001582C7 /* Model */,
 				CF8A758E2322544F001582C7 /* Main.storyboard */,
@@ -215,6 +217,7 @@
 			children = (
 				CF8A75B62328413A001582C7 /* CGPoint+.swift */,
 				CF8A75F6232C3AF0001582C7 /* NSLayoutConstraint+.swift */,
+				CF7656B42362E50000A7CD2E /* CGRect+.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -377,7 +380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CF8A75AA23279E26001582C7 /* Canvas.swift in Sources */,
+				CF8A75AA23279E26001582C7 /* GraphicsView.swift in Sources */,
 				CF98100B233AA3AD0090AEDE /* UIBotOperation.swift in Sources */,
 				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
 				CF8A758D2322544F001582C7 /* RouteViewController.swift in Sources */,
@@ -396,6 +399,7 @@
 				CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */,
 				CF8A75EC232AE02C001582C7 /* TestsSummaryViewController.swift in Sources */,
 				CF8A75BB2328E158001582C7 /* Direction.swift in Sources */,
+				CF7656B52362E50000A7CD2E /* CGRect+.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,7 +412,7 @@
 				CF2B4A83233A1A34008DFAD4 /* Circle.swift in Sources */,
 				CF2B4A85233A1A54008DFAD4 /* LineSector.swift in Sources */,
 				CF2B4A89233A1BA5008DFAD4 /* CGPoint+.swift in Sources */,
-				CF2B4A87233A1B83008DFAD4 /* Canvas.swift in Sources */,
+				CF2B4A87233A1B83008DFAD4 /* GraphicsView.swift in Sources */,
 				CF98100F233B65270090AEDE /* UIBotOperation.swift in Sources */,
 				CF981013233B7E7D0090AEDE /* Sequences.swift in Sources */,
 				CF98101C233D41910090AEDE /* Globals.swift in Sources */,

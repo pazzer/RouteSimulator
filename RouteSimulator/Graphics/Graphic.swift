@@ -12,9 +12,11 @@ import UIKit
 protocol Graphic: class {
     var frame: CGRect { get set }
     var center: CGPoint { get set }
+    var hidden: Bool { get set }
     var selected: Bool { get set }
     func draw(in context: CGContext, rect: CGRect)
     func contains(_ point: CGPoint) -> Bool
+    
 }
 
 extension Graphic {

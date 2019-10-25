@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -26,9 +27,30 @@
                                     <segue destination="lCI-jJ-KDe" kind="embed" id="46Y-U5-wCA"/>
                                 </connections>
                             </containerView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-IG-xv4" customClass="GraphicsView" customModule="RouteSimulator" customModuleProvider="target">
+                            <view userInteractionEnabled="NO" contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-IG-xv4">
                                 <rect key="frame" x="8" y="8" width="359" height="415"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <subviews>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Lock" translatesAutoresizingMaskIntoConstraints="NO" id="36q-CY-Z8c">
+                                        <rect key="frame" x="319" y="375" width="32" height="32"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="32" id="Mcc-RV-DGr"/>
+                                            <constraint firstAttribute="width" constant="32" id="RPK-VH-8Tf"/>
+                                        </constraints>
+                                    </imageView>
+                                    <view userInteractionEnabled="NO" contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="F8J-xA-1gy" customClass="GraphicsView" customModule="RouteSimulator" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="359" height="415"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" name="disabledBackground"/>
+                                <constraints>
+                                    <constraint firstItem="F8J-xA-1gy" firstAttribute="top" secondItem="UbC-IG-xv4" secondAttribute="top" id="FUK-UC-ili"/>
+                                    <constraint firstAttribute="trailing" secondItem="F8J-xA-1gy" secondAttribute="trailing" id="NeU-oq-v5C"/>
+                                    <constraint firstAttribute="trailing" secondItem="36q-CY-Z8c" secondAttribute="trailing" constant="8" id="fIO-87-ewo"/>
+                                    <constraint firstAttribute="bottom" secondItem="F8J-xA-1gy" secondAttribute="bottom" id="kFp-WU-JFb"/>
+                                    <constraint firstItem="F8J-xA-1gy" firstAttribute="leading" secondItem="UbC-IG-xv4" secondAttribute="leading" id="mEE-9Z-a0G"/>
+                                    <constraint firstAttribute="bottom" secondItem="36q-CY-Z8c" secondAttribute="bottom" constant="8" id="vid-O4-Gax"/>
+                                </constraints>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="tCr-K4-J8c"/>
                                 </connections>
@@ -39,12 +61,18 @@
                             <constraint firstItem="nDI-rE-04V" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="DkI-ga-LlG"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nDI-rE-04V" secondAttribute="trailing" constant="8" id="KVs-gy-CUf"/>
                             <constraint firstItem="nDI-rE-04V" firstAttribute="top" secondItem="UbC-IG-xv4" secondAttribute="bottom" constant="8" id="Wxe-vt-iCe"/>
+                            <constraint firstItem="UbC-IG-xv4" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" constant="-8" id="cqP-hA-0Zo"/>
                             <constraint firstItem="UbC-IG-xv4" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="eQM-b5-ZQ8"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="nDI-rE-04V" secondAttribute="bottom" constant="8" id="n60-hQ-2vF"/>
                             <constraint firstItem="UbC-IG-xv4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="rHa-fH-djW"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="UbC-IG-xv4" secondAttribute="trailing" constant="8" id="scK-93-bJp"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="cqP-hA-0Zo"/>
+                            </mask>
+                        </variation>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="H1x-00-GJu" appends="YES" id="anT-K5-skS"/>
                         </connections>
@@ -74,14 +102,20 @@
                         </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" image="Clipboard" id="wsW-fN-84w">
                             <connections>
-                                <action selector="userTappedTest:" destination="BYZ-38-t0r" id="B8h-oO-Hea"/>
+                                <action selector="userTappedTest:" destination="BYZ-38-t0r" id="8s3-FI-qt0"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="graphicsView" destination="UbC-IG-xv4" id="gyC-WP-G8X"/>
+                        <outlet property="graphicsView" destination="F8J-xA-1gy" id="g3i-el-hku"/>
+                        <outlet property="graphicsViewBtmToViewBtm" destination="cqP-hA-0Zo" id="0Od-mF-aP3"/>
+                        <outlet property="graphicsViewContainer" destination="UbC-IG-xv4" id="jwV-Pg-lVS"/>
+                        <outlet property="lockView" destination="36q-CY-Z8c" id="OM5-o4-d0H"/>
                         <outlet property="redoButton" destination="YdR-KH-SHj" id="uQb-vG-MGZ"/>
+                        <outlet property="testViewContainer" destination="nDI-rE-04V" id="Sie-T5-cNT"/>
+                        <outlet property="testViewTop" destination="Wxe-vt-iCe" id="jdb-kF-Dgk"/>
                         <outlet property="undoButton" destination="rkn-BR-dSo" id="POY-mq-wSb"/>
+                        <outlet property="viewBtmToTestViewBtm" destination="n60-hQ-2vF" id="JHb-9e-QY1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -315,6 +349,7 @@
     <resources>
         <image name="Clipboard" width="32" height="32"/>
         <image name="Jump" width="28" height="28"/>
+        <image name="Lock" width="32" height="32"/>
         <image name="Minus" width="32" height="2"/>
         <image name="Plus" width="32" height="32"/>
         <image name="Redo" width="32" height="32"/>
@@ -322,5 +357,8 @@
         <image name="SmallPlay" width="13" height="15"/>
         <image name="Step" width="26" height="30"/>
         <image name="Undo" width="32" height="32"/>
+        <namedColor name="disabledBackground">
+            <color white="0.95999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </namedColor>
     </resources>
 </document>

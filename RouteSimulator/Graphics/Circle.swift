@@ -47,7 +47,10 @@ public class Circle: Graphic, CustomStringConvertible {
         }
     }
     
+    var hidden = false
+    
     var selected = false
+    
     var frame: CGRect = .zero {
         didSet {
             updatePaths()
@@ -72,6 +75,9 @@ public class Circle: Graphic, CustomStringConvertible {
     var path: UIBezierPath!
     
     func draw(in context: CGContext, rect: CGRect) {
+        guard !hidden else {
+            return
+        }
         fill?.setFill()
         stroke?.setStroke()
         path.fill()

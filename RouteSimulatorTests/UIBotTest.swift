@@ -69,7 +69,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     func testSteppingThroughSections() {
         
         // Test 1
-        var bot = UIBot(sequences: [SequenceB()], delegate: self, dataSource: self)
+
+        var bot = UIBot(sequences: [SequenceB()])
+        bot.delegate = self
+        bot.dataSource = self
         self.result = 0
 
         try! bot.step() // executed 1.0, now at 2.0
@@ -90,7 +93,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         sequenceCompleteBlock = nil
         
         // Test 2
-        bot = UIBot(sequences: [SequenceB()], delegate: self, dataSource: self)
+        bot = UIBot(sequences: [SequenceB()])
+        bot.delegate = self
+        bot.dataSource = self
         self.result = 0
 
         try! bot.step() // executed 1.0, now at 2.0
@@ -112,8 +117,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     
     func testSequenceLoading() {
         // Test 1
-        
-        var bot = UIBot(sequences: [SequenceB()], delegate: self, dataSource: self)
+        var bot = UIBot(sequences: [SequenceB()])
+        bot.delegate = self
+        bot.dataSource = self
         result = 0
         try! bot.step()
         try! bot.step()
@@ -126,7 +132,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         
         // Test 2
         
-        bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()], delegate: self, dataSource: self)
+        
+        bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()])
+        bot.delegate = self
+        bot.dataSource = self
         self.result = 0
         try! bot.loadNextSequence()
         XCTAssertEqual(bot.sequenceName, "B")
@@ -142,7 +151,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     }
     
     func testResetting() {
-        let bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()], delegate: self, dataSource: self)
+        let bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()])
+        bot.delegate = self
+        bot.dataSource = self
         result = 0
         
         try! bot.loadNextSequence()
@@ -176,7 +187,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     
     func testRandomlyStepThroughAllSequences() {
         let seqs = [SequenceA(),SequenceB(),SequenceC()]
-        let bot = UIBot(sequences: seqs, delegate: self, dataSource: self)
+        let bot = UIBot(sequences: seqs)
+        bot.delegate = self
+        bot.dataSource = self
         
         // Sequence A /////
         
@@ -286,7 +299,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     func testSequenceCompleteDelegate() {
         // Tests whether bot.allSequncesComplete returns the correct value in the delegate method <didCompleteSequence>
         let seqs = [SequenceA(),SequenceB(),SequenceC()]
-        let bot = UIBot(sequences: seqs, delegate: self, dataSource: self)
+        let bot = UIBot(sequences: seqs)
+        bot.delegate = self
+        bot.dataSource = self
+        
         try! bot.loadNextSequence()
         try! bot.loadNextSequence()
         
