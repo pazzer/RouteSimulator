@@ -27,7 +27,7 @@
                                     <segue destination="lCI-jJ-KDe" kind="embed" id="46Y-U5-wCA"/>
                                 </connections>
                             </containerView>
-                            <view userInteractionEnabled="NO" contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-IG-xv4">
+                            <view contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-IG-xv4">
                                 <rect key="frame" x="8" y="8" width="359" height="415"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Lock" translatesAutoresizingMaskIntoConstraints="NO" id="36q-CY-Z8c">
@@ -37,9 +37,13 @@
                                             <constraint firstAttribute="width" constant="32" id="RPK-VH-8Tf"/>
                                         </constraints>
                                     </imageView>
-                                    <view userInteractionEnabled="NO" contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="F8J-xA-1gy" customClass="GraphicsView" customModule="RouteSimulator" customModuleProvider="target">
+                                    <view contentMode="TopLeft" translatesAutoresizingMaskIntoConstraints="NO" id="F8J-xA-1gy" customClass="GraphicsView" customModule="RouteSimulator" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="359" height="415"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="mer-9C-j8G"/>
+                                            <outletCollection property="gestureRecognizers" destination="H1x-00-GJu" appends="YES" id="XNk-y6-yD1"/>
+                                        </connections>
                                     </view>
                                 </subviews>
                                 <color key="backgroundColor" name="disabledBackground"/>
@@ -51,9 +55,6 @@
                                     <constraint firstItem="F8J-xA-1gy" firstAttribute="leading" secondItem="UbC-IG-xv4" secondAttribute="leading" id="mEE-9Z-a0G"/>
                                     <constraint firstAttribute="bottom" secondItem="36q-CY-Z8c" secondAttribute="bottom" constant="8" id="vid-O4-Gax"/>
                                 </constraints>
-                                <connections>
-                                    <outletCollection property="gestureRecognizers" destination="hD9-VH-AYF" appends="YES" id="tCr-K4-J8c"/>
-                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.77480706865923388" green="0.77480706865923388" blue="0.77480706865923388" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -73,9 +74,6 @@
                                 <exclude reference="cqP-hA-0Zo"/>
                             </mask>
                         </variation>
-                        <connections>
-                            <outletCollection property="gestureRecognizers" destination="H1x-00-GJu" appends="YES" id="anT-K5-skS"/>
-                        </connections>
                     </view>
                     <navigationItem key="navigationItem" id="Ce5-z7-v4Q">
                         <leftBarButtonItems>
@@ -121,7 +119,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="hD9-VH-AYF">
                     <connections>
-                        <action selector="userTapped:" destination="BYZ-38-t0r" id="wsh-sy-rzf"/>
+                        <action selector="userTapped:" destination="BYZ-38-t0r" id="8N8-iV-fNw"/>
                     </connections>
                 </tapGestureRecognizer>
                 <panGestureRecognizer minimumNumberOfTouches="1" id="H1x-00-GJu">
@@ -148,10 +146,10 @@
             </objects>
             <point key="canvasLocation" x="-183" y="138"/>
         </scene>
-        <!--Tests Summary View Controller-->
+        <!--Bot Tests Dashboard View Controller-->
         <scene sceneID="Wy2-WS-njo">
             <objects>
-                <viewController id="lCI-jJ-KDe" customClass="TestsSummaryViewController" customModule="RouteSimulator" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="lCI-jJ-KDe" customClass="BotTestsDashboardViewController" customModule="RouteSimulator" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="PLY-ir-Dhc">
                         <rect key="frame" x="0.0" y="0.0" width="359" height="184"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -358,7 +356,7 @@
         <image name="Step" width="26" height="30"/>
         <image name="Undo" width="32" height="32"/>
         <namedColor name="disabledBackground">
-            <color white="0.95999999999999996" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color white="0.95999997854232788" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </namedColor>
     </resources>
 </document>

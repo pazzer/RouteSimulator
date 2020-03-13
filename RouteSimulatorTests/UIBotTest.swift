@@ -7,9 +7,10 @@
 //
 
 import XCTest
+@testable import RouteSimulator
 
 class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
-    
+
     var result = Double(0)
     
     // MARK: UIBotDataSource
@@ -18,9 +19,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         return false
     }
     
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void) {
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable {
         
-        return {
+        return SimpleBlock {
             let `string` = operationData as! String
             let comps = `string`.components(separatedBy: ",")
             let operation = comps.first!
@@ -70,9 +71,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         
         // Test 1
 
-        var bot = UIBot(sequences: [SequenceB()])
+        var bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceB()])
         self.result = 0
 
         try! bot.step() // executed 1.0, now at 2.0
@@ -93,9 +95,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         sequenceCompleteBlock = nil
         
         // Test 2
-        bot = UIBot(sequences: [SequenceB()])
+        bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceB()])
         self.result = 0
 
         try! bot.step() // executed 1.0, now at 2.0
@@ -117,9 +120,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     
     func testSequenceLoading() {
         // Test 1
-        var bot = UIBot(sequences: [SequenceB()])
+        var bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceB()])
         result = 0
         try! bot.step()
         try! bot.step()
@@ -133,9 +137,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         // Test 2
         
         
-        bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()])
+        bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceA(), SequenceB(), SequenceC()])
         self.result = 0
         try! bot.loadNextSequence()
         XCTAssertEqual(bot.sequenceName, "B")
@@ -151,9 +156,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     }
     
     func testResetting() {
-        let bot = UIBot(sequences: [SequenceA(), SequenceB(), SequenceC()])
+        let bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceA(), SequenceB(), SequenceC()])
         result = 0
         
         try! bot.loadNextSequence()
@@ -164,7 +170,7 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         
         XCTAssertEqual(self.result, 6)
         
-        bot.reset()
+        bot.restart()
         result = 0
         XCTAssertEqual(bot.sequenceName, "A")
         
@@ -186,10 +192,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     }
     
     func testRandomlyStepThroughAllSequences() {
-        let seqs = [SequenceA(),SequenceB(),SequenceC()]
-        let bot = UIBot(sequences: seqs)
+        let bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceA(),SequenceB(),SequenceC()])
         
         // Sequence A /////
         
@@ -298,10 +304,10 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
     
     func testSequenceCompleteDelegate() {
         // Tests whether bot.allSequncesComplete returns the correct value in the delegate method <didCompleteSequence>
-        let seqs = [SequenceA(),SequenceB(),SequenceC()]
-        let bot = UIBot(sequences: seqs)
+        let bot = UIBot()
         bot.delegate = self
         bot.dataSource = self
+        bot.set(sequences: [SequenceA(),SequenceB(),SequenceC()])
         
         try! bot.loadNextSequence()
         try! bot.loadNextSequence()

@@ -13,10 +13,11 @@ enum UIBotError: Error {
     case sequenceIsComplete
     case allSequencesComplete
     case noSequencesRemaining
+    case midExecution
 }
 
 protocol UIBotDataSource {
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void)
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable
     func uiBot(_ uiBot: UIBot, operationIsTest operationName: String) -> Bool
     func uiBot(_ uiBot: UIBot, executeTestNamed testName: String, data: Any?) -> (pass: Bool, msg: String)
 }
@@ -26,18 +27,29 @@ protocol UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool)
     func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool)
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?)
+    
+    func uiBotExecutingBlocks(_ uiBot: UIBot)
+    func uiBotFinishedExecutingBlocks(_ uiBot: UIBot)
 }
 
+// TODO: Add simple logging statements
 extension UIBotDelegate {
     func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named name: String?) { }
     func uiBot(_ uiBot: UIBot, loadedOperation named: String, fromSection section: String?, operationIndex: Int, isTest: Bool) { }
     func uiBot(_ uiBot: UIBot, didCompleteSequence index: Int, named name: String?, isLast: Bool) { }
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?) { }
+    
+    func uiBotExecutingBlocks(_ uiBot: UIBot) { }
+    func uiBotFinishedExecutingBlocks(_ uiBot: UIBot) { }
+}
+
+extension Notification.Name {
+    static let UIBotDidLoadSequence = Notification.Name("uibotDidLoadSequence")
 }
 
 class UIBot {
     
-    init(sequences: [UIBotSequence]) {
+    func set(sequences: [UIBotSequence]) {
         self.sequences = sequences
     }
     
@@ -60,10 +72,16 @@ class UIBot {
     func restart() {
         assert(sequences.count > 0)
         assert(dataSource != nil)
+        
         sequenceIndex = 0
     }
     
-    private var sequences: [UIBotSequence]!
+    private var sequences: [UIBotSequence]! {
+        didSet {
+            sequenceIndex = 0
+        }
+        
+    }
     
     private var sequenceIndex: Int! {
         didSet {
@@ -82,16 +100,34 @@ class UIBot {
         }
     }
     
-    private func executeOnConsecutiveRunLoopIterations(blocks: [() -> Void]) {
+    private func executeOnConsecutiveRunLoopIterations(blocks: [Blockable]) {
         var counter = 0
-        
+        var delayed = false
+        currentlyExecutingBlocks = true
         let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.beforeWaiting.rawValue, true, 0) { (observer, activity) in
             if activity.contains(.beforeWaiting) && counter < blocks.count {
-                let block = blocks[counter]
-                RunLoop.main.perform {
-                    block()
+                if !delayed {
+                    let blockable = blocks[counter]
+                    RunLoop.main.perform {
+                        blockable.block()
+                    }
+                    if let blockWithDelay = blockable as? BlockWithDelay {
+                        delayed = true
+                        RunLoop.main.add(Timer(timeInterval: blockWithDelay.delay, repeats: false, block: { (_) in
+                            delayed = false
+                            counter += 1
+                            if counter == blocks.count {
+                                self.currentlyExecutingBlocks = false
+                            }
+                        }), forMode: .common)
+                    } else {
+                        counter += 1
+                        if counter == blocks.count {
+                            self.currentlyExecutingBlocks = false
+                        }
+                    }
                 }
-                counter += 1
+                
             } else {
                 CFRunLoopRemoveObserver(CFRunLoopGetMain(), observer, CFRunLoopMode.commonModes)
             }
@@ -103,20 +139,16 @@ class UIBot {
     
     var delegate: UIBotDelegate!
     
-    var dataSource: UIBotDataSource! {
-        didSet {
-            sequenceIndex = 0
-        }
-    }
+    var dataSource: UIBotDataSource!
     
-    private func executeTest(named name: String, data: Any) -> () -> Void {
-        return {
+    private func executeTest(named name: String, data: Any) -> SimpleBlock {
+        return SimpleBlock {
             let (pass, msg) = self.dataSource.uiBot(self, executeTestNamed: name, data: data)
             self.delegate.uiBot(self, evaluated: name, didPass: pass, details: msg)
         }
     }
     
-    private func block(for operation: UIBotOperation) -> () -> Void {
+    private func blockable(for operation: UIBotOperation) -> Blockable {
         if dataSource.uiBot(self, operationIsTest: operation.name) {
             return executeTest(named: operation.name, data: operation.data)
         } else {
@@ -136,7 +168,9 @@ class UIBot {
     // MARK: Stepping
     
     private func checkForStepError() -> UIBotError? {
-        if allSequencesComplete {
+        if currentlyExecutingBlocks {
+            return UIBotError.midExecution
+        } else if allSequencesComplete {
             return UIBotError.allSequencesComplete
         } else if allStepsComplete {
             return UIBotError.sequenceIsComplete
@@ -150,35 +184,44 @@ class UIBot {
     }
     
     private func executeOperation(_ operation: UIBotOperation) {
-        let block = self.block(for: operation)
-        block()
+        let blockable = self.blockable(for: operation)
+        blockable.block()
         blocksDidExecute()
+        if let blockWithDelay = blockable as? BlockWithDelay {
+            currentlyExecutingBlocks = true
+            Timer.scheduledTimer(withTimeInterval: blockWithDelay.delay, repeats: false) { (_) in
+                self.currentlyExecutingBlocks = false
+            }
+        }
     }
     
     private func executeOperations(_ operations: [UIBotOperation]) {
         
-        var blocks = [() -> Void]()
+        var blocks = [Blockable]()
         
         for (ii, operation) in operations.enumerated() {
             
             if ii != 0 {
-                blocks.append {
+                blocks.append(SimpleBlock(block: {
                     let isTest = self.dataSource.uiBot(self, operationIsTest: operation.name)
                     self.delegate.uiBot(self, loadedOperation: operation.name, fromSection: operation.section, operationIndex: operation.index, isTest: isTest)
-                }
+                }))
             }
             
-            let block = self.block(for: operation)
+            let block = self.blockable(for: operation)
             blocks.append(block)
         }
         
         if sequence.isComplete {
             self.pending = nil
-            blocks.append {
+            blocks.append(SimpleBlock {
                 self.delegate.uiBot(self, didCompleteSequence: self.sequenceIndex, named: self.sequence.name, isLast: self.allSequencesComplete)
-            }
+                })
+            
         } else {
-            blocks.append { self.pending = try! self.sequence.step() }
+            blocks.append(SimpleBlock(block: {
+                self.pending = try! self.sequence.step()
+            }))
         }
         
         executeOnConsecutiveRunLoopIterations(blocks: blocks)
@@ -195,7 +238,18 @@ class UIBot {
         
     }
     
+    private var currentlyExecutingBlocks = false {
+        didSet {
+            if self.currentlyExecutingBlocks {
+                delegate.uiBotExecutingBlocks(self)
+            } else {
+                delegate.uiBotFinishedExecutingBlocks(self)
+            }
+        }
+    }
+    
     func step(to location: SequenceLocation) throws {
+        
         if let error = checkForStepError() {
             throw error
         }
@@ -225,6 +279,3 @@ class UIBot {
         sequenceIndex += 1
     }
 }
-
-
-

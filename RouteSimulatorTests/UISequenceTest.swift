@@ -7,6 +7,7 @@
 //
 
 import XCTest
+@testable import RouteSimulator
 
 class UISequenceTest: XCTestCase {
 

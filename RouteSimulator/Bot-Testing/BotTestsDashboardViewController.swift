@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TestsSummaryViewController: UIViewController, UIBotDelegate {
+class BotTestsDashboardViewController: UIViewController, UIBotDelegate {
     
     @IBOutlet weak var testNumber: UILabel!
     @IBOutlet weak var currentTest: UILabel!
@@ -24,6 +24,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     // Takes a single step forward
     @IBOutlet weak var step: UIButton!
     
+
     // Steps through all outstanding operations in the current section
     @IBOutlet weak var sectionStep: UIButton!
     
@@ -35,22 +36,33 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     @IBOutlet weak var buttonStack: UIStackView!
     
-    weak var routeViewController: RouteViewController!
     var uiBot: UIBot!
 
     @IBAction func step(_ sender: Any) {
-        try! uiBot.step()
+        do {
+            try uiBot.step()
+        } catch let error {
+            print("step failed: \(error)")
+        }
     }
     
     @IBAction func sectionStep(_ sender: Any) {
-        try! uiBot.step(to: .nextSection)
+        do {
+            try uiBot.step(to: .nextSection)
+        } catch let error {
+            print("section-step failed: \(error)")
+        }
     }
     
     /*
      Completes all outstanding steps in the current sequence.
      */
     @IBAction func sequenceStep(_ sender: Any) {
-        try! uiBot.step(to: .end)
+        do {
+            try uiBot.step(to: .end)
+        } catch let error {
+            print("sequence-step failed: \(error)")
+        }
     }
     
     /*
@@ -71,16 +83,18 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     
     // MARK: UIBotDelegate
     
-    func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named: String?) {        
+    func uiBot(_ uiBot: UIBot, loadedSequence index: Int, named: String?) {
+        NotificationCenter.default.post(name: .UIBotDidLoadSequence, object: uiBot)
+        if index == 0 {
+            reset()
+        }
+        
         leftOperation.text = nil
         middleOperation.text = nil
         rightOperation.text = nil
         
         sequenceFails = 0
         sequencePasses = 0
-        
-        routeViewController.clearRoute(self)
-        routeViewController.unicodePoint = UNICODE_CAP_A
         
         currentTest.text = named
         currentFails.text = "\(0)"
@@ -90,6 +104,20 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         [step, sectionStep, sequenceStep].forEach { $0.isEnabled = true }
     }
     
+    
+    func uiBotExecutingBlocks(_ uiBot: UIBot) {
+        self.step.isEnabled = false
+        self.sectionStep.isEnabled = false
+        self.sequenceStep.isEnabled = false
+        self.sequenceSkip.isEnabled = false
+    }
+    
+    func uiBotFinishedExecutingBlocks(_ uiBot: UIBot) {
+        self.step.isEnabled = true
+        self.sectionStep.isEnabled = true
+        self.sequenceStep.isEnabled = true
+        self.sequenceSkip.isEnabled = true
+    }
     
     let testTextColor = #colorLiteral(red: 0.2196078449, green: 0.007843137719, blue: 0.8549019694, alpha: 1)
     
@@ -115,7 +143,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         leftOperation.textColor = isTest ? testTextColor : .black
     }
     
-    var completed: Int! {
+    var completed = 0 {
         didSet {
             updateSummary()
         }
@@ -140,7 +168,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
     }
     
     func uiBot(_ uiBot: UIBot, evaluated operation: String, didPass: Bool, details: String?) {
-        
+
         if didPass {
             sequencePasses += 1
             leftOperation.textColor = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
@@ -171,7 +199,7 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         skipped += 1
     }
     
-    func updateSummary() {        
+    func updateSummary() {
         var summary: String!
         
         let totalPasses = String(format: "%i %@", self.totalPasses, self.totalPasses == 1 ? "pass" : "passes")
@@ -180,13 +208,13 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         let passesAndFails = String(format: "%@, %@", totalPasses, totalFails)
         
         if uiBot.allSequencesComplete {
-            summary = "All Complete (\(completed!)): " + passesAndFails
+            summary = "All Complete (\(completed)): " + passesAndFails
         } else if completed == 0 {
             summary = "No Tests Completed"
         } else if completed == 1 {
             summary = "One Test Completed: " + passesAndFails
         } else {
-            summary = "\(completed!) Tests Completed: " + passesAndFails
+            summary = "\(completed) Tests Completed: " + passesAndFails
         }
         
         mainSummary.text = summary
@@ -202,10 +230,9 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
             divideButtons()
             setUpComplete = true
         }
-        reset()
-        
+        //reset()
     }
-    
+
     func reset() {
         skipped = 0
         totalPasses = 0
@@ -233,8 +260,4 @@ class TestsSummaryViewController: UIViewController, UIBotDelegate {
         }
         
     }
-    
-
 }
-
-

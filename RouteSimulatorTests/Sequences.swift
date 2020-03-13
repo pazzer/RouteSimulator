@@ -7,6 +7,7 @@
 //
 
 import Foundation
+@testable import RouteSimulator
 
 func MakeRawOperation(named name: String, data: Any) -> NSDictionary {
     return ["name": name, "data": data]

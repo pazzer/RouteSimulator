@@ -47,6 +47,11 @@ class RouteViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         _undoManager = UndoManager()
+        
+        NotificationCenter.default.addObserver(forName: .UIBotDidLoadSequence, object: nil, queue: nil) { (_) in
+            self.clearRoute(self)
+            self.unicodePoint = UNICODE_CAP_A
+        }
     }
     
     @IBOutlet weak var graphicsViewContainer: UIView!
@@ -61,12 +66,13 @@ class RouteViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        guard let testsSummaryViewController = self.testsSummaryViewController else {
+        guard let botTestsDashboardViewController = self.botTestsDashboardViewController else {
             fatalError("testsSummaryViewController is nil")
         }
-        let uiBot = testsSummaryViewController.uiBot
-        uiBot?.delegate = testsSummaryViewController
-        uiBot?.dataSource = self
+        botTestsDashboardViewController.uiBot = UIBot()
+        botTestsDashboardViewController.uiBot.delegate = botTestsDashboardViewController
+        botTestsDashboardViewController.uiBot.dataSource = self
+        botTestsDashboardViewController.uiBot.set(sequences: testSequences)
     }
     
     // MARK:- Variables (stored and computed)
@@ -707,20 +713,15 @@ class RouteViewController: UIViewController {
     // MARK:- Seguing
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let testsSummaryViewController = segue.destination as? TestsSummaryViewController else {
+        guard let botTestsDashboardViewController = segue.destination as? BotTestsDashboardViewController else {
             return
         }
-        self.testsSummaryViewController = testsSummaryViewController
+        self.botTestsDashboardViewController = botTestsDashboardViewController
         
         
     }
     
-    var testsSummaryViewController: TestsSummaryViewController! {
-        didSet {
-            testsSummaryViewController.routeViewController = self
-            testsSummaryViewController.uiBot = UIBot(sequences: testSequences)
-        }
-    }
+    var botTestsDashboardViewController: BotTestsDashboardViewController!
     
     // MARK:- Debugging
     
@@ -829,9 +830,9 @@ class RouteViewController: UIViewController {
             
             self.graphicsViewContainerBtmToViewBtm.isActive = true
 
-            self.testsSummaryViewController.willMove(toParent: nil)
+            self.botTestsDashboardViewController.willMove(toParent: nil)
             self.testViewContainer.removeFromSuperview()
-            self.testsSummaryViewController.removeFromParent()
+            self.botTestsDashboardViewController.removeFromParent()
             
             self.lockView.isHidden = true
             self.mode = .user
@@ -861,7 +862,7 @@ class RouteViewController: UIViewController {
         UIView.animate(withDuration: 0.25, animations: {
             graphicsViewImageView.alpha = 0
         }) { (_) in
-            self.addChild(self.testsSummaryViewController)
+            self.addChild(self.botTestsDashboardViewController)
             self.view.addSubview(self.testViewContainer)
 
             NSLayoutConstraint.activate([
@@ -874,8 +875,8 @@ class RouteViewController: UIViewController {
             let constraint = self.view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: self.testViewContainer.bottomAnchor, constant: -self.testViewContainer.frame.height)
             constraint.isActive = true
             self.viewBtmToTestViewBtm = constraint
-            self.testsSummaryViewController.didMove(toParent: self)
-            self.testsSummaryViewController.uiBot.restart()
+            self.botTestsDashboardViewController.didMove(toParent: self)
+            self.botTestsDashboardViewController.uiBot.restart()
             
             self.view.layoutIfNeeded()
             constraint.constant = 8
@@ -937,7 +938,7 @@ extension RouteViewController: UIBotDataSource {
         return ["COUNT_WAYPOINTS", "COUNT_ARROWS", "DELETED_WAYPOINTS", "VALIDATE_ROUTE_NEXT", "VALIDATE_ROUTE_PREVIOUS", "VALIDATE_SELECTION", "VALIDATE_WAYPOINT_LOCATION", "VALIDATE_ARROW_PRESENCE","VALIDATE_ARROW_ABSENCE", "VALIDATE_ARROW_LOCATION"].contains(operationName)
     }
 
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void) {
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable {
         switch operationName {
             
         // Editing
@@ -966,53 +967,53 @@ extension RouteViewController: UIBotDataSource {
         }
     }
     
-    func setCrosshairsOnWaypoint(named name: String) -> () -> Void {
-        return {
+    func setCrosshairsOnWaypoint(named name: String) -> Blockable {
+        return SimpleBlock {
             let circle = self.graphicsView.circle(labeled: name)
             self.move(self.crosshairs, to: circle.center)
         }
     }
     
-    func tapAdd() -> () -> Void {
-        return {
+    func tapAdd() -> Blockable {
+        return SimpleBlock {
             self.userTappedAdd(self)
         }
     }
     
-    func tapRemove() -> () -> Void {
-        return {
+    func tapRemove() -> Blockable {
+        return SimpleBlock {
             self.userTappedRemove(self)
         }
     }
     
-    func tapRedo() -> () -> Void {
-        return {
+    func tapRedo() -> Blockable {
+        return SimpleBlock {
             self.redo(self)
         }
     }
     
-    func tapUndo() -> () -> Void {
-        return {
+    func tapUndo() -> Blockable {
+        return SimpleBlock {
             self.undo(self)
         }
     }
     
-    func moveCrosshairsToZone(_ zone: Int) -> () -> Void {
-        return {
+    func moveCrosshairsToZone(_ zone: Int) -> Blockable {
+        return SimpleBlock {
             let pt = self.center(of: zone)
             self.move(self.crosshairs, to: pt)
         }
     }
     
-    func tapWaypoint(named name: String) -> () -> Void {
-        return {
+    func tapWaypoint(named name: String) -> Blockable {
+        return SimpleBlock {
             let circle = self.graphicsView.circle(labeled: name)
             self.handleTap(at: circle.center)
         }
     }
     
-    func setCrosshairsOnArrow(originatingAt waypointName: String) -> () -> Void {
-        return {
+    func setCrosshairsOnArrow(originatingAt waypointName: String) -> Blockable {
+        return SimpleBlock {
             let next = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
             let pt⁰ = self.route.location(ofWaypointNamed: waypointName)
             let pt¹ = self.route.location(ofWaypointNamed: next)
@@ -1029,8 +1030,8 @@ extension RouteViewController: UIBotDataSource {
         }
     }
     
-    func tapEmptyZone() -> () -> Void {
-        return {
+    func tapEmptyZone() -> Blockable {
+        return SimpleBlock {
             self.handleTap(at: self.center(of: CIRCLE_FREE_ZONE))
         }
     }

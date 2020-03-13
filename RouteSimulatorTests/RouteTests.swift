@@ -7,7 +7,7 @@
 //
 
 import XCTest
-
+@testable import RouteSimulator
 
 class RouteTests: XCTestCase {
 
