@@ -13,6 +13,7 @@ struct UIBotOperation {
     
     let name: String
     let data: Any
+    let delay: TimeInterval?
     
     let section: String?
     let index: Int
@@ -20,6 +21,8 @@ struct UIBotOperation {
     init(from rawOperation: NSDictionary, index: Int, section: String?) {
         self.name = rawOperation["name"] as! String
         self.data = rawOperation["data"] as Any
+        self.delay = rawOperation["delay"] as? TimeInterval
+        
         self.section = section
         self.index = index
     }

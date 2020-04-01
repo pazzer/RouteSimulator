@@ -17,7 +17,7 @@ enum UIBotError: Error {
 }
 
 protocol UIBotDataSource {
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> (() -> Void)
     func uiBot(_ uiBot: UIBot, operationIsTest operationName: String) -> Bool
     func uiBot(_ uiBot: UIBot, executeTestNamed testName: String, data: Any?) -> (pass: Bool, msg: String)
 }
@@ -100,26 +100,26 @@ class UIBot {
         }
     }
     
-    private func executeOnConsecutiveRunLoopIterations(blocks: [Blockable]) {
+    private func executeOnConsecutiveRunLoopIterations(blocks: [BotBlock]) {
         var counter = 0
         var delayed = false
         currentlyExecutingBlocks = true
         let observer = CFRunLoopObserverCreateWithHandler(kCFAllocatorDefault, CFRunLoopActivity.beforeWaiting.rawValue, true, 0) { (observer, activity) in
             if activity.contains(.beforeWaiting) && counter < blocks.count {
                 if !delayed {
-                    let blockable = blocks[counter]
+                    let botBlock = blocks[counter]
                     RunLoop.main.perform {
-                        blockable.block()
+                        botBlock.block()
                     }
-                    if let blockWithDelay = blockable as? BlockWithDelay {
+                    if let delay = botBlock.delay {
                         delayed = true
-                        RunLoop.main.add(Timer(timeInterval: blockWithDelay.delay, repeats: false, block: { (_) in
+                        RunLoop.main.add(Timer(timeInterval: delay, repeats: false, block: { (_) in
                             delayed = false
                             counter += 1
                             if counter == blocks.count {
                                 self.currentlyExecutingBlocks = false
                             }
-                        }), forMode: .common)
+                        }), forMode: RunLoop.Mode.common)
                     } else {
                         counter += 1
                         if counter == blocks.count {
@@ -141,18 +141,23 @@ class UIBot {
     
     var dataSource: UIBotDataSource!
     
-    private func executeTest(named name: String, data: Any) -> SimpleBlock {
-        return SimpleBlock {
+    private func executeTest(named name: String, data: Any) -> BotBlock {
+        return BotBlock {
             let (pass, msg) = self.dataSource.uiBot(self, executeTestNamed: name, data: data)
             self.delegate.uiBot(self, evaluated: name, didPass: pass, details: msg)
         }
     }
     
-    private func blockable(for operation: UIBotOperation) -> Blockable {
+    private func botBlock(for operation: UIBotOperation) -> BotBlock {
         if dataSource.uiBot(self, operationIsTest: operation.name) {
             return executeTest(named: operation.name, data: operation.data)
         } else {
-            return dataSource.uiBot(self, blockForOperationNamed: operation.name, operationData: operation.data)
+            let block = dataSource.uiBot(self, blockForOperationNamed: operation.name, operationData: operation.data)
+            if let delay = operation.delay {
+                return BotBlock(block: block, delay: delay)
+            } else {
+                return BotBlock(block: block)
+            }
         }
     }
     
@@ -184,12 +189,12 @@ class UIBot {
     }
     
     private func executeOperation(_ operation: UIBotOperation) {
-        let blockable = self.blockable(for: operation)
-        blockable.block()
+        let botBlock = self.botBlock(for: operation)
+        botBlock.block()
         blocksDidExecute()
-        if let blockWithDelay = blockable as? BlockWithDelay {
+        if let delay = botBlock.delay {
             currentlyExecutingBlocks = true
-            Timer.scheduledTimer(withTimeInterval: blockWithDelay.delay, repeats: false) { (_) in
+            Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { (_) in
                 self.currentlyExecutingBlocks = false
             }
         }
@@ -197,31 +202,31 @@ class UIBot {
     
     private func executeOperations(_ operations: [UIBotOperation]) {
         
-        var blocks = [Blockable]()
+        var blocks = [BotBlock]()
         
         for (ii, operation) in operations.enumerated() {
             
             if ii != 0 {
-                blocks.append(SimpleBlock(block: {
+                blocks.append(BotBlock {
                     let isTest = self.dataSource.uiBot(self, operationIsTest: operation.name)
                     self.delegate.uiBot(self, loadedOperation: operation.name, fromSection: operation.section, operationIndex: operation.index, isTest: isTest)
-                }))
+                })
             }
             
-            let block = self.blockable(for: operation)
+            let block = self.botBlock(for: operation)
             blocks.append(block)
         }
         
         if sequence.isComplete {
             self.pending = nil
-            blocks.append(SimpleBlock {
+            blocks.append(BotBlock {
                 self.delegate.uiBot(self, didCompleteSequence: self.sequenceIndex, named: self.sequence.name, isLast: self.allSequencesComplete)
                 })
             
         } else {
-            blocks.append(SimpleBlock(block: {
+            blocks.append(BotBlock {
                 self.pending = try! self.sequence.step()
-            }))
+            })
         }
         
         executeOnConsecutiveRunLoopIterations(blocks: blocks)

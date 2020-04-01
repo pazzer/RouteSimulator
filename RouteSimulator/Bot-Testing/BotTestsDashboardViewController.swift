@@ -1,9 +1,9 @@
 //
-//  TestsSummaryController.swift
-//  RouteSimulator
+//  BotTestSummaryViewController.swift
+//  QuickRoute
 //
-//  Created by Paul Patterson on 12/09/2019.
-//  Copyright © 2019 Paul Patterson. All rights reserved.
+//  Created by Paul Patterson on 25/02/2020.
+//  Copyright © 2020 paulpatterson. All rights reserved.
 //
 
 import UIKit

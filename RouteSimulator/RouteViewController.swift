@@ -938,7 +938,7 @@ extension RouteViewController: UIBotDataSource {
         return ["COUNT_WAYPOINTS", "COUNT_ARROWS", "DELETED_WAYPOINTS", "VALIDATE_ROUTE_NEXT", "VALIDATE_ROUTE_PREVIOUS", "VALIDATE_SELECTION", "VALIDATE_WAYPOINT_LOCATION", "VALIDATE_ARROW_PRESENCE","VALIDATE_ARROW_ABSENCE", "VALIDATE_ARROW_LOCATION"].contains(operationName)
     }
 
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable {
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) ->  (() -> Void) {
         switch operationName {
             
         // Editing
@@ -967,53 +967,53 @@ extension RouteViewController: UIBotDataSource {
         }
     }
     
-    func setCrosshairsOnWaypoint(named name: String) -> Blockable {
-        return SimpleBlock {
+    func setCrosshairsOnWaypoint(named name: String) -> (() -> Void) {
+        return {
             let circle = self.graphicsView.circle(labeled: name)
             self.move(self.crosshairs, to: circle.center)
         }
     }
     
-    func tapAdd() -> Blockable {
-        return SimpleBlock {
+    func tapAdd() -> (() -> Void) {
+        return {
             self.userTappedAdd(self)
         }
     }
     
-    func tapRemove() -> Blockable {
-        return SimpleBlock {
+    func tapRemove() -> (() -> Void) {
+        return {
             self.userTappedRemove(self)
         }
     }
     
-    func tapRedo() -> Blockable {
-        return SimpleBlock {
+    func tapRedo() -> (() -> Void) {
+        return {
             self.redo(self)
         }
     }
     
-    func tapUndo() -> Blockable {
-        return SimpleBlock {
+    func tapUndo() -> (() -> Void) {
+        return {
             self.undo(self)
         }
     }
     
-    func moveCrosshairsToZone(_ zone: Int) -> Blockable {
-        return SimpleBlock {
+    func moveCrosshairsToZone(_ zone: Int) -> (() -> Void) {
+        return {
             let pt = self.center(of: zone)
             self.move(self.crosshairs, to: pt)
         }
     }
     
-    func tapWaypoint(named name: String) -> Blockable {
-        return SimpleBlock {
+    func tapWaypoint(named name: String) -> (() -> Void) {
+        return {
             let circle = self.graphicsView.circle(labeled: name)
             self.handleTap(at: circle.center)
         }
     }
     
-    func setCrosshairsOnArrow(originatingAt waypointName: String) -> Blockable {
-        return SimpleBlock {
+    func setCrosshairsOnArrow(originatingAt waypointName: String) -> (() -> Void) {
+        return {
             let next = self.route.nameOfWaypointFollowing(waypointNamed: waypointName)!
             let pt⁰ = self.route.location(ofWaypointNamed: waypointName)
             let pt¹ = self.route.location(ofWaypointNamed: next)
@@ -1030,8 +1030,8 @@ extension RouteViewController: UIBotDataSource {
         }
     }
     
-    func tapEmptyZone() -> Blockable {
-        return SimpleBlock {
+    func tapEmptyZone() -> (() -> Void) {
+        return {
             self.handleTap(at: self.center(of: CIRCLE_FREE_ZONE))
         }
     }

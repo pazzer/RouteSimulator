@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CF13BF12241B7D090064E59A /* Blockable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF13BF11241B7D090064E59A /* Blockable.swift */; };
 		CF2B4A82233A1A2A008DFAD4 /* Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75B323283F8B001582C7 /* Arrow.swift */; };
 		CF2B4A83233A1A34008DFAD4 /* Circle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75AB23283F08001582C7 /* Circle.swift */; };
 		CF2B4A84233A1A3D008DFAD4 /* Graphic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75A723279D3F001582C7 /* Graphic.swift */; };
@@ -50,9 +49,11 @@
 		CF98100B233AA3AD0090AEDE /* UIBotOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */; };
 		CF98100D233B63AE0090AEDE /* UISequenceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98100C233B63AE0090AEDE /* UISequenceTest.swift */; };
 		CF981011233B7D990090AEDE /* UIBotTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981010233B7D990090AEDE /* UIBotTest.swift */; };
-		CF981013233B7E7D0090AEDE /* Sequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981012233B7E7D0090AEDE /* Sequences.swift */; };
+		CF981013233B7E7D0090AEDE /* TestSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981012233B7E7D0090AEDE /* TestSequences.swift */; };
 		CF98101B233D41480090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
+		CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */; };
+		CFA092A92434ACAA00A58F49 /* BotBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA092A82434ACAA00A58F49 /* BotBlock.swift */; };
 		CFCFBDA8241B895A006D442F /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C5235122B3001BC5AD /* TestEight.plist */; };
 		CFF4D8C8235127CD001BC5AD /* TestNine.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C7235127CD001BC5AD /* TestNine.plist */; };
@@ -69,8 +70,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CF13BF11241B7D090064E59A /* Blockable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Blockable.swift; sourceTree = "<group>"; };
-		CF25E592234E7064004083F3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CF25E592234E7064004083F3 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.markdown; };
 		CF7656B42362E50000A7CD2E /* CGRect+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+.swift"; sourceTree = "<group>"; };
 		CF8A75872322544F001582C7 /* RouteSimulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteSimulator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF8A758A2322544F001582C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -111,8 +111,10 @@
 		CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotOperation.swift; sourceTree = "<group>"; };
 		CF98100C233B63AE0090AEDE /* UISequenceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISequenceTest.swift; sourceTree = "<group>"; };
 		CF981010233B7D990090AEDE /* UIBotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotTest.swift; sourceTree = "<group>"; };
-		CF981012233B7E7D0090AEDE /* Sequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sequences.swift; sourceTree = "<group>"; };
+		CF981012233B7E7D0090AEDE /* TestSequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSequences.swift; sourceTree = "<group>"; };
 		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
+		CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = .xcodesamplecode.plist; sourceTree = "<group>"; };
+		CFA092A82434ACAA00A58F49 /* BotBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotBlock.swift; sourceTree = "<group>"; };
 		CFF4D8C5235122B3001BC5AD /* TestEight.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestEight.plist; sourceTree = "<group>"; };
 		CFF4D8C7235127CD001BC5AD /* TestNine.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestNine.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -147,6 +149,7 @@
 		CF8A757E2322544F001582C7 = {
 			isa = PBXGroup;
 			children = (
+				CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */,
 				CF25E592234E7064004083F3 /* README.md */,
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
@@ -203,8 +206,8 @@
 				CF8A75D723291013001582C7 /* RouteTests.swift */,
 				CF98100C233B63AE0090AEDE /* UISequenceTest.swift */,
 				CF981010233B7D990090AEDE /* UIBotTest.swift */,
+				CF981012233B7E7D0090AEDE /* TestSequences.swift */,
 				CF8A75D923291013001582C7 /* Info.plist */,
-				CF981012233B7E7D0090AEDE /* Sequences.swift */,
 			);
 			path = RouteSimulatorTests;
 			sourceTree = "<group>";
@@ -259,9 +262,9 @@
 				CF8A75EB232AE02C001582C7 /* BotTestsDashboardViewController.swift */,
 				CF8D0614234F8687000C3882 /* BotTests */,
 				CF981008233AA3780090AEDE /* UIBotSequence.swift */,
+				CFA092A82434ACAA00A58F49 /* BotBlock.swift */,
 				CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */,
 				CF8A75E5232A69BF001582C7 /* UIBot.swift */,
-				CF13BF11241B7D090064E59A /* Blockable.swift */,
 				CF8A75E7232A7A7C001582C7 /* BotTests.plist */,
 			);
 			path = "Bot-Testing";
@@ -353,6 +356,7 @@
 				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
 				CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
+				CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */,
 				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,
 				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
 				CF8D061C234F8846000C3882 /* TestFour.plist in Resources */,
@@ -379,6 +383,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFA092A92434ACAA00A58F49 /* BotBlock.swift in Sources */,
 				CF8A75AA23279E26001582C7 /* GraphicsView.swift in Sources */,
 				CF98100B233AA3AD0090AEDE /* UIBotOperation.swift in Sources */,
 				CF8A75A823279D3F001582C7 /* Graphic.swift in Sources */,
@@ -396,7 +401,6 @@
 				CF981009233AA3780090AEDE /* UIBotSequence.swift in Sources */,
 				CF8A75AC23283F08001582C7 /* Circle.swift in Sources */,
 				CF8A75B92328DDAE001582C7 /* LineSector.swift in Sources */,
-				CF13BF12241B7D090064E59A /* Blockable.swift in Sources */,
 				CF8A75EC232AE02C001582C7 /* BotTestsDashboardViewController.swift in Sources */,
 				CF8A75BB2328E158001582C7 /* Direction.swift in Sources */,
 				CF7656B52362E50000A7CD2E /* CGRect+.swift in Sources */,
@@ -412,7 +416,7 @@
 				CF2B4A85233A1A54008DFAD4 /* LineSector.swift in Sources */,
 				CF2B4A89233A1BA5008DFAD4 /* CGPoint+.swift in Sources */,
 				CF2B4A87233A1B83008DFAD4 /* GraphicsView.swift in Sources */,
-				CF981013233B7E7D0090AEDE /* Sequences.swift in Sources */,
+				CF981013233B7E7D0090AEDE /* TestSequences.swift in Sources */,
 				CF98101C233D41910090AEDE /* Globals.swift in Sources */,
 				CF2B4A82233A1A2A008DFAD4 /* Arrow.swift in Sources */,
 				CF981011233B7D990090AEDE /* UIBotTest.swift in Sources */,
@@ -574,6 +578,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RLT3Y7VWF4;
 				INFOPLIST_FILE = RouteSimulator/Info.plist;
@@ -583,8 +588,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.paulpatterson.RouteSimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -592,6 +598,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = RLT3Y7VWF4;
 				INFOPLIST_FILE = RouteSimulator/Info.plist;
@@ -601,8 +608,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.paulpatterson.RouteSimulator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

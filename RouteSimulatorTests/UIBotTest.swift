@@ -19,9 +19,9 @@ class UIBotTest: XCTestCase, UIBotDelegate, UIBotDataSource {
         return false
     }
     
-    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> Blockable {
+    func uiBot(_ uiBot: UIBot, blockForOperationNamed operationName: String, operationData: Any) -> () -> Void {
         
-        return SimpleBlock {
+        return {
             let `string` = operationData as! String
             let comps = `string`.components(separatedBy: ",")
             let operation = comps.first!
