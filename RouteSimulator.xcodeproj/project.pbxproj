@@ -52,7 +52,6 @@
 		CF981013233B7E7D0090AEDE /* TestSequences.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF981012233B7E7D0090AEDE /* TestSequences.swift */; };
 		CF98101B233D41480090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
-		CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */; };
 		CFA092A92434ACAA00A58F49 /* BotBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA092A82434ACAA00A58F49 /* BotBlock.swift */; };
 		CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */; };
 		CFCFBDA8241B895A006D442F /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
@@ -114,7 +113,6 @@
 		CF981010233B7D990090AEDE /* UIBotTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBotTest.swift; sourceTree = "<group>"; };
 		CF981012233B7E7D0090AEDE /* TestSequences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSequences.swift; sourceTree = "<group>"; };
 		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
-		CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = .xcodesamplecode.plist; sourceTree = "<group>"; };
 		CFA092A82434ACAA00A58F49 /* BotBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotBlock.swift; sourceTree = "<group>"; };
 		CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BotTestsDashboardView.xib; sourceTree = "<group>"; };
 		CFF4D8C5235122B3001BC5AD /* TestEight.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestEight.plist; sourceTree = "<group>"; };
@@ -151,7 +149,6 @@
 		CF8A757E2322544F001582C7 = {
 			isa = PBXGroup;
 			children = (
-				CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */,
 				CF25E592234E7064004083F3 /* README.md */,
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
@@ -368,7 +365,6 @@
 				CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
 				CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */,
-				CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */,
 				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,
 				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
 				CF8D061C234F8846000C3882 /* TestFour.plist in Resources */,
