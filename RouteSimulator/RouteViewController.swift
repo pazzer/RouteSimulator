@@ -57,22 +57,11 @@ class RouteViewController: UIViewController {
     @IBOutlet weak var graphicsViewContainer: UIView!
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.tintColor = .lightGray
+        navigationController?.navigationBar.tintColor = .systemBlue
         crosshairs = Crosshairs(center: CGPoint(x: graphicsView.bounds.midX, y: graphicsView.bounds.midY), size: CGSize(width: 120, height: 120))
         graphicsView.add(crosshairs)
         
        updateButtons()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        guard let botTestsDashboardViewController = self.botTestsDashboardViewController else {
-            fatalError("testsSummaryViewController is nil")
-        }
-        botTestsDashboardViewController.uiBot = UIBot()
-        botTestsDashboardViewController.uiBot.delegate = botTestsDashboardViewController
-        botTestsDashboardViewController.uiBot.dataSource = self
-        botTestsDashboardViewController.uiBot.set(sequences: testSequences)
     }
     
     // MARK:- Variables (stored and computed)
@@ -109,14 +98,6 @@ class RouteViewController: UIViewController {
     @IBOutlet weak var undoButton: UIBarButtonItem!
     
     @IBOutlet weak var redoButton: UIBarButtonItem!
-    
-    @IBOutlet weak var testViewTop: NSLayoutConstraint?
-    
-    @IBOutlet weak var viewBtmToTestViewBtm: NSLayoutConstraint?
-    
-    @IBOutlet weak var graphicsViewContainerBtmToViewBtm: NSLayoutConstraint!
-    
-    @IBOutlet var testViewContainer: UIView!
     
     @IBOutlet weak var lockView: UIImageView!
     
@@ -192,7 +173,13 @@ class RouteViewController: UIViewController {
     }
     
     func tapShouldBeProcessed(sender: Any) -> Bool {
-        return !((sender is UIBarButtonItem) && (mode == .test))
+        if !((sender is UIBarButtonItem) && (mode == .test)) {
+            return true
+        } else {
+            NSLog("button taps not processed in test mode")
+            return false
+            
+        }
     }
     
     @IBAction func undo(_ sender: Any) {
@@ -226,7 +213,7 @@ class RouteViewController: UIViewController {
     }
     
     @IBAction func userTappedRemove(_ sender: Any) {
-        guard !((sender is UIBarButtonItem) && (mode == .test)) else { return }
+        guard tapShouldBeProcessed(sender: sender) else { return }
         
         if let waypoint = circleUnderCursor?.label {
             instigateRemoval(of: waypoint)
@@ -721,8 +708,6 @@ class RouteViewController: UIViewController {
         
     }
     
-    var botTestsDashboardViewController: BotTestsDashboardViewController!
-    
     // MARK:- Debugging
     
     func describeGraphicsView() {
@@ -752,7 +737,7 @@ class RouteViewController: UIViewController {
         case test
     }
     
-    var mode = Mode.test
+    var mode = Mode.user
     
     // MARK:- Switching UI Modes
     
@@ -784,12 +769,16 @@ class RouteViewController: UIViewController {
         }
     }
     
+    var dashboardContainer: UIView? {
+        return botTestsDashboardViewController?.view.superview
+    }
+    
     func graphicsViewImageForTransitionToMode(_ mode: Mode) -> UIImage? {
         let size: CGSize
         switch mode {
         case .user:
             let width = graphicsView.frame.width
-            let height = testViewContainer.frame.maxY - graphicsView.frame.minY
+            let height = dashboardContainer!.frame.maxY - graphicsView.frame.minY
             size = CGSize(width: width, height: height)
         case .test:
             size = graphicsView.bounds.size
@@ -813,13 +802,9 @@ class RouteViewController: UIViewController {
     }
     
     func enterUserMode() {
-        guard let testViewBottom = self.viewBtmToTestViewBtm else {
-            fatalError("constaint 'testViewBottom' not set")
-        }
         
-        // 4. Slide out container
-        testViewBottom.constant = -(testViewContainer.frame.height)
-
+        self.graphicsViewContainerBottomPin.constant = 8
+        
         UIView.animate(withDuration: 0.25, animations: {
             self.view.layoutIfNeeded()
             self.graphicsViewContainer.backgroundColor = .white
@@ -827,12 +812,11 @@ class RouteViewController: UIViewController {
             self.navigationController?.navigationBar.tintColor = .systemBlue
             self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Clipboard")
         }) { (_) in
-            
-            self.graphicsViewContainerBtmToViewBtm.isActive = true
-
-            self.botTestsDashboardViewController.willMove(toParent: nil)
-            self.testViewContainer.removeFromSuperview()
-            self.botTestsDashboardViewController.removeFromParent()
+    
+            self.botTestsDashboardViewController?.willMove(toParent: nil)
+            self.botTestsDashboardViewController?.view.superview?.removeFromSuperview()
+            self.botTestsDashboardViewController?.removeFromParent()
+            self.botTestsDashboardViewController = nil
             
             self.lockView.isHidden = true
             self.mode = .user
@@ -840,7 +824,54 @@ class RouteViewController: UIViewController {
         }
     }
     
+
+    @IBOutlet weak var graphicsViewContainerBottomPin: NSLayoutConstraint!
+    
+    var botTestsDashboardViewController: BotTestsDashboardViewController?
+    
+    func installDashboardOffscreen() {
+        let dashboardContainer = UIView()
+        dashboardContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        botTestsDashboardViewController = BotTestsDashboardViewController()
+        let dashboard = botTestsDashboardViewController!.view!
+        dashboard.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.addChild(botTestsDashboardViewController!)
+        dashboardContainer.addSubview(dashboard)
+        
+        NSLayoutConstraint.fitSubviewIntoSuperview(subview: dashboard)
+        
+        self.view.addSubview(dashboardContainer)
+        NSLayoutConstraint.activate([
+            dashboardContainer.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 8),
+            dashboardContainer.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -8),
+            dashboardContainer.heightAnchor.constraint(equalToConstant: dashboard.frame.height),
+            dashboardContainer.topAnchor.constraint(equalTo: self.graphicsViewContainer.bottomAnchor, constant: 8)
+        ])
+
+        botTestsDashboardViewController!.didMove(toParent: self)
+        
+        self.loadTests()
+    }
+    
+    func loadTests() {
+        let bot = UIBot()
+        bot.delegate = botTestsDashboardViewController!
+        bot.dataSource = self
+        botTestsDashboardViewController?.uiBot = bot
+        botTestsDashboardViewController?.uiBot.set(sequences: testSequences)
+    }
+    
     func enterTestMode() {
+        installDashboardOffscreen()
+        
+        
+        guard let botTestsDashboardViewController = self.botTestsDashboardViewController, let dashboardContainer = botTestsDashboardViewController.view.superview else {
+            NSLog("warning: problem installing dashboard")
+            return
+        }
+        
         guard let graphicsViewImage = graphicsViewImageForTransitionToMode(.test), let crosshairsImage = crosshairsImage() else {
             // Plan-B???
             return
@@ -857,47 +888,32 @@ class RouteViewController: UIViewController {
         graphicsView.graphics.forEach { $0.hidden = true }
         graphicsView.setNeedsDisplay()
         
-        self.lockView.isHidden = false
-        
         UIView.animate(withDuration: 0.25, animations: {
             graphicsViewImageView.alpha = 0
         }) { (_) in
-            self.addChild(self.botTestsDashboardViewController)
-            self.view.addSubview(self.testViewContainer)
-
-            NSLayoutConstraint.activate([
-                self.testViewContainer.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 8),
-                self.testViewContainer.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -8),
-                self.testViewContainer.topAnchor.constraint(equalTo: self.graphicsView.bottomAnchor, constant: 8)
-            ])
-
-            self.graphicsViewContainerBtmToViewBtm.isActive = false
-            let constraint = self.view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: self.testViewContainer.bottomAnchor, constant: -self.testViewContainer.frame.height)
-            constraint.isActive = true
-            self.viewBtmToTestViewBtm = constraint
-            self.botTestsDashboardViewController.didMove(toParent: self)
-            self.botTestsDashboardViewController.uiBot.restart()
-            
             self.view.layoutIfNeeded()
-            constraint.constant = 8
-
+            
+            self.graphicsViewContainerBottomPin.constant = self.graphicsViewContainerBottomPin.constant + dashboardContainer.frame.height + 8
+            
+            self.lockView.isHidden = false
+            self.lockView.alpha = 0
+            
             UIView.animate(withDuration: 0.25, animations: {
                 self.view.layoutIfNeeded()
                 crosshairsImageView.center = self.graphicsView.bounds.center
-                self.lockView.alpha = 1.0
+                self.lockView.alpha = 1
                 self.graphicsViewContainer.backgroundColor = UIColor(named: "disabledBackground")
                 self.navigationController?.navigationBar.tintColor = .lightGray
-                self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Female")
             }) { (_) in
                 self.clearRoute(self)
-                
                 self.crosshairs.center = crosshairsImageView.center
                 self.crosshairs.hidden = false
                 self.graphicsView.setNeedsDisplay()
                 
                 crosshairsImageView.removeFromSuperview()
-                
                 self.mode = .test
+                
+                
             }
         }
     }

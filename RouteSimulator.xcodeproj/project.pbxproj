@@ -54,6 +54,7 @@
 		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 		CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */; };
 		CFA092A92434ACAA00A58F49 /* BotBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA092A82434ACAA00A58F49 /* BotBlock.swift */; };
+		CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */; };
 		CFCFBDA8241B895A006D442F /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C5235122B3001BC5AD /* TestEight.plist */; };
 		CFF4D8C8235127CD001BC5AD /* TestNine.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C7235127CD001BC5AD /* TestNine.plist */; };
@@ -115,6 +116,7 @@
 		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		CFA092A62433D1EC00A58F49 /* .xcodesamplecode.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = .xcodesamplecode.plist; sourceTree = "<group>"; };
 		CFA092A82434ACAA00A58F49 /* BotBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotBlock.swift; sourceTree = "<group>"; };
+		CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BotTestsDashboardView.xib; sourceTree = "<group>"; };
 		CFF4D8C5235122B3001BC5AD /* TestEight.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestEight.plist; sourceTree = "<group>"; };
 		CFF4D8C7235127CD001BC5AD /* TestNine.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestNine.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,8 +181,9 @@
 				CF8A75ED232AE134001582C7 /* DashedLineView.swift */,
 				CF8A75E0232A5A77001582C7 /* Model */,
 				CF8A758E2322544F001582C7 /* Main.storyboard */,
-				CF8A759423225450001582C7 /* Assets.xcassets */,
+				CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */,
 				CF8A759623225450001582C7 /* LaunchScreen.storyboard */,
+				CF8A759423225450001582C7 /* Assets.xcassets */,
 				CF8A759923225450001582C7 /* Info.plist */,
 				CF8A75912322544F001582C7 /* RouteSimulator.xcdatamodeld */,
 				CF8951E5236370BE000D22C7 /* Geometry */,
@@ -259,15 +262,23 @@
 			isa = PBXGroup;
 			children = (
 				CF8A75F82331507D001582C7 /* MapBotReadme.md */,
-				CF8A75EB232AE02C001582C7 /* BotTestsDashboardViewController.swift */,
+				CF8A75E7232A7A7C001582C7 /* BotTests.plist */,
 				CF8D0614234F8687000C3882 /* BotTests */,
+				CFA092AA2435118700A58F49 /* Bot Classes */,
+			);
+			path = "Bot-Testing";
+			sourceTree = "<group>";
+		};
+		CFA092AA2435118700A58F49 /* Bot Classes */ = {
+			isa = PBXGroup;
+			children = (
+				CF8A75EB232AE02C001582C7 /* BotTestsDashboardViewController.swift */,
 				CF981008233AA3780090AEDE /* UIBotSequence.swift */,
 				CFA092A82434ACAA00A58F49 /* BotBlock.swift */,
 				CF98100A233AA3AD0090AEDE /* UIBotOperation.swift */,
 				CF8A75E5232A69BF001582C7 /* UIBot.swift */,
-				CF8A75E7232A7A7C001582C7 /* BotTests.plist */,
 			);
-			path = "Bot-Testing";
+			path = "Bot Classes";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -356,6 +367,7 @@
 				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
 				CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
+				CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */,
 				CFA092A72433D1EC00A58F49 /* .xcodesamplecode.plist in Resources */,
 				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,
 				CF8D061A234F87B0000C3882 /* TestThree.plist in Resources */,
