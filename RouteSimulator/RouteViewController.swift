@@ -810,9 +810,8 @@ class RouteViewController: UIViewController {
             self.graphicsViewContainer.backgroundColor = .white
             self.lockView.alpha = 0.0
             self.navigationController?.navigationBar.tintColor = .systemBlue
-            self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Clipboard")
+            self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Female")
         }) { (_) in
-    
             self.botTestsDashboardViewController?.willMove(toParent: nil)
             self.botTestsDashboardViewController?.view.superview?.removeFromSuperview()
             self.botTestsDashboardViewController?.removeFromParent()
@@ -904,6 +903,7 @@ class RouteViewController: UIViewController {
                 self.lockView.alpha = 1
                 self.graphicsViewContainer.backgroundColor = UIColor(named: "disabledBackground")
                 self.navigationController?.navigationBar.tintColor = .lightGray
+                self.navigationItem.rightBarButtonItem?.image = #imageLiteral(resourceName: "Clipboard")
             }) { (_) in
                 self.clearRoute(self)
                 self.crosshairs.center = crosshairsImageView.center

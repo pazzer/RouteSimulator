@@ -54,6 +54,7 @@
 		CF98101C233D41910090AEDE /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF98101A233D41480090AEDE /* Globals.swift */; };
 		CFA092A92434ACAA00A58F49 /* BotBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA092A82434ACAA00A58F49 /* BotBlock.swift */; };
 		CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */; };
+		CFB99753243BB11100C15137 /* rs-screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = CFB99752243BB11100C15137 /* rs-screenshot.png */; };
 		CFCFBDA8241B895A006D442F /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A75BC2328E5A2001582C7 /* Route.swift */; };
 		CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C5235122B3001BC5AD /* TestEight.plist */; };
 		CFF4D8C8235127CD001BC5AD /* TestNine.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFF4D8C7235127CD001BC5AD /* TestNine.plist */; };
@@ -115,6 +116,7 @@
 		CF98101A233D41480090AEDE /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		CFA092A82434ACAA00A58F49 /* BotBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BotBlock.swift; sourceTree = "<group>"; };
 		CFA092AB243511BA00A58F49 /* BotTestsDashboardView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BotTestsDashboardView.xib; sourceTree = "<group>"; };
+		CFB99752243BB11100C15137 /* rs-screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "rs-screenshot.png"; sourceTree = "<group>"; };
 		CFF4D8C5235122B3001BC5AD /* TestEight.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestEight.plist; sourceTree = "<group>"; };
 		CFF4D8C7235127CD001BC5AD /* TestNine.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestNine.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -150,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				CF25E592234E7064004083F3 /* README.md */,
+				CFB99752243BB11100C15137 /* rs-screenshot.png */,
 				CF8A75892322544F001582C7 /* RouteSimulator */,
 				CF8A75D623291013001582C7 /* RouteSimulatorTests */,
 				CF8A75882322544F001582C7 /* Products */,
@@ -363,6 +366,7 @@
 				CF8D0618234F872C000C3882 /* TestTwo.plist in Resources */,
 				CF8D0620234FB9A3000C3882 /* TestSix.plist in Resources */,
 				CFF4D8C6235122B3001BC5AD /* TestEight.plist in Resources */,
+				CFB99753243BB11100C15137 /* rs-screenshot.png in Resources */,
 				CF8A75E8232A7A7C001582C7 /* BotTests.plist in Resources */,
 				CFA092AC243511BA00A58F49 /* BotTestsDashboardView.xib in Resources */,
 				CF8D062223507754000C3882 /* TestSeven.plist in Resources */,

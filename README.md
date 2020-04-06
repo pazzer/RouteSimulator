@@ -2,15 +2,17 @@
  
 RouteSimulator is a sample project that was created to assist with the development of another app - *QuickRoute* - that has since been released on the App Store. Specifically, *RouteSimulator* was used to refine and demonstrate a testing method - dubbed *bot-testing* - that could supplement the testing apparatus provided by Xcode.
  
-Like Xcode's User-Interface Testing, bot-testing is designed to allow the developer to simulate user interaction with an app, and then establish whether these interactions have had the intended consequences. Unlike Xcode's native testing suite however, this approach allows the developr to probe the state of the underlying model in response to user activity, rather than just the state of user interface elements.
+ ![RouteSimulator Screenshot](rs-screenshot.png)
+ 
+Like Xcode's User-Interface Testing, bot-testing is designed to allow the developer to simulate user interaction with an app, and then establish whether these interactions have had the intended consequences. Unlike Xcode's native testing suite however, this approach allows the developr to probe the state of the underlying model in response to user activity, rather than just the state of user interface elements
  
 ## Bot-Testing Guide
 Bot-testing works by allowing the developer to specify a series instructions each of which corresponds to either a user **action** (e.g. a tap on a particular button), or the execution of particular **test**. The bot - with the help of its data-source - converts these instructions into blocks of code, which are in turn executed one-at-a-time on consecutive run-loop iterations. The results of any tests are reported to the bot's delegate, which in turn displays them on the test dashboard.
- 
+
 ### Definining Actions and Tests
 A single bot-test test is housed within a single .plist file, and consists of any number of actions and tests - collectively know as the test's *operations*. In the example below, the test '*Basic Addition*' simulates the user tapping the *add* button after moving the crosshairs to a specific location on the screen. This is then followed by a test which validates that the number of waypoints within the model is now one. Note that in addition to action blocks and test blocks, the user can insert simple strings to group a set of related operations; in this example the first two actions are grouped together under the title *'Adding A'*, and the single test is grouped under the title *'One Simple Test'*.
  
- ```
+ ```xml
  <?xml version="1.0" encoding="UTF-8"?>
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
  <plist version="1.0">
@@ -72,7 +74,7 @@ When a test is loaded from its plist file, and handed to an instance of ``UIBot`
  ```
 Tests operations are handled in much the same way, but rather than returning a block of code, the function corresponding to a particular test is called, and returns the result of the test (pass or fail), and an accompanying message. The code below corresponds to the test requested by the operation titled `COUNT_WAYPOINTS`.
 
- ```
+ ```swift
  func countWaypoints(expectedWaypoints: Int) -> (Bool, String) {
      let pass: Bool
      let msg: String
@@ -99,7 +101,7 @@ Tests operations are handled in much the same way, but rather than returning a b
 Once you've written your tests and completed the relevant data-source methods, you're now in a position to run the tests. Here's how to do it:
  
  1. Create and array of ``UIBotSequence`` objects to store your tests:
-     ```
+     ```swift
      lazy var testSequences: [UIBotSequence] = {
          var sequences = [UIBotSequence]()
          ["TestOne", "TestTwo"].forEach { (number) in
@@ -116,7 +118,7 @@ Once you've written your tests and completed the relevant data-source methods, y
  3. Set the ``dataSource`` of the ``UIBot`` to the relevant object.
  
  4. Finally, pass the the array  of test sequences to the bot:
-     ```
+     ```swift
      uiBot.set(sequences: testSequences)
      ```
  
